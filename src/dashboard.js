@@ -2193,8 +2193,18 @@ function startDashboard() {
         messages: [{ role: 'user', content: userMessage }],
       });
 
+      function safeParseJSON(text) {
+        // Strip markdown code fences
+        let clean = text
+          .replace(/^```json\s*/i, '')
+          .replace(/^```\s*/i, '')
+          .replace(/```\s*$/i, '')
+          .trim()
+        return JSON.parse(clean)
+      }
+
       const rawText = message.content[0].text.trim();
-      const prep = JSON.parse(rawText);
+      const prep = safeParseJSON(rawText);
       prepCache[jobId] = prep;
       savePrepCache();
       return res.json({ success: true, prep });
