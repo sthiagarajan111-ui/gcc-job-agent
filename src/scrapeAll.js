@@ -40,10 +40,14 @@ async function scrapeAllSites(role, location) {
     scrapeCvLibrary(),
   ])
 
+  results.forEach((r, i) => {
+    const count = r.status === 'fulfilled' ? r.value.length : 0;
+    console.log(`${scraperNames[i]}: ${count} jobs`);
+  });
   const summary = results
-    .map((r, i) => `${scraperNames[i]}: ${r.status === 'fulfilled' ? r.value.length : 0} jobs`)
+    .map((r, i) => `${scraperNames[i]}: ${r.status === 'fulfilled' ? r.value.length : 0}`)
     .join(' | ')
-  console.log(summary)
+  console.log('Summary: ' + summary);
 
   const combined = results
     .filter(r => r.status === 'fulfilled')

@@ -14,6 +14,7 @@ const { prioritizeAllJobs, prioritizeJob } = require('./jobPrioritizer');
 const { loadContacts } = require('./contactFinder');
 const { loadNetworkingPlans } = require('./networkingEngine');
 const Anthropic = require('@anthropic-ai/sdk');
+const { scrapeAllSites } = require('./scrapeAll');
 
 const prepCache = {};
 
@@ -41,6 +42,57 @@ function detectCandidate(job) {
   const isAfterSales = afterSalesKeywords.some(k => title.includes(k));
   if (isAfterSales) return 'thiagarajan';
   return 'dheeraj';
+}
+
+async function triggerImmediateScrape(profile) {
+  try {
+    const loc = (profile.locations && profile.locations[0]) || 'Dubai';
+    const rawJobs = await scrapeAllSites(profile.role, loc);
+    const candidateId = profile.candidateId || 'dheeraj';
+
+    // Filter by profile locations if not a wildcard
+    const profLocs = (profile.locations || []).map(l => l.toLowerCase());
+    let filtered = rawJobs;
+    if (profLocs.length && !profLocs.some(pl => pl.includes('all'))) {
+      filtered = rawJobs.filter(j =>
+        profLocs.some(pl => (j.location || '').toLowerCase().includes(pl))
+      );
+    }
+
+    // Filter by include keywords
+    if ((profile.includeKeywords || []).length) {
+      filtered = filtered.filter(j => {
+        const text = ((j.title || '') + ' ' + (j.description || '')).toLowerCase();
+        return profile.includeKeywords.some(kw => text.includes(kw.toLowerCase()));
+      });
+    }
+
+    filtered.forEach(job => { job.candidateId = candidateId; });
+    const prioritized = prioritizeAllJobs(filtered);
+
+    // Save to today's report (new jobs only)
+    const today = new Date().toISOString().split('T')[0];
+    const filePath = path.join(__dirname, `../data/report-${today}.json`);
+    fs.ensureDirSync(path.dirname(filePath));
+    let existing = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        const raw = fs.readJsonSync(filePath);
+        existing = Array.isArray(raw) ? raw : (raw.jobs || []);
+      } catch(e) {}
+    }
+    const existingKeys = new Set(existing.map(j => j.id || `${j.title}|${j.company}`));
+    const newJobs = prioritized.filter(j => !existingKeys.has(j.id || `${j.title}|${j.company}`));
+    if (newJobs.length > 0) {
+      fs.writeJsonSync(filePath, [...newJobs, ...existing], { spaces: 2 });
+    }
+
+    // Reset cache so next page load picks up new jobs
+    allJobs = null;
+    console.log(`Immediate scrape for ${profile.role}: ${newJobs.length} new jobs found`);
+  } catch (err) {
+    console.error(`[triggerImmediateScrape] Error for ${profile.role}:`, err.message);
+  }
 }
 
 let server = null;
@@ -600,7 +652,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
-      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#58A6FF;color:white;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#F0E68C;color:#0D1117;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
       <span style="color:#8B949E;font-size:12px">|</span>
       <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#3FB950;color:white;font-size:11px;font-weight:bold;flex-shrink:0">TS</span>
     </div>
@@ -638,7 +690,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 <div class="filter-bar">
   <select id="filter-candidate" onchange="applyFilters()">
     <option value="">All Candidates</option>
-    <option value="dheeraj">🔵 Dheeraj Thiagarajan</option>
+    <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
     <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
   </select>
   <select id="filter-tier" onchange="onTierChange()">
@@ -669,11 +721,6 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   </select>
   <select id="filter-role" onchange="applyFilters()">
     <option value="">All Roles</option>
-    <option value="Business Development">Business Development</option>
-    <option value="Sales">Sales</option>
-    <option value="Strategy">Strategy</option>
-    <option value="Finance">Finance</option>
-    <option value="Business Analyst">Business Analyst</option>
   </select>
   <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Show Fortune 500 Only</button>
   <select id="filter-experience" onchange="applyFilters()">
@@ -802,10 +849,28 @@ function updateSourceDropdown(jobs, selectedTier) {
   sourceSelect.value = 'All Sources'
 }
 
+function updateRoleDropdown(jobs) {
+  const seen = new Set();
+  const roles = [];
+  jobs.forEach(j => {
+    const t = (j.title || '').replace(/\|.*$/, '').trim();
+    const lower = t.toLowerCase();
+    if (t && !seen.has(lower)) {
+      seen.add(lower);
+      roles.push(t);
+    }
+  });
+  roles.sort((a, b) => a.localeCompare(b));
+  const select = document.getElementById('filter-role');
+  select.innerHTML = '<option value="">All Roles</option>' +
+    roles.map(r => \`<option value="\${r}">\${r}</option>\`).join('');
+}
+
 function onTierChange() {
   const tier = document.getElementById('filter-tier').value
   updateCompanyDropdown(ALL_JOBS, tier)
   updateSourceDropdown(ALL_JOBS, tier)
+  updateRoleDropdown(ALL_JOBS)
   applyFilters()
 }
 
@@ -865,8 +930,9 @@ function resetFilters() {
   document.getElementById('filter-tier').value = '';
   updateCompanyDropdown(ALL_JOBS, '');
   updateSourceDropdown(ALL_JOBS, '');
-  document.getElementById('filter-location').value = '';
+  updateRoleDropdown(ALL_JOBS);
   document.getElementById('filter-role').value = '';
+  document.getElementById('filter-location').value = '';
   document.getElementById('filter-experience').value = '';
   document.getElementById('filter-date').value = 'All Dates';
   document.getElementById('filter-sort').value = 'high';
@@ -967,7 +1033,7 @@ function buildCard(job, idx) {
           <div class="card-meta">
             <span class="card-location">\${escapeHtml(job.location || '')}</span>
             <span class="tier-badge" style="background:\${tierColor}">TIER \${job.tier}</span>
-            \${(() => { const cid = job.candidateId || 'dheeraj'; const av = cid === 'thiagarajan' ? { i: 'TS', c: '#3FB950' } : { i: 'DT', c: '#58A6FF' }; return \`<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:\${av.c};color:white;font-size:11px;font-weight:bold;">\${av.i}</span>\`; })()}
+            \${(() => { const cid = job.candidateId || 'dheeraj'; const av = cid === 'thiagarajan' ? { i: 'TS', c: '#3FB950', tc: 'white' } : { i: 'DT', c: '#F0E68C', tc: '#0D1117' }; return \`<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:\${av.c};color:\${av.tc};font-size:11px;font-weight:bold;">\${av.i}</span>\`; })()}
             \${job.isFortuneCompany ? '<span class="fortune-badge">Fortune 500</span>' : ''}
             \${(job.experienceLevel || '') === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
             \${(job.experienceLevel || '') === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
@@ -1137,6 +1203,15 @@ async function handleRemoveJob(btn, jobId) {
         el.style.opacity = '0';
         setTimeout(() => el.remove(), 400);
       }
+      // Remove from ALL_JOBS and rebuild dropdowns
+      const idx = ALL_JOBS.findIndex(j => getJobId(j) === jobId);
+      if (idx > -1) ALL_JOBS.splice(idx, 1);
+      const currentTier = document.getElementById('filter-tier').value;
+      updateCompanyDropdown(ALL_JOBS, currentTier);
+      updateSourceDropdown(ALL_JOBS, currentTier);
+      updateRoleDropdown(ALL_JOBS);
+      const statTotal = document.getElementById('stat-total');
+      if (statTotal) statTotal.textContent = Math.max(0, parseInt(statTotal.textContent || '1') - 1);
       showToast('Job permanently removed');
     } else {
       btn.textContent = '🗑 Remove';
@@ -1370,6 +1445,7 @@ ALL_JOBS.forEach(j => { window.__jobMap[getJobId(j)] = j; });
 if (ALL_JOBS.length > 0) {
   updateCompanyDropdown(ALL_JOBS, '');
   updateSourceDropdown(ALL_JOBS, '');
+  updateRoleDropdown(ALL_JOBS);
   applyFilters();
 }
 
@@ -1556,8 +1632,10 @@ function addJobToGrid(job) {
     grid.insertAdjacentHTML('afterbegin', buildCard(job, 0));
   }
   ALL_JOBS.push(job);
-  updateSourceDropdown(ALL_JOBS, document.getElementById('filter-tier').value);
-  updateCompanyDropdown(ALL_JOBS, document.getElementById('filter-tier').value);
+  const _curTier = document.getElementById('filter-tier').value;
+  updateSourceDropdown(ALL_JOBS, _curTier);
+  updateCompanyDropdown(ALL_JOBS, _curTier);
+  updateRoleDropdown(ALL_JOBS);
   const statTotal = document.getElementById('stat-total');
   if (statTotal) statTotal.textContent = parseInt(statTotal.textContent || '0') + 1;
   const statToday = document.getElementById('stat-today');
@@ -1813,7 +1891,7 @@ function buildTrackerHtml() {
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
-      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#58A6FF;color:white;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#F0E68C;color:#0D1117;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
       <span style="color:#8B949E;font-size:12px">|</span>
       <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#3FB950;color:white;font-size:11px;font-weight:bold;flex-shrink:0">TS</span>
     </div>
@@ -2221,6 +2299,8 @@ function buildSearchProfilesHtml() {
   const data = loadSearchProfiles();
   const profiles = data.profiles || [];
   const activeProfiles = profiles.filter(p => p.active);
+  const dheerajActive = activeProfiles.filter(p => !p.candidateId || p.candidateId === 'dheeraj');
+  const thiagarajanActive = activeProfiles.filter(p => p.candidateId === 'thiagarajan');
   const allLocations = [...new Set(profiles.flatMap(p => p.locations || []))];
   const minExp = profiles.length ? Math.min(...profiles.map(p => p.experienceMin)) : 0;
   const maxExp = profiles.length ? Math.max(...profiles.map(p => p.experienceMax)) : 0;
@@ -2239,7 +2319,10 @@ function buildSearchProfilesHtml() {
     return `
     <div class="profile-card" data-id="${p.id}" style="border-left:4px solid ${p.color}">
       <div class="card-top-row">
-        <span class="card-role-name">${p.role}</span>
+        <div>
+          <span class="card-role-name">${p.role}</span>
+          <div style="font-size:12px;margin-top:2px;color:${p.candidateId === 'thiagarajan' ? '#3FB950' : '#F0E68C'}">${p.candidateId === 'thiagarajan' ? '🟢 Thiagarajan Shanthakumar' : '🟡 Dheeraj Thiagarajan'}</div>
+        </div>
         <div class="card-actions">
           <label class="toggle-switch" title="Toggle active">
             <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleProfile('${p.id}', this.checked)">
@@ -2463,8 +2546,16 @@ function buildSearchProfilesHtml() {
   <div class="summary-box">
     <div class="summary-title">Search Summary</div>
     <div class="summary-row">
-      <span class="summary-key">Total active profiles</span>
+      <span class="summary-key">Active profiles (total)</span>
       <span class="summary-val" id="sum-active">${activeProfiles.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">🟡 Dheeraj active profiles</span>
+      <span class="summary-val">${dheerajActive.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">🟢 Thiagarajan active profiles</span>
+      <span class="summary-val">${thiagarajanActive.length}</span>
     </div>
     <div class="summary-row">
       <span class="summary-key">Total roles being searched</span>
@@ -2496,6 +2587,20 @@ function buildSearchProfilesHtml() {
     <div class="modal-title" id="modal-title">🎯 Add Search Profile</div>
 
     <input type="hidden" id="edit-profile-id" value="">
+
+    <div class="form-group">
+      <label class="form-label">This profile is for:</label>
+      <div style="display:flex;gap:20px;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
+          <input type="radio" name="field-candidate" value="dheeraj" checked style="accent-color:#F0E68C">
+          <span style="color:#F0E68C;font-weight:bold">🟡 Dheeraj Thiagarajan</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
+          <input type="radio" name="field-candidate" value="thiagarajan" style="accent-color:#3FB950">
+          <span style="color:#3FB950;font-weight:bold">🟢 Thiagarajan Shanthakumar</span>
+        </label>
+      </div>
+    </div>
 
     <div class="form-group">
       <label class="form-label">What job role are you looking for? *</label>
@@ -2543,7 +2648,7 @@ function buildSearchProfilesHtml() {
     <div class="form-group">
       <label class="form-label">Profile color</label>
       <div class="color-swatches" id="color-swatches">
-        ${['#58A6FF','#3FB950','#8957E5','#D29922','#F78166','#79C0FF'].map((c, i) =>
+        ${['#F0E68C','#3FB950','#8957E5','#D29922','#F78166','#79C0FF'].map((c, i) =>
           `<div class="color-swatch ${i===0?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor('${c}')"></div>`
         ).join('')}
       </div>
@@ -2572,7 +2677,9 @@ function openAddModal() {
   document.querySelectorAll('#location-grid input[type=checkbox]').forEach(cb => {
     cb.checked = ['Dubai','Abu Dhabi'].includes(cb.value);
   });
-  selectColor('#58A6FF');
+  const dheerajRadio = document.querySelector('input[name="field-candidate"][value="dheeraj"]');
+  if (dheerajRadio) dheerajRadio.checked = true;
+  selectColor('#F0E68C');
   updateExpLabel();
   document.getElementById('suggestions-box').innerHTML = '';
   document.getElementById('modal-overlay').classList.add('open');
@@ -2593,7 +2700,10 @@ function openEditModal(id) {
     document.querySelectorAll('#location-grid input[type=checkbox]').forEach(cb => {
       cb.checked = (p.locations || []).includes(cb.value);
     });
-    selectColor(p.color || '#58A6FF');
+    const cid = p.candidateId || 'dheeraj';
+    const radio = document.querySelector('input[name="field-candidate"][value="' + cid + '"]');
+    if (radio) radio.checked = true;
+    selectColor(p.color || '#F0E68C');
     updateExpLabel();
     document.getElementById('suggestions-box').innerHTML = '';
     document.getElementById('modal-overlay').classList.add('open');
@@ -2676,8 +2786,10 @@ function getSelectedLocations() {
 function saveProfile() {
   const role = document.getElementById('field-role').value.trim();
   if (!role) { alert('Please enter a job role.'); return; }
+  const candidateRadio = document.querySelector('input[name="field-candidate"]:checked');
   const profileData = {
     role,
+    candidateId: candidateRadio ? candidateRadio.value : 'dheeraj',
     experienceMin: parseInt(document.getElementById('field-exp-min').value) || 0,
     experienceMax: parseInt(document.getElementById('field-exp-max').value) || 0,
     locations: getSelectedLocations(),
@@ -2758,6 +2870,8 @@ function startDashboard() {
     data.profiles.push(profile);
     saveSearchProfiles(data);
     res.json({ success: true, profile });
+    // Trigger immediate background scrape for this new profile
+    triggerImmediateScrape(profile);
   });
 
   // ── PUT /api/search-profiles/:id ──────────────────
@@ -3256,12 +3370,14 @@ if (require.main === module) {
   const profileData = loadSearchProfiles();
   const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
   const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
+  console.log('All 6 fixes applied');
+  console.log('Candidate field in roles: YES');
+  console.log('Role filter dynamic: YES');
+  console.log('Dheeraj color: #F0E68C (light yellow)');
+  console.log('Scraper fixes applied: YES');
   console.log('Multi-candidate system built');
   console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
   console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);
-  console.log('Thiagarajan full CV profile updated');
-  console.log('38 years experience profile loaded');
-  console.log('Cover letter prompt updated with full CV details');
   console.log('Routes: /roles, /api/search-profiles (GET/POST/PUT/DELETE)');
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');

@@ -1,11 +1,14 @@
 const puppeteer = require('puppeteer');
 
-async function scrapeLinkedIn(role, location) {
+async function scrapeLinkedIn(role, location, daysBack = 1) {
   let browser;
   try {
     await new Promise(r => setTimeout(r, 2000));
 
-    const url = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(role)}&location=${encodeURIComponent(location)}`;
+    let url = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(role)}&location=${encodeURIComponent(location)}`;
+    if (daysBack && daysBack > 1) {
+      url += `&f_TPR=r${Math.round(daysBack * 24 * 3600)}`;
+    }
 
     browser = await puppeteer.launch({
       headless: true,
