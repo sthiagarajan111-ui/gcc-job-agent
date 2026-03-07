@@ -542,6 +542,18 @@ function getCandidateDataAsText() {
   ].join('\n');
 }
 
+function forceEnglishUrl(url) {
+  if (url.includes('linkedin.com')) {
+    // Add language parameter to force English
+    const separator = url.includes('?') ? '&' : '?';
+    url = url + separator + 'locale=en_US';
+    // Also replace any Arabic locale if present
+    url = url.replace('locale=ar_AE', 'locale=en_US');
+    url = url.replace('locale=ar', 'locale=en_US');
+  }
+  return url;
+}
+
 /**
  * Opens the URL, fills all fields, injects the overlay, and leaves the browser open.
  * Returns { filledCount, browser, page }
@@ -550,14 +562,19 @@ async function fillForm(url, job) {
   const portal = detectPortal(url);
   console.log(`[formFiller] Opening ${portal.portal} job page...`);
 
+  const isLinkedIn = url.includes('linkedin.com');
   const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
-    args: ['--start-maximized'],
+    args: [
+      '--start-maximized',
+      ...(isLinkedIn ? ['--lang=en-US,en', '--accept-lang=en-US,en'] : []),
+    ],
   });
 
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  const englishUrl = forceEnglishUrl(url);
+  await page.goto(englishUrl, { waitUntil: 'domcontentloaded' });
 
   try {
     await page.waitForSelector('body', { timeout: 15000 });
@@ -618,6 +635,13 @@ if (require.main === module) {
   console.log('\n=== Test 2: Candidate Data Text ===');
   console.log(getCandidateDataAsText());
 
+  // Test 3: forceEnglishUrl
+  console.log('\n=== Test 3: forceEnglishUrl ===');
+  console.log(forceEnglishUrl('https://www.linkedin.com/jobs/view/123'));
+  console.log(forceEnglishUrl('https://www.linkedin.com/jobs/view/123?locale=ar_AE'));
+  console.log(forceEnglishUrl('https://www.bayt.com/job/456'));
+
+  console.log('\nLinkedIn English language fix applied');
   // Browser test
-  console.log('\nBrowser auto-fill ready — call fillForm(url, job) to test manually');
+  console.log('Browser auto-fill ready — call fillForm(url, job) to test manually');
 }
