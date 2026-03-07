@@ -831,6 +831,11 @@ function buildCard(job, idx) {
           onclick="handleInterviewPrep(this, '\${escapeHtml(jobId)}', \${JSON.stringify(job).replace(/"/g, '&quot;')})">
           INTERVIEW PREP
         </button>
+        \${job.manuallyAdded ? \`<button class="btn"
+          style="background:#DA3633;color:white;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:bold;"
+          onclick="handleRemoveJob(this, '\${escapeHtml(jobId)}')">
+          🗑 Remove
+        </button>\` : ''}
       </div>
     </div>
     <div class="prep-panel" id="prep-panel-\${escapeHtml(jobId)}">
@@ -915,6 +920,35 @@ async function handleAutofill(btn, job) {
   } catch (e) {
     btn.textContent = 'Error';
     btn.disabled = false;
+  }
+}
+
+async function handleRemoveJob(btn, jobId) {
+  if (!confirm('Remove this job from your list?')) return;
+  btn.disabled = true;
+  btn.textContent = 'Removing...';
+  try {
+    const res = await fetch('/api/remove-job/' + encodeURIComponent(jobId), { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      const card = document.getElementById('card-' + jobId);
+      const wrapper = card ? (card.closest('div[style*="flex-direction:column"]') || card.parentElement) : null;
+      const el = wrapper || card;
+      if (el) {
+        el.style.transition = 'opacity 0.4s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 400);
+      }
+      showToast('Job removed');
+    } else {
+      btn.textContent = '🗑 Remove';
+      btn.disabled = false;
+      alert(data.message || 'Failed to remove job');
+    }
+  } catch (e) {
+    btn.textContent = '🗑 Remove';
+    btn.disabled = false;
+    alert('Error removing job: ' + e.message);
   }
 }
 
@@ -1821,6 +1855,7 @@ function handleManualData(manualData, url, res) {
     source: manualData.source || detectPortalName(url),
     applyUrl: url || manualData.applyUrl || '',
     postedDate: new Date().toISOString().split('T')[0],
+    manuallyAdded: true,
   });
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
@@ -1921,11 +1956,21 @@ function startDashboard() {
       if (!job) {
         return res.json({ success: false, message: 'Job not found' });
       }
+      // Normalize fields so generateSingleCoverLetter never receives undefined
+      job = {
+        ...job,
+        title: job.title || 'the role',
+        company: job.company || 'the company',
+        location: job.location || 'UAE',
+        description: job.description || '',
+        salary: job.salary || '',
+        tier: job.tier || 2,
+      };
       const result = await generateSingleCoverLetter(job);
       res.json({ success: true, filePath: result.filePath, message: 'Cover letter generated' });
     } catch (err) {
       console.error('[dashboard] Cover letter error:', err.message);
-      res.json({ success: false, message: err.message });
+      res.json({ success: false, message: err.message || 'Failed to generate cover letter' });
     }
   });
 
@@ -2214,6 +2259,44 @@ function startDashboard() {
         return res.json({ success: false, message: 'no_credits', error: err.message });
       }
       return res.json({ success: false, message: err.message || 'Failed to generate prep' });
+    }
+  });
+
+  // ── DELETE /api/remove-job/:jobId ─────────────────
+  app.delete('/api/remove-job/:jobId', (req, res) => {
+    try {
+      const jobId = decodeURIComponent(req.params.jobId);
+      const job = findJobById(jobId);
+      if (!job) return res.json({ success: false, message: 'Job not found' });
+
+      // Remove from in-memory cache
+      if (allJobs !== null) {
+        const idx = allJobs.indexOf(job);
+        if (idx !== -1) allJobs.splice(idx, 1);
+      }
+
+      // Remove from today's report file
+      const today = new Date().toISOString().split('T')[0];
+      const filePath = path.join(__dirname, `../data/report-${today}.json`);
+      if (fs.existsSync(filePath)) {
+        try {
+          let existing = fs.readJsonSync(filePath);
+          if (!Array.isArray(existing)) existing = existing.jobs || [];
+          const before = existing.length;
+          existing = existing.filter(j => j.id !== job.id);
+          if (existing.length === before) {
+            existing = existing.filter(j => !(j.title === job.title && j.company === job.company));
+          }
+          fs.writeJsonSync(filePath, existing, { spaces: 2 });
+        } catch (e) {
+          console.error('[remove-job] Error updating file:', e.message);
+        }
+      }
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error('[remove-job] Error:', err.message);
+      res.json({ success: false, message: err.message });
     }
   });
 
