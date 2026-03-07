@@ -776,12 +776,22 @@ function resetFilters() {
 
 function renderPage() {
   const grid = document.getElementById('jobs-grid');
+  console.log('Grid element:', grid);
   if (!grid) return;
   const start = (currentPage - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
   const pageJobs = filteredJobs.slice(start, end);
+  console.log('Jobs received:', filteredJobs.length);
 
-  grid.innerHTML = pageJobs.map((job, idx) => buildCard(job, start + idx)).join('');
+  grid.innerHTML = '';
+  pageJobs.forEach((job, idx) => {
+    try {
+      const card = buildCard(job, start + idx);
+      grid.innerHTML += card;
+    } catch(err) {
+      console.error('Error building card for:', job.title, err);
+    }
+  });
 
   const pagination = document.getElementById('pagination');
   if (filteredJobs.length > PAGE_SIZE) {
@@ -796,6 +806,7 @@ function renderPage() {
 }
 
 function buildCard(job, idx) {
+  console.log('Building card for:', job.title);
   console.log('job.manuallyAdded:', job.manuallyAdded);
   const jobId = getJobId(job);
   const tierColor = getTierColor(job.tier);
@@ -844,9 +855,9 @@ function buildCard(job, idx) {
             <span class="card-location">\${escapeHtml(job.location || '')}</span>
             <span class="tier-badge" style="background:\${tierColor}">TIER \${job.tier}</span>
             \${job.isFortuneCompany ? '<span class="fortune-badge">Fortune 500</span>' : ''}
-            \${job.experienceLevel === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
-            \${job.experienceLevel === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
-            \${job.experienceLevel === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
+            \${(job.experienceLevel || '') === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
+            \${(job.experienceLevel || '') === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
+            \${(job.experienceLevel || '') === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
           </div>
         </div>
         <div class="score-circle" style="background:\${scoreColor}">\${job.totalScore || 0}</div>
@@ -997,7 +1008,7 @@ async function handleAutofill(btn, job) {
 }
 
 async function handleRemoveJob(btn, jobId) {
-  if (!confirm('Remove this job permanently?\nIt will never appear again in future scrapes.')) return;
+  if (!confirm('Remove this job permanently?\\nIt will never appear again in future scrapes.')) return;
   btn.disabled = true;
   btn.textContent = 'Removing...';
   try {
