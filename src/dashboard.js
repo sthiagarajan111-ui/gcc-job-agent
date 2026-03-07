@@ -20,6 +20,7 @@ const prepCache = {};
 let server = null;
 let app = null;
 let browserExtractionResult = null;
+let allJobs = null;
 
 // ═══════════════════════════════════════════════════════
 // LOAD TODAY'S JOBS
@@ -44,11 +45,13 @@ function loadTodaysJobs() {
 // ═══════════════════════════════════════════════════════
 
 function loadAllJobs() {
+  if (allJobs !== null) return allJobs;
+
   const dataDir = path.join(__dirname, '../data');
-  if (!fs.existsSync(dataDir)) return [];
+  if (!fs.existsSync(dataDir)) { allJobs = []; return allJobs; }
 
   const files = fs.readdirSync(dataDir).filter(f => /^report-\d{4}-\d{2}-\d{2}\.json$/.test(f));
-  if (files.length === 0) return [];
+  if (files.length === 0) { allJobs = []; return allJobs; }
 
   const seen = new Set();
   let combined = [];
@@ -75,10 +78,34 @@ function loadAllJobs() {
     }
   }
 
+  // Assign id if missing, so routes can look up by stable id
+  for (const job of deduped) {
+    if (!job.id) {
+      job.id = (job.title + '_' + job.company + '_' +
+        (job.datePosted || '')).replace(/[^a-zA-Z0-9]/g, '_');
+    }
+  }
+
   // Prioritize then sort by totalScore descending
   const prioritized = prioritizeAllJobs(deduped);
   prioritized.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
-  return prioritized;
+  allJobs = prioritized;
+  return allJobs;
+}
+
+function saveJobToTodaysReport(job) {
+  const today = new Date().toISOString().split('T')[0];
+  const filePath = path.join(__dirname, `../data/report-${today}.json`);
+  fs.ensureDirSync(path.dirname(filePath));
+  let existing = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      const raw = fs.readJsonSync(filePath);
+      existing = Array.isArray(raw) ? raw : (raw.jobs || []);
+    } catch (e) {}
+  }
+  existing.unshift(job);
+  fs.writeJsonSync(filePath, existing, { spaces: 2 });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -456,7 +483,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <div class="stat-label">Total Jobs (All Time)</div>
   </div>
   <div class="stat-box">
-    <div class="stat-number" style="color:#00D4FF">${todaysNew}</div>
+    <div class="stat-number" id="stat-today" style="color:#00D4FF">${todaysNew}</div>
     <div class="stat-label">Today's New Jobs</div>
   </div>
   <div class="stat-box">
@@ -579,9 +606,10 @@ function formatDate(dateStr) {
   return String(dateStr);
 }
 function getJobId(job) {
-  const today = new Date().toISOString().split('T')[0];
-  return ((job.company || '') + '_' + (job.title || '') + '_' + today)
-    .toLowerCase().replace(/\\s+/g, '_');
+  if (job.id) return job.id;
+  if (job._id) return String(job._id);
+  return ((job.title || '') + '_' + (job.company || '') + '_' +
+    (job.datePosted || '')).replace(/[^a-zA-Z0-9]/g, '_');
 }
 
 function updateCompanyDropdown(jobs, selectedTier) {
@@ -1171,8 +1199,8 @@ async function startExtraction() {
     const data = await r.json();
 
     if (data.success && data.job) {
-      setProgress([{ state: 'done', text: 'Job extracted successfully' }]);
-      showSuccessCard(data.job);
+      closeAddJobModal();
+      addJobToGrid(data.job);
     } else if (data.requiresBrowser) {
       const portalName = data.portalName || detectPortalName(_addJobUrl);
       setProgress([
@@ -1205,7 +1233,8 @@ async function startBrowserExtraction(url, portalName) {
       const data = await r.json();
       if (data.status === 'complete' && data.job) {
         clearInterval(_browserPollInterval); _browserPollInterval = null;
-        showSuccessCard(data.job);
+        closeAddJobModal();
+        addJobToGrid(data.job);
       } else if (data.status === 'failed') {
         clearInterval(_browserPollInterval); _browserPollInterval = null;
         showManualForm();
@@ -1243,7 +1272,7 @@ async function submitManual() {
     body: JSON.stringify({ url, manualData })
   });
   const data = await r.json();
-  if (data.success && data.job) showSuccessCard(data.job);
+  if (data.success && data.job) { closeAddJobModal(); addJobToGrid(data.job); }
   else alert(data.message || 'Error saving job');
 }
 
@@ -1271,6 +1300,27 @@ function showSuccessCard(job) {
     </div>
   \`;
   window._lastExtractedJob = job;
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#238636;color:white;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:500;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,.4);pointer-events:none';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function addJobToGrid(job) {
+  const grid = document.getElementById('jobs-grid');
+  if (grid) {
+    grid.insertAdjacentHTML('afterbegin', buildCard(job, 0));
+  }
+  const statTotal = document.getElementById('stat-total');
+  if (statTotal) statTotal.textContent = parseInt(statTotal.textContent || '0') + 1;
+  const statToday = document.getElementById('stat-today');
+  if (statToday) statToday.textContent = parseInt(statToday.textContent || '0') + 1;
+  showToast(\`✅ \${job.title} at \${job.company} added!\`);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function saveJobToDashboard(job) {
@@ -1749,6 +1799,8 @@ function handleExtractedJob(extracted, url, res) {
     applyUrl: url,
     postedDate: new Date().toISOString().split('T')[0],
   });
+  saveJobToTodaysReport(job);
+  if (allJobs !== null) allJobs.unshift(job);
   return res.json({ success: true, job, extractedBy: 'fetch' });
 }
 
@@ -1763,12 +1815,43 @@ function handleManualData(manualData, url, res) {
     applyUrl: url || manualData.applyUrl || '',
     postedDate: new Date().toISOString().split('T')[0],
   });
+  saveJobToTodaysReport(job);
+  if (allJobs !== null) allJobs.unshift(job);
   return res.json({ success: true, job, extractedBy: 'manual' });
 }
 
 // ═══════════════════════════════════════════════════════
 // START DASHBOARD
 // ═══════════════════════════════════════════════════════
+
+function findJobById(jobId) {
+  const allJobs = loadAllJobs();
+
+  // 1. Exact id match
+  let job = allJobs.find(j => j.id === jobId);
+  if (job) return job;
+
+  // 2. _id match
+  job = allJobs.find(j => String(j._id) === jobId);
+  if (job) return job;
+
+  // 3. Index match
+  const idx = parseInt(jobId);
+  if (!isNaN(idx) && allJobs[idx]) return allJobs[idx];
+
+  // 4. title+company from jobId string
+  const parts = jobId.split('_');
+  if (parts.length >= 2) {
+    job = allJobs.find(j =>
+      j.company && j.title &&
+      jobId.toLowerCase().includes(
+        j.company.toLowerCase().replace(/\s+/g, ''))
+    );
+    if (job) return job;
+  }
+
+  return null;
+}
 
 function startDashboard() {
   app = express();
@@ -1839,14 +1922,8 @@ function startDashboard() {
   // ── GET /api/autofill/:jobId ───────────────────────
   app.get('/api/autofill/:jobId', async (req, res) => {
     try {
-      const jobs = loadTodaysJobs();
       const jobId = decodeURIComponent(req.params.jobId);
-      const today = new Date().toISOString().split('T')[0];
-      const job = jobs.find(j => {
-        const id = ((j.company || '') + '_' + (j.title || '') + '_' + today)
-          .toLowerCase().replace(/\s+/g, '_');
-        return id === jobId;
-      });
+      const job = findJobById(jobId);
       if (!job) {
         return res.json({ success: false, message: 'Job not found' });
       }
@@ -1999,6 +2076,8 @@ function startDashboard() {
             applyUrl: extracted.applyUrl || url,
             postedDate: new Date().toISOString().split('T')[0],
           });
+          saveJobToTodaysReport(job);
+          if (allJobs !== null) allJobs.unshift(job);
           browserExtractionResult = { status: 'complete', job };
         } else {
           browserExtractionResult = { status: 'failed', message: 'Browser timed out. Please try manual entry.' };
@@ -2028,14 +2107,8 @@ function startDashboard() {
       return res.json({ success: true, prep: prepCache[jobId], cached: true });
     }
 
-    // Find job in today's list
-    const jobs = loadTodaysJobs();
-    const today = new Date().toISOString().split('T')[0];
-    const job = jobs.find(j => {
-      const id = ((j.company || '') + '_' + (j.title || '') + '_' + today)
-        .toLowerCase().replace(/\s+/g, '_');
-      return id === jobId;
-    });
+    // Find job across all historical jobs
+    const job = findJobById(jobId);
 
     if (!job) {
       return res.json({ success: false, message: 'Job not found' });
