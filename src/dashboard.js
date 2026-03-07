@@ -1308,8 +1308,11 @@ async function submitManual() {
     body: JSON.stringify({ url, manualData })
   });
   const data = await r.json();
-  if (data.success && data.job) { closeAddJobModal(); addJobToGrid(data.job); }
-  else alert(data.message || 'Error saving job');
+  if (data.success && data.job) {
+    console.log('job from server:', data.job.manuallyAdded);
+    closeAddJobModal();
+    addJobToGrid(data.job);
+  } else alert(data.message || 'Error saving job');
 }
 
 function showSuccessCard(job) {
@@ -1838,11 +1841,14 @@ function handleExtractedJob(extracted, url, res) {
     applyUrl: url,
     postedDate: new Date().toISOString().split('T')[0],
   });
+  job.manuallyAdded = true;
+  job.addedDate = new Date().toISOString();
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
+  console.log('Sending job to client, manuallyAdded:', job.manuallyAdded);
   return res.json({ success: true, job, extractedBy: 'fetch' });
 }
 
@@ -1858,12 +1864,15 @@ function handleManualData(manualData, url, res) {
     postedDate: new Date().toISOString().split('T')[0],
     manuallyAdded: true,
   });
+  job.manuallyAdded = true;
+  job.addedDate = new Date().toISOString();
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
-  return res.json({ success: true, job, extractedBy: 'manual' });
+  console.log('manuallyAdded in response:', job.manuallyAdded);
+  return res.json({ success: true, job });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1944,15 +1953,8 @@ function startDashboard() {
       if (jobData) {
         job = JSON.parse(jobData);
       } else {
-        // Fall back to finding job in today's list
-        const jobs = loadTodaysJobs();
         const jobId = decodeURIComponent(req.params.jobId);
-        const today = new Date().toISOString().split('T')[0];
-        job = jobs.find(j => {
-          const id = ((j.company || '') + '_' + (j.title || '') + '_' + today)
-            .toLowerCase().replace(/\s+/g, '_');
-          return id === jobId;
-        });
+        job = findJobById(jobId);
       }
       if (!job) {
         return res.json({ success: false, message: 'Job not found' });
@@ -1967,7 +1969,6 @@ function startDashboard() {
         salary: job.salary || '',
         tier: job.tier || 2,
       };
-      console.log('Cover letter job object:', JSON.stringify(job));
       const result = await generateSingleCoverLetter(job);
       res.json({ success: true, filePath: result.filePath, message: 'Cover letter generated' });
     } catch (err) {
