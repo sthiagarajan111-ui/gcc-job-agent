@@ -1,0 +1,1528 @@
+[
+  {
+    "jobId": "emirates-group-business-development-manager-1772818024888",
+    "jobTitle": "Business Development Manager",
+    "company": "Emirates Group",
+    "location": "Dubai",
+    "tier": 1,
+    "tierLabel": "APPLY TODAY",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Emirates+Group+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Emirates+Group+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Emirates+Group+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Emirates Group\" \"London School of Economics\"",
+      "\"Emirates Group\" \"Newcastle University\"",
+      "\"Emirates Group\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [NAME], fellow LSE alum here. I'm applying for the Business Development Manager role at Emirates Group and would love to connect. Would appreciate any insights you might have. Best, Dheeraj",
+      "newcastleAlumni": "Hi [NAME], Newcastle University alum here. I'm applying for the Business Development Manager role at Emirates Group and would love to connect. Would appreciate any insights. Best, Dheeraj",
+      "coldOutreach": "Hi [NAME], I'm Dheeraj, LSE MSc Finance graduate applying for the Business Development Manager role at Emirates Group. Would love to connect and learn more about [COMPANY]. Best regards."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Emirates Group on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Emirates+Group+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Emirates+Group+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Development Manager via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Emirates Group recent LinkedIn posts",
+          "Follow Emirates Group official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Emirates Group on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-06T17:27:06.068Z"
+  },
+  {
+    "jobId": "etihad-business-development-manager-1772846043417",
+    "jobTitle": "Business Development Manager",
+    "company": "Etihad",
+    "location": "Abu Dhabi, Abu Dhabi Emirate, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Etihad+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Etihad+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Etihad+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Etihad\" \"London School of Economics\"",
+      "\"Etihad\" \"Newcastle University\"",
+      "\"Etihad\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm applying for the Business Development Manager role at Etihad and would love to connect with a fellow LSE graduate. Would appreciate any insights you might share about the company culture and role.",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021). I'm applying for the Business Development Manager role at Etihad and would love to connect with a fellow alumnus. Would appreciate any insights about your experience there. Thanks!",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Business Development Manager role at Etihad. With an LSE MSc Finance and 65% B2B sales conversion rate at G.Network, I'd welcome the opportunity to discuss how I can contribute to Etihad's growth. Thank you."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Etihad on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Etihad+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Etihad+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Development Manager via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Etihad recent LinkedIn posts",
+          "Follow Etihad official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Etihad on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:14:11.470Z"
+  },
+  {
+    "jobId": "hilton-sales-executive---corporate-1772846136679",
+    "jobTitle": "Sales Executive - Corporate",
+    "company": "Hilton",
+    "location": "Dubai, Dubai, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Hilton+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Hilton+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Hilton+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Hilton\" \"London School of Economics\"",
+      "\"Hilton\" \"Newcastle University\"",
+      "\"Hilton\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here - just graduated from MSc Management Finance 2025. I'm applying for the Sales Executive Corporate role at Hilton Dubai and would love to connect with someone who's experienced the LSE-to-Hilton journey. Would appreciate any insights you could share!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alum here (BSc 2021). I'm applying for the Sales Executive - Corporate role at Hilton Dubai and would love to connect with a Newcastle graduate already thriving there. Would appreciate any insights about the team and culture. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Sales Executive - Corporate role at Hilton Dubai. With my LSE MSc Finance background and proven 65% B2B sales conversion rate at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team's success."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Hilton on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Hilton+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Hilton+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Sales Executive - Corporate via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Hilton recent LinkedIn posts",
+          "Follow Hilton official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Hilton on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:15:45.472Z"
+  },
+  {
+    "jobId": "intelligent-solutions-hr-business-analyst-1772846147496",
+    "jobTitle": "Business Analyst",
+    "company": "Intelligent Solutions HR",
+    "location": "Dubai, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Intelligent+Solutions+HR+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Intelligent+Solutions+HR+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Intelligent+Solutions+HR+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Intelligent Solutions HR\" \"London School of Economics\"",
+      "\"Intelligent Solutions HR\" \"Newcastle University\"",
+      "\"Intelligent Solutions HR\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here - just graduated from MSc Management Finance 2025. I'm very interested in the Business Analyst role at Intelligent Solutions HR. Would love to connect and learn about your experience there. Thanks!\n\nBest regards,\nDheeraj Thiagarajan",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021). I'm applying for the Business Analyst role at Intelligent Solutions HR and would love to connect with another Magpie in Dubai. Would appreciate any insights about the company culture. Thanks!",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, applying for your Business Analyst role. With an LSE MSc Finance and 65% B2B sales conversion rate at G.Network, I bring strong analytical and commercial skills. I'd value connecting to discuss how I can contribute to Intelligent Solutions HR."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Intelligent Solutions HR on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Intelligent+Solutions+HR+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Intelligent+Solutions+HR+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Analyst via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Intelligent Solutions HR recent LinkedIn posts",
+          "Follow Intelligent Solutions HR official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Intelligent Solutions HR on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:15:56.120Z"
+  },
+  {
+    "jobId": "deloitte-business-analyst-|-fresh-graduates-|-emiratization-|-dubai-1772846158133",
+    "jobTitle": "Business Analyst | Fresh Graduates | Emiratization | Dubai",
+    "company": "Deloitte",
+    "location": "Dubai, Dubai, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Deloitte+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Deloitte+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Deloitte+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Deloitte\" \"London School of Economics\"",
+      "\"Deloitte\" \"Newcastle University\"",
+      "\"Deloitte\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here - just graduated from MSc Management Finance 2025. I'm applying for the Business Analyst Fresh Graduate role at Deloitte Dubai and would love to connect with a fellow LSE graduate. Would appreciate any insights you could share about your experience there.",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University graduate here (BSc 2021). I'm applying for the Business Analyst role at Deloitte Dubai and would love to connect with a fellow alumnus. Would appreciate any insights about your experience there. Best regards, Dheeraj Thiagarajan",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, LSE MSc Finance graduate interested in the Business Analyst position for Fresh Graduates in Dubai. With a 65% B2B sales conversion rate at G.Network, I bring strong analytical and client engagement skills. I'd value connecting to discuss this opportunity."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Deloitte on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Deloitte+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Deloitte+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Analyst | Fresh Graduates | Emiratization | Dubai via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Deloitte recent LinkedIn posts",
+          "Follow Deloitte official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Deloitte on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:16:07.049Z"
+  },
+  {
+    "jobId": "majid-al-futtaim-coordinator-(portfolio-management)-1772846169813",
+    "jobTitle": "Coordinator (Portfolio Management)",
+    "company": "Majid Al Futtaim",
+    "location": "Dubai, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Majid Al Futtaim\" \"London School of Economics\"",
+      "\"Majid Al Futtaim\" \"Newcastle University\"",
+      "\"Majid Al Futtaim\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here - just graduated from MSc Management Finance 2025. I'm applying for the Coordinator Portfolio Management role at Majid Al Futtaim and would love to connect with you to learn about your experience there. Would appreciate any insights you could share. Best, Dheeraj",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alumnus here (BSc 2021). I'm currently applying for the Coordinator Portfolio Management role at Majid Al Futtaim and would love to connect with another Newcastle graduate. Would appreciate any insights about your experience there. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Coordinator (Portfolio Management) role at Majid Al Futtaim. With my LSE MSc Finance and proven 65% B2B sales conversion at G.Network, I'd value discussing how I can contribute to your team. Best regards"
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Majid Al Futtaim on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Coordinator (Portfolio Management) via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Majid Al Futtaim recent LinkedIn posts",
+          "Follow Majid Al Futtaim official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Majid Al Futtaim on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:16:18.445Z"
+  },
+  {
+    "jobId": "majid-al-futtaim-sales-executive-1772846180481",
+    "jobTitle": "Sales Executive",
+    "company": "Majid Al Futtaim",
+    "location": "Doha, Doha, Qatar",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Majid Al Futtaim\" \"London School of Economics\"",
+      "\"Majid Al Futtaim\" \"Newcastle University\"",
+      "\"Majid Al Futtaim\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm applying for the Sales Executive role at Majid Al Futtaim Doha and would love to connect with someone who knows the company culture firsthand. Would appreciate any insights you could share!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021). I'm applying for the Sales Executive role at Majid Al Futtaim and would love to connect with a fellow alumnus. Would appreciate any insights about the company culture and opportunities. Best regards, Dheeraj Thiagarajan",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Sales Executive role at Majid Al Futtaim. With an LSE MSc Finance and 65% B2B sales conversion rate at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team's success in Doha."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Majid Al Futtaim on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Majid+Al+Futtaim+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Sales Executive via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Majid Al Futtaim recent LinkedIn posts",
+          "Follow Majid Al Futtaim official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Majid Al Futtaim on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:16:28.803Z"
+  },
+  {
+    "jobId": "siemens-energy-senior-strategy-project-manager-1772846190818",
+    "jobTitle": "Senior Strategy Project Manager",
+    "company": "Siemens Energy",
+    "location": "Abu Dhabi, Abu Dhabi Emirate, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Siemens+Energy+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Siemens+Energy+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Siemens+Energy+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Siemens Energy\" \"London School of Economics\"",
+      "\"Siemens Energy\" \"Newcastle University\"",
+      "\"Siemens Energy\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm applying for the Senior Strategy Project Manager role at Siemens Energy and would love to connect with you to learn about your experience there. Would appreciate any insights you could share!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021). I'm applying for the Senior Strategy Project Manager role at Siemens Energy Abu Dhabi and would love to connect with a fellow alumnus. Would appreciate any insights about the team and culture there. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Senior Strategy Project Manager role at Siemens Energy. With my LSE MSc Finance background and proven 65% B2B sales conversion rate at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team's success."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Siemens Energy on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Siemens+Energy+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Siemens+Energy+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Senior Strategy Project Manager via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Siemens Energy recent LinkedIn posts",
+          "Follow Siemens Energy official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Siemens Energy on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:16:38.929Z"
+  },
+  {
+    "jobId": "adnoc-group-senior-analyst,-business-continuity-1772846200949",
+    "jobTitle": "Senior Analyst, Business Continuity",
+    "company": "ADNOC Group",
+    "location": "Abu Dhabi, Abu Dhabi Emirate, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=ADNOC+Group+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=ADNOC+Group+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=ADNOC+Group+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"ADNOC Group\" \"London School of Economics\"",
+      "\"ADNOC Group\" \"Newcastle University\"",
+      "\"ADNOC Group\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm applying for the Senior Analyst, Business Continuity role at ADNOC and would love to connect with you to learn about your experience there. Would appreciate any insights you could share!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alumnus here (BSc 2021). I'm applying for the Senior Analyst, Business Continuity role at ADNOC and would love to connect with another Newcastle graduate. Would appreciate any insights about the company culture. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Senior Analyst, Business Continuity role at ADNOC. With my LSE MSc Finance and proven 65% B2B sales conversion at G.Network, I bring strong analytical skills and results-driven performance. Would appreciate connecting to discuss this opportunity."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research ADNOC Group on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=ADNOC+Group+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=ADNOC+Group+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Senior Analyst, Business Continuity via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on ADNOC Group recent LinkedIn posts",
+          "Follow ADNOC Group official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at ADNOC Group on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:16:49.577Z"
+  },
+  {
+    "jobId": "totalenergies-financial-analyst-1772846211598",
+    "jobTitle": "Financial Analyst",
+    "company": "TotalEnergies",
+    "location": "Abu Dhabi, Abu Dhabi Emirate, United Arab Emirates",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=TotalEnergies+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=TotalEnergies+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=TotalEnergies+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"TotalEnergies\" \"London School of Economics\"",
+      "\"TotalEnergies\" \"Newcastle University\"",
+      "\"TotalEnergies\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here! I'm Dheeraj, MSc Management Finance 2025 graduate, currently applying for the Financial Analyst role at TotalEnergies Abu Dhabi. Would love to connect and learn about your experience there. Thanks!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021)! I'm applying for the Financial Analyst role at TotalEnergies Abu Dhabi and would love to connect with a fellow alum. Would appreciate any insights about the company culture. Thanks, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Financial Analyst position at TotalEnergies. With my LSE MSc Finance and proven track record achieving 65% B2B sales conversion at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research TotalEnergies on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=TotalEnergies+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=TotalEnergies+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Financial Analyst via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on TotalEnergies recent LinkedIn posts",
+          "Follow TotalEnergies official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at TotalEnergies on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:17:00.027Z"
+  },
+  {
+    "jobId": "unilever-business-development-executive-1772846222067",
+    "jobTitle": "Business Development Executive",
+    "company": "Unilever",
+    "location": "Jeddah, Makkah, Saudi Arabia",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Unilever+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Unilever\" \"London School of Economics\"",
+      "\"Unilever\" \"Newcastle University\"",
+      "\"Unilever\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm applying for the Business Development Executive role at Unilever Jeddah and would love to connect with another LSE graduate. Would appreciate any insights you might share about the team and role.\n\nBest regards,\nDheeraj",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle graduate here (BSc 2021). I'm applying for the Business Development Executive role at Unilever Jeddah and would love to connect with another Geordie making their mark in Saudi. Would appreciate any insights about your experience there. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Business Development Executive role at Unilever. With an LSE MSc Finance and 65% B2B sales conversion rate at G.Network, I'd value connecting to discuss how I can contribute to your team's growth in the Saudi market."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Unilever on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Unilever+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Development Executive via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Unilever recent LinkedIn posts",
+          "Follow Unilever official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Unilever on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:17:11.148Z"
+  },
+  {
+    "jobId": "clifford-chance-business-development-manager-1772846233168",
+    "jobTitle": "Business Development Manager",
+    "company": "Clifford Chance",
+    "location": "Riyadh, Riyadh, Saudi Arabia",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Clifford+Chance+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Clifford+Chance+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Clifford+Chance+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Clifford Chance\" \"London School of Economics\"",
+      "\"Clifford Chance\" \"Newcastle University\"",
+      "\"Clifford Chance\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alumnus here - just graduated from MSc Management Finance 2025. I'm applying for the Business Development Manager role at Clifford Chance Riyadh and would love to connect with a fellow LSE graduate. Would appreciate any insights you might share about the firm.\n\nBest regards,\nDheeraj",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alumnus here (BSc 2021). I'm applying for the Business Development Manager role at Clifford Chance Riyadh and would love to connect with a fellow graduate. Would appreciate any insights about the firm and role. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Business Development Manager role at Clifford Chance Riyadh. With an LSE MSc Finance and proven 65% B2B sales conversion at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team's growth."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Clifford Chance on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Clifford+Chance+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Clifford+Chance+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Development Manager via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Clifford Chance recent LinkedIn posts",
+          "Follow Clifford Chance official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Clifford Chance on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:17:21.517Z"
+  },
+  {
+    "jobId": "unilever-business-development-assistant-manager---general-trade-1772846243546",
+    "jobTitle": "Business Development Assistant Manager - General Trade",
+    "company": "Unilever",
+    "location": "Jeddah, Makkah, Saudi Arabia",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Unilever+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Unilever\" \"London School of Economics\"",
+      "\"Unilever\" \"Newcastle University\"",
+      "\"Unilever\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated with MSc Management Finance 2025. I'm applying for the Business Development Assistant Manager role at Unilever Jeddah and would love to connect with a fellow LSE graduate. Would appreciate any insights you might share about the team and culture there.",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alumnus here (BSc 2021). I'm applying for the Business Development Assistant Manager role at Unilever Jeddah and would love to connect with a fellow graduate. Would appreciate any insights about your experience there. Best regards, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Business Development Assistant Manager role at Unilever Jeddah. With my LSE MSc Finance and 65% B2B sales conversion rate at G.Network, I'd welcome the opportunity to discuss how I can contribute to your team's success."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Unilever on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Unilever+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Unilever+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Business Development Assistant Manager - General Trade via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Unilever recent LinkedIn posts",
+          "Follow Unilever official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Unilever on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:17:31.759Z"
+  },
+  {
+    "jobId": "marriott-international-sales-executive-1772846253787",
+    "jobTitle": "Sales Executive",
+    "company": "Marriott International",
+    "location": "Manama, Capital Governorate, Bahrain",
+    "tier": 2,
+    "tierLabel": "APPLY THIS WEEK",
+    "alumniSearchUrls": {
+      "lse": "https://www.linkedin.com/search/results/people/?keywords=Marriott+International+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+      "newcastle": "https://www.linkedin.com/search/results/people/?keywords=Marriott+International+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER",
+      "chicagoBooth": "https://www.linkedin.com/search/results/people/?keywords=Marriott+International+%22Chicago+Booth%22+OR+%22University+of+Chicago%22&origin=GLOBAL_SEARCH_HEADER",
+      "lsePage": "https://www.linkedin.com/school/london-school-of-economics/people/",
+      "newcastlePage": "https://www.linkedin.com/school/newcastle-university/people/"
+    },
+    "linkedInSearchStrings": [
+      "\"Marriott International\" \"London School of Economics\"",
+      "\"Marriott International\" \"Newcastle University\"",
+      "\"Marriott International\" \"LSE\" OR \"Newcastle\""
+    ],
+    "linkedInMessages": {
+      "lseAlumni": "Hi [Name], Fellow LSE alum here - just graduated from MSc Management Finance 2025. I'm very interested in the Sales Executive role at Marriott International and would love to connect with you to learn about your experience there. Would appreciate any insights you could share!",
+      "newcastleAlumni": "Hi [Name], Fellow Newcastle University alum here (BSc 2021). I'm applying for the Sales Executive role at Marriott International in Manama and would love to connect with another Newcastle graduate. Would appreciate any insights about the company culture there. Best, Dheeraj",
+      "coldOutreach": "Hi [Name], I'm Dheeraj Thiagarajan, interested in the Sales Executive role at Marriott Manama. With an LSE MSc Finance and 65% B2B conversion rate at G.Network, I'd welcome the chance to discuss how my skills align with your team's needs. Thank you."
+    },
+    "actionPlan": [
+      {
+        "day": 1,
+        "title": "Research",
+        "tasks": [
+          "Research Marriott International on LinkedIn and company website",
+          "Find 3-5 LSE/Newcastle alumni at the company",
+          "Identify the hiring manager if possible"
+        ],
+        "urls": [
+          "https://www.linkedin.com/search/results/people/?keywords=Marriott+International+LSE+%22London+School+of+Economics%22&origin=GLOBAL_SEARCH_HEADER",
+          "https://www.linkedin.com/search/results/people/?keywords=Marriott+International+%22Newcastle+University%22&origin=GLOBAL_SEARCH_HEADER"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Connect with Alumni",
+        "tasks": [
+          "Send connection requests to 2-3 LSE alumni found",
+          "Use Message Type 1 (LSE alumni message)",
+          "Send connection requests to 2-3 Newcastle alumni",
+          "Use Message Type 2 (Newcastle alumni message)",
+          "Do NOT mention the job application yet"
+        ],
+        "urls": [
+          "https://www.linkedin.com/school/london-school-of-economics/people/",
+          "https://www.linkedin.com/school/newcastle-university/people/"
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Apply",
+        "tasks": [
+          "Submit the job application for Sales Executive via the apply URL",
+          "Use Auto-Fill feature from the dashboard",
+          "Attach CV and cover letter",
+          "Note the application in the tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 4,
+        "title": "Follow up on connections",
+        "tasks": [
+          "Check if alumni accepted connection requests",
+          "If accepted: send a follow-up message mentioning the application naturally",
+          "Connect with HR Manager if found via contactFinder"
+        ],
+        "urls": []
+      },
+      {
+        "day": 5,
+        "title": "Engage with company content",
+        "tasks": [
+          "Like and comment on Marriott International recent LinkedIn posts",
+          "Follow Marriott International official LinkedIn page",
+          "This increases profile visibility to recruiters"
+        ],
+        "urls": []
+      },
+      {
+        "day": 6,
+        "title": "Second wave outreach",
+        "tasks": [
+          "If no response from alumni: try 1-2 more connections",
+          "Send cold outreach to HR Manager using Message Type 3",
+          "Check application status in tracker"
+        ],
+        "urls": []
+      },
+      {
+        "day": 7,
+        "title": "Review and escalate",
+        "tasks": [
+          "If no response to application: send follow-up email",
+          "Use the follow-up template from appTracker.js",
+          "Connect with senior leaders at Marriott International on LinkedIn",
+          "Move to next priority job if no response"
+        ],
+        "urls": []
+      }
+    ],
+    "companyInsights": null,
+    "generatedDate": "2026-03-07T01:17:42.309Z"
+  }
+]

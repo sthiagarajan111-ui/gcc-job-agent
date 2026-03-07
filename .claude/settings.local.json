@@ -11,7 +11,12 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "Bash(cmd:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(timeout /t 4:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)"
     ]
   }
 }
