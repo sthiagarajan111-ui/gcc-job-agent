@@ -1,0 +1,235 @@
+Create ONE file: src/contactFinder.js
+
+This file uses Hunter.io and Apollo.io APIs to find HR manager
+email addresses and contact details for Tier 1 and Tier 2 jobs.
+It also generates LinkedIn search terms for manual searching.
+
+Do NOT modify any existing files.
+
+═══════════════════════════════════════════════════════
+DEPENDENCIES — already installed, no new installs needed
+═══════════════════════════════════════════════════════
+node-fetch or axios — check if installed, if not:
+Run: npm install axios dotenv
+
+═══════════════════════════════════════════════════════
+API KEYS (read from .env file)
+═══════════════════════════════════════════════════════
+HUNTER_API_KEY  = already in .env
+APOLLO_API_KEY  = already in .env
+
+═══════════════════════════════════════════════════════
+DATA FILE
+═══════════════════════════════════════════════════════
+Save all found contacts to: data/contacts.json
+Structure: array of contact objects
+Create with [] if does not exist
+
+Each contact object:
+  jobId:          string (company_title_date)
+  jobTitle:       string
+  company:        string
+  location:       string
+  tier:           number
+  source:         string ("hunter" / "apollo" / "manual")
+  contacts:       array of contact entries:
+    [
+      {
+        name:       string or null
+        title:      string or null (e.g. "HR Manager")
+        email:      string or null
+        linkedin:   string or null
+        confidence: number (0-100, from Hunter.io)
+        source:     string
+      }
+    ]
+  linkedInSearchTerms: array of strings
+  domainFound:    string or null
+  searchDate:     ISO date string
+
+═══════════════════════════════════════════════════════
+HUNTER.IO API INTEGRATION
+═══════════════════════════════════════════════════════
+Base URL: https://api.hunter.io/v2
+
+Step 1 — Domain Search:
+  Endpoint: GET /domain-search
+  Params:
+    company: company name
+    api_key: HUNTER_API_KEY
+    limit: 10
+  This returns the company domain and email addresses
+
+Step 2 — Email Finder (if domain found):
+  Endpoint: GET /email-finder
+  Params:
+    domain: company domain from step 1
+    first_name: (try common HR names)
+    last_name: (try common HR names)
+    api_key: HUNTER_API_KEY
+  Use to find specific HR contacts
+
+Step 3 — Email Verification (if email found):
+  Endpoint: GET /email-verifier
+  Params:
+    email: email to verify
+    api_key: HUNTER_API_KEY
+  Only verify if email was found — saves API credits
+
+Filter results to prioritize contacts with these
+title keywords (case-insensitive):
+  HR, Human Resources, Talent, Recruitment, Recruiter,
+  Talent Acquisition, People, Hiring, HR Manager,
+  HR Director, Head of HR, HR Business Partner,
+  Resourcing, Staffing
+
+If no HR contacts found: return all contacts found
+with a note that HR filter returned no results.
+
+═══════════════════════════════════════════════════════
+APOLLO.IO API INTEGRATION
+═══════════════════════════════════════════════════════
+Base URL: https://api.apollo.io/v1
+
+People Search:
+  Endpoint: POST /people/search
+  Headers:
+    Content-Type: application/json
+    Cache-Control: no-cache
+    X-Api-Key: APOLLO_API_KEY
+  Body:
+    {
+      "q_organization_name": company name,
+      "person_titles": [
+        "HR Manager", "HR Director", "Talent Acquisition",
+        "Recruiter", "Head of HR", "People Manager",
+        "HR Business Partner", "Talent Manager"
+      ],
+      "per_page": 5
+    }
+  Parse response: people array
+  Each person: first_name, last_name, title,
+               email, linkedin_url, organization
+
+═══════════════════════════════════════════════════════
+LINKEDIN SEARCH TERMS GENERATOR
+═══════════════════════════════════════════════════════
+Generate 3 LinkedIn search strings per job:
+
+Search 1 (HR Manager):
+  "HR Manager" "[Company Name]" "[Location]"
+
+Search 2 (Talent Acquisition):
+  "Talent Acquisition" "[Company Name]"
+
+Search 3 (Recruiter):
+  "Recruiter" OR "HR" "[Company Name]" "[Location]"
+
+Also generate a LinkedIn Sales Navigator URL format:
+  https://www.linkedin.com/search/results/people/?
+  keywords=HR+Manager+[CompanyName]&origin=GLOBAL_SEARCH_HEADER
+
+Replace spaces in company name with + for the URL.
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. async findContactsHunter(company, location)
+   Calls Hunter.io domain search for the company
+   Filters for HR-related contacts
+   Returns array of contact objects with email,
+   name, title, confidence score
+   If API fails or no results: returns empty array
+   Logs: "Hunter.io search for [company]..."
+
+2. async findContactsApollo(company, location)
+   Calls Apollo.io people search
+   Filters for HR/Talent/Recruiter titles
+   Returns array of contact objects
+   If API fails or no results: returns empty array
+   Logs: "Apollo.io search for [company]..."
+
+3. generateLinkedInSearchTerms(company, location, jobTitle)
+   Returns object with:
+     searches: array of 3 search strings
+     linkedInUrl: the search URL string
+     directMessage: a short template message string:
+       "Hi [Name], I recently applied for the
+       [jobTitle] role at [company] and wanted to
+       connect. I have a background in business
+       development and finance from LSE and would
+       love to discuss the opportunity."
+
+4. async findAllContacts(job)
+   Input: job object with title, company, location, tier
+   Runs Hunter.io search first
+   Then runs Apollo.io search
+   Merges and deduplicates results by email
+   Generates LinkedIn search terms
+   Saves to data/contacts.json
+   Returns full contact record object
+
+5. async findContactsForTier1And2(jobs)
+   Filters jobs array to tier 1 and tier 2 only
+   For each qualifying job:
+     Calls findAllContacts(job)
+     Adds 1 second delay between calls
+   Logs summary: "Found contacts for X of Y jobs"
+   Returns array of contact records
+
+6. loadContacts()
+   Reads data/contacts.json
+   Returns array or [] if not found
+
+7. getContactsForJob(company, jobTitle)
+   Looks up contacts by company and job title
+   Returns contact record or null
+
+═══════════════════════════════════════════════════════
+ERROR HANDLING
+═══════════════════════════════════════════════════════
+- If Hunter API returns 401: log "Hunter.io API key
+  invalid — check .env file"
+- If Hunter API returns 429: log "Hunter.io rate limit
+  reached — try again later"
+- If Apollo API returns 401: log "Apollo.io API key
+  invalid — check .env file"
+- If any API call fails: log the error, return empty
+  array, do NOT crash
+- All API calls wrapped in try/catch
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Test 1: generateLinkedInSearchTerms offline test
+  Call: generateLinkedInSearchTerms(
+    "Goldman Sachs", "Dubai",
+    "Business Development Manager")
+  Print all 3 search strings and the LinkedIn URL
+  Print the direct message template
+
+Test 2: findContactsHunter live API test
+  Call: findContactsHunter("Emaar Properties", "Dubai")
+  Print: how many contacts found
+  Print: first contact name, title, email if found
+  If API key error: print the error message clearly
+
+Test 3: findContactsApollo live API test
+  Call: findContactsApollo("Majid Al Futtaim", "Dubai")
+  Print: how many contacts found
+  Print: first contact name, title if found
+  If API key error: print the error message clearly
+
+Test 4: findAllContacts combined test
+  testJob = { title: "Business Development Manager",
+              company: "ADNOC", location: "Abu Dhabi",
+              tier: 1, tierLabel: "APPLY TODAY" }
+  Call: findAllContacts(testJob)
+  Print: total unique contacts found
+  Print: data saved to contacts.json confirmation
+
+Print all results clearly with labels.
+Then run: node src/contactFinder.js

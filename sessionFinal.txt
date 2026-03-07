@@ -1,0 +1,161 @@
+Update the existing file: index.js
+
+This is the final wiring step. Connect all new modules
+into the main daily flow. The existing scraping, caching,
+dedup and email logic must be fully preserved.
+Do NOT break anything that currently works.
+
+Read the current index.js first before making any changes.
+
+═══════════════════════════════════════════════════════
+NEW MODULES TO IMPORT AT TOP OF index.js
+═══════════════════════════════════════════════════════
+const { prioritizeAllJobs } = require('./src/jobPrioritizer');
+const { getSalaryReport } = require('./src/salaryEngine');
+const { runDailyReport } = require('./src/reporterV2');
+const { generateForTierOneAndTwo } = require('./src/coverLetter');
+const { checkFollowUps } = require('./src/appTracker');
+const { findContactsForTier1And2 } = require('./src/contactFinder');
+const { buildNetworkingPlansForTier1And2 } = require('./src/networkingEngine');
+
+Keep all existing imports. Add new ones after existing ones.
+
+═══════════════════════════════════════════════════════
+NEW DAILY FLOW — insert after jobs are scored/filtered
+═══════════════════════════════════════════════════════
+The existing index.js flow is roughly:
+  1. Check cache for today's jobs
+  2. Scrape all sources if no cache
+  3. Deduplicate against seen_jobs.json
+  4. Score jobs with analyzer.js
+  5. Filter new jobs only
+  6. Send email report with reporter.js
+  7. Save cache files
+
+Keep all of the above exactly as is.
+
+After step 4 (scoring) and before step 6 (email),
+INSERT this new enhanced flow:
+
+STEP A — Re-prioritize with new scoring engine:
+  Call: const prioritizedJobs = prioritizeAllJobs(scoredJobs)
+  Log: "Jobs re-prioritized: Tier 1: X, Tier 2: X, Tier 3: X, Tier 4: X"
+  Count each tier and log the numbers
+
+STEP B — Enrich jobs with salary intelligence:
+  For each job in prioritizedJobs where salary is
+  null or empty:
+    Call getSalaryReport(job.title, job.location, "")
+    Add to job object:
+      job.salaryEstimate = result.estimatedSalary
+      job.salaryVerdict = result.verdict
+      job.autoFillSalary = result.autoFillRecommendation.autoFillAED
+  Log: "Salary intelligence added to X jobs"
+
+STEP C — Send upgraded email report:
+  Replace the existing reporter.js email call with:
+  Call: await runDailyReport(prioritizedJobs)
+  Log: "Upgraded email report sent via reporterV2"
+  Keep the old reporter.js call commented out
+  (not deleted — just commented) as a fallback
+
+STEP D — Generate cover letters (Tier 1 and 2 only):
+  Wrap in try/catch — do not crash if API has no credits
+  Call: await generateForTierOneAndTwo(prioritizedJobs)
+  Log: "Cover letters generated for Tier 1 and 2 jobs"
+  If error: log "Cover letter generation skipped: [error]"
+
+STEP E — Find HR contacts (Tier 1 and 2 only):
+  Wrap in try/catch
+  Call: await findContactsForTier1And2(prioritizedJobs)
+  Log: "HR contacts search complete"
+  If error: log "Contact finder skipped: [error]"
+
+STEP F — Build networking plans (Tier 1 and 2 only):
+  Wrap in try/catch
+  Call: await buildNetworkingPlansForTier1And2(prioritizedJobs)
+  Log: "Networking plans built for Tier 1 and 2 jobs"
+  If error: log "Networking engine skipped: [error]"
+
+STEP G — Check follow-up reminders:
+  Wrap in try/catch
+  Call: const followUps = await checkFollowUps()
+  If followUps.length > 0:
+    Log: "Follow-up reminders sent for X applications"
+  Else:
+    Log: "No follow-up reminders due today"
+
+═══════════════════════════════════════════════════════
+TIMING AND PERFORMANCE NOTES
+═══════════════════════════════════════════════════════
+Steps D, E, F involve API calls and web requests.
+They must be wrapped in try/catch individually so
+if one fails the others still run.
+
+Add a log at the very end showing total run time:
+  const endTime = Date.now()
+  Log: "GCC Job Agent complete in [X] seconds"
+  Log: "Tier 1: X | Tier 2: X | Cover letters: X | Contacts: X"
+
+═══════════════════════════════════════════════════════
+DASHBOARD AUTO-START (OPTIONAL)
+═══════════════════════════════════════════════════════
+At the very end of the daily run, add this optional block:
+
+const args = process.argv.slice(2)
+if (args.includes('--dashboard')) {
+  const { startDashboard } = require('./src/dashboard')
+  startDashboard()
+  console.log('Dashboard started at http://localhost:3000')
+  console.log('Press Ctrl+C to stop')
+}
+
+This means:
+  node index.js           — runs agent only, no dashboard
+  node index.js --dashboard — runs agent then opens dashboard
+
+═══════════════════════════════════════════════════════
+SUMMARY LOG AT THE END
+═══════════════════════════════════════════════════════
+After all steps complete, print a clear summary:
+
+console.log('═══════════════════════════════════════')
+console.log('GCC JOB AGENT — DAILY RUN COMPLETE')
+console.log('═══════════════════════════════════════')
+console.log('Date:          ' + today)
+console.log('Jobs scraped:  ' + totalScraped)
+console.log('New jobs:      ' + newJobs)
+console.log('Tier 1:        ' + tier1Count)
+console.log('Tier 2:        ' + tier2Count)
+console.log('Tier 3:        ' + tier3Count)
+console.log('Fortune 500:   ' + fortuneCount)
+console.log('Cover letters: ' + coverLetterCount)
+console.log('HR contacts:   ' + contactCount)
+console.log('Follow-ups:    ' + followUpCount)
+console.log('Report sent:   all 4 inboxes')
+console.log('Dashboard:     http://localhost:3000')
+console.log('═══════════════════════════════════════')
+
+═══════════════════════════════════════════════════════
+AFTER UPDATING index.js — RUN THIS TEST
+═══════════════════════════════════════════════════════
+Do a dry-run test using today's cached data.
+Today's cache file exists at:
+  data/rawjobs_2026-03-06.json  (581 jobs)
+
+The agent should detect this cache and use it
+without scraping again.
+
+Run: node index.js
+
+Confirm:
+1. Cache detected and used (no re-scraping)
+2. Jobs re-prioritized with new scoring engine
+3. Salary intelligence added
+4. Upgraded email sent via reporterV2
+5. Cover letters attempted (may skip if no API credits)
+6. HR contacts searched via Hunter.io
+7. Networking plans built
+8. Summary log printed at end
+
+Report what the final summary log shows.

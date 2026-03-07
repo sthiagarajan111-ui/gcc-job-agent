@@ -1,0 +1,21 @@
+[dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+=== GCC Job Agent Starting: 2026-03-06 ===
+=== Scheduler active. 8AM Gulf Time daily ===
+=== Running now... ===
+Loaded 581 cached jobs for 2026-03-06
+Cache found! 581 jobs from earlier today
+Skipping scraping - using saved jobs
+Checking for new jobs...
+Total jobs ever seen: 393
+New jobs today: 0
+Already seen before: 581
+No new jobs today
+All jobs seen in previous days
+Email sent successfully to dheerajt1899@gmail.com,jothidevchin@gmail.com,sthiagarajan111@gmail.com, sthiagarajan111@yahoo.com,
+=== GCC Job Agent Finished: 2026-03-06 ===

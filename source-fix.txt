@@ -1,0 +1,103 @@
+Read these files first before making any changes:
+  src/scrapers/linkedin.js
+  src/scrapers/gulf.js
+  src/scrapers/extra.js
+  src/scrapeAll.js
+
+Do NOT change any scraping logic, selectors, or URLs.
+Only add or fix the source field on every job object.
+
+═══════════════════════════════════════════════════════
+THE FIX — ADD SOURCE FIELD TO EVERY JOB OBJECT
+═══════════════════════════════════════════════════════
+
+In each scraper file, every job object that is
+returned or pushed to an array must have a
+source field set to the correct value.
+
+src/scrapers/linkedin.js:
+  Every job object must have: source: "LinkedIn"
+
+src/scrapers/gulf.js:
+  Read the file to see which job boards are scraped.
+  For each job board found in this file, set source
+  to the correct name:
+    gulf.com or gulftalent.com → source: "GulfTalent"
+    bayt.com → source: "Bayt"
+    naukrigulf.com → source: "Naukrigulf"
+    dubizzle.com → source: "Dubizzle"
+    monstergulf.com → source: "Monster Gulf"
+    If any other URL is found: use the domain name
+    as the source (e.g. "careers.company.com" →
+    source: "Company Careers")
+
+src/scrapers/extra.js:
+  Read the file to see which job boards are scraped.
+  For each job board found in this file, set source:
+    indeed.com → source: "Indeed"
+    glassdoor.com → source: "Glassdoor"
+    michaelpage.com → source: "Michael Page"
+    robertwalters.com → source: "Robert Walters"
+    hays.com → source: "Hays"
+    roberthalf.com → source: "Robert Half"
+    reed.co.uk → source: "Reed"
+    totaljobs.com → source: "Total Jobs"
+    Any recruiter agency URL → use agency name
+    If any other URL is found: use the domain name
+
+src/scrapeAll.js:
+  If scrapeAll.js combines results from all scrapers,
+  check if it already sets a source field.
+  If not: after each scraper runs, ensure the source
+  field is preserved from the individual scraper.
+  Do not overwrite existing source fields.
+
+═══════════════════════════════════════════════════════
+ALSO FIX THE ANALYZER AND PRIORITIZER
+═══════════════════════════════════════════════════════
+
+Check src/analyzer.js — if it creates or modifies
+job objects, make sure it does NOT delete or
+overwrite the source field.
+
+Check src/jobPrioritizer.js — same check.
+Make sure prioritizeJob() preserves the source field
+when it adds tier, scores etc. to the job object.
+
+═══════════════════════════════════════════════════════
+FALLBACK IN DASHBOARD
+═══════════════════════════════════════════════════════
+
+Also update src/dashboard.js:
+In the updateSourceDropdown function and the
+source filter display logic, when reading the
+source field from a job use this fallback chain:
+
+  const jobSource = job.source
+    || job.platform
+    || job.board
+    || job.origin
+    || job.website
+    || 'Unknown'
+
+This catches any field name variation across
+different scrapers.
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+After making all changes, run:
+  node src/scrapeAll.js
+
+If scrapeAll.js takes too long (scraping live data),
+instead just run this quick check:
+  node -e "
+    const jobs = require('./src/scrapers/linkedin.js');
+    console.log('LinkedIn scraper source check done');
+  "
+
+Then print a summary of which source values are
+now being set by each scraper file.
+
+Print: "Source tagging fixed in all scrapers"
+Print: list of all source values now being set

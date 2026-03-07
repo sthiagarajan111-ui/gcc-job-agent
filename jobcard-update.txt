@@ -1,0 +1,150 @@
+Update the existing file: src/dashboard.js
+
+Read the current src/dashboard.js first before making changes.
+Do NOT change any routes, logic, or functionality.
+Make these two sets of changes only:
+
+═══════════════════════════════════════════════════════
+CHANGE 1 — JOB CARD BACKGROUND COLOR
+═══════════════════════════════════════════════════════
+Find the current job card background color (#161B22)
+Change it to match the filter bar background: #1F2937
+
+Also change the card border from #30363D to #484F58
+so cards stand out more from the page background #0D1117
+
+The contrast should now be:
+  Page background:  #0D1117  (darkest)
+  Card background:  #1F2937  (clearly lighter — same as filter bar)
+  Card border:      #484F58  (visible edge)
+
+═══════════════════════════════════════════════════════
+CHANGE 2 — ADD NEW FIELDS TO EACH JOB CARD
+═══════════════════════════════════════════════════════
+Add a new info row inside each job card showing these
+6 new data points. Place this row BETWEEN the title
+row and the score breakdown row.
+
+Style this row as a horizontal flex row with small
+pill-style labels. Font size 11px. Each item has:
+  - A small icon or emoji prefix
+  - Label in #8B949E (grey)
+  - Value in #E6EDF3 (white)
+
+The 6 fields to show:
+
+FIELD 1 — Source:
+  Icon: 🌐
+  Label: Source
+  Value: job.source OR job.platform OR job.board
+  If not available: show "Unknown"
+  Common values: LinkedIn, GulfTalent, Bayt,
+    Michael Page, Naukrigulf, Indeed, Glassdoor,
+    Recruiter Website
+
+FIELD 2 — Date Posted:
+  Icon: 📅
+  Label: Posted
+  Value: job.datePosted OR job.date OR job.postedAt
+  Format as: "Today", "Yesterday", "2 days ago",
+    "X days ago" based on difference from today
+  If not available: show "Unknown"
+
+FIELD 3 — Salary:
+  Icon: 💰
+  Label: Salary
+  Value: If job.salary or job.salaryText exists:
+    show the raw salary text in green #3FB950
+  If not posted: show estimated range from
+    job.salaryEstimate if available, format as:
+    "Est. AED X,XXX – X,XXX" in grey italic
+  If nothing available: show "Not disclosed" in grey
+
+FIELD 4 — Hiring Manager:
+  Icon: 👤
+  Label: Hiring Mgr
+  Value: Look up data/contacts.json for this company
+    Find contact with title containing:
+    "hiring manager", "talent acquisition",
+    "recruiter", "HR manager", "HR director"
+    If found: show first name + last name in #58A6FF
+    If not found: show "Not found" in #6E7681
+
+FIELD 5 — Functional Manager:
+  Icon: 👔
+  Label: Func. Mgr
+  Value: Look up data/contacts.json for this company
+    Find contact with title NOT containing HR keywords
+    but containing: "director", "head of", "VP",
+    "manager", "lead", "chief"
+    If found: show first name + last name in #58A6FF
+    If not found: show "Not found" in #6E7681
+
+FIELD 6 — Alumni Contacts:
+  Icon: 🎓
+  Label: Alumni
+  Value: Look up data/networking.json for this company
+    Count total contacts found across LSE + Newcastle
+    Show as colored counter badge:
+      0 contacts: show "0" in grey #6E7681
+        with text "Not available"
+      1-2 contacts: show count in orange #D29922
+        with text "X found"
+      3+ contacts: show count in green #3FB950
+        with text "X found"
+    Format: 🎓 Alumni: [badge] X found
+    The badge should be a small colored circle
+    with the number inside
+
+═══════════════════════════════════════════════════════
+HOW TO LOAD CONTACTS AND NETWORKING DATA
+═══════════════════════════════════════════════════════
+At the top of the route handler for GET /,
+load these two data files once (not per card):
+
+const contactsData = loadContacts()
+  from src/contactFinder.js
+
+const networkingData = loadNetworkingPlans()
+  from src/networkingEngine.js
+
+Pass them into the HTML generation function.
+
+When building each card, look up by company name
+(case-insensitive match):
+  const jobContacts = contactsData.find(c =>
+    c.company.toLowerCase() === job.company.toLowerCase())
+  const jobNetworking = networkingData.find(n =>
+    n.company.toLowerCase() === job.company.toLowerCase())
+
+═══════════════════════════════════════════════════════
+LAYOUT OF THE NEW INFO ROW
+═══════════════════════════════════════════════════════
+The new row should look like this inside each card:
+
+┌─────────────────────────────────────────────────────┐
+│ 🌐 LinkedIn  📅 2 days ago  💰 AED 18,000-22,000    │
+│ 👤 Sarah Ahmed  👔 Not found  🎓 ② 2 found          │
+└─────────────────────────────────────────────────────┘
+
+Two lines, 3 items per line.
+Wrap in a div with:
+  background: #161B22
+  border-radius: 6px
+  padding: 8px 12px
+  margin: 8px 0
+  border: 1px solid #30363D
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+After making all changes:
+  node src/dashboard.js
+
+Confirm:
+  GET / returns HTTP 200
+  GET /tracker returns HTTP 200
+
+Print: "Job card updates applied successfully"
+Print: "New fields added: Source, Date Posted, Salary,
+        Hiring Manager, Functional Manager, Alumni Contacts"

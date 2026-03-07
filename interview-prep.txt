@@ -1,0 +1,244 @@
+Update the existing file: src/dashboard.js
+
+Read the current src/dashboard.js first before making changes.
+Do NOT change any existing routes, logic, or functionality.
+Add an "Interview Prep" expandable section to each job card.
+
+═══════════════════════════════════════════════════════
+FEATURE — INTERVIEW PREP BUTTON ON EACH JOB CARD
+═══════════════════════════════════════════════════════
+
+Add a 5th button to the existing button row on each card:
+  [INTERVIEW PREP] button
+  Background: #8957E5 (purple)
+  Color: white
+  Border-radius: 6px
+  Padding: 6px 12px
+  Font-size: 12px
+  Font-weight: bold
+
+When clicked:
+  If prep section already generated and visible: hide it
+  If prep section already generated but hidden: show it
+  If not yet generated: call /api/interview-prep/:jobId
+    Show spinner inside button: "Preparing..."
+    When data returns: show the prep section below the card
+    Button text changes to "📚 INTERVIEW PREP ▲"
+
+═══════════════════════════════════════════════════════
+NEW ROUTE — GET /api/interview-prep/:jobId
+═══════════════════════════════════════════════════════
+
+This route generates interview prep content using
+the Claude API for a specific job.
+
+Steps:
+1. Find the job by jobId in today's jobs array
+2. Check if networking.json already has insights
+   for this company — if yes, use them
+3. Call Claude API to generate full interview prep
+4. Cache the result in memory (prepCache object)
+   so same job is not re-generated if clicked again
+5. Return the prep data as JSON
+
+Claude API call:
+  Model: claude-sonnet-4-20250514
+  max_tokens: 1500
+  System prompt:
+    "You are an expert career coach helping a candidate
+    prepare for a job interview. Provide concise,
+    actionable interview preparation content.
+    Always respond in valid JSON format only.
+    No markdown, no code blocks, just raw JSON."
+
+  User message:
+    "Generate interview preparation for this job:
+    Candidate: Dheeraj Thiagarajan
+    Education: LSE MSc Management Finance (Merit) 2025,
+    University of Chicago Booth MBA Exchange 2024,
+    Newcastle University BSc Business Management 2021
+    Experience: Investment & Partnerships Analyst at
+    Lovemore Sports (current), Business Development
+    at G.Network (65% conversion rate, top 3 by revenue),
+    B2B Sales at Durhamlane
+    Skills: Financial modelling, B2B sales, C-suite
+    stakeholder management, strategy consulting
+
+    Job Title: [title]
+    Company: [company]
+    Location: [location]
+    Industry: [detect from company and title]
+    Job Description: [description or 'Not provided']
+
+    Return ONLY this JSON structure:
+    {
+      companyOverview: {
+        whatTheyDo: string (2 sentences),
+        size: string (e.g. Large multinational / Mid-size regional),
+        culture: string (3-5 culture keywords),
+        recentNews: string (1-2 likely recent developments),
+        whyDheerajFits: string (2 sentences connecting his background)
+      },
+      industryInsights: {
+        sector: string (industry sector name),
+        gccMarketSize: string (market context),
+        keyTrends: array of 3 strings (current trends),
+        topCompetitors: array of 3 competitor names
+      },
+      roleInsights: {
+        typicalResponsibilities: array of 4 strings,
+        kpisMeasuredBy: array of 3 strings,
+        careerProgression: string (likely next role),
+        salaryRange: string (AED range for this role)
+      },
+      likelyInterviewQuestions: {
+        behavioural: array of 4 question strings,
+        technical: array of 3 question strings,
+        situational: array of 3 question strings,
+        companySpecific: array of 2 question strings
+      },
+      suggestedAnswerPointers: {
+        topStrengthToEmphasise: string,
+        starExamples: array of 3 objects each with:
+          { situation: string, task: string,
+            action: string, result: string }
+      },
+      questionsToAskInterviewer: array of 4 strings,
+      redFlags: array of 2 strings (things to be careful about),
+      dresscode: string,
+      preparationChecklist: array of 6 strings
+    }"
+
+═══════════════════════════════════════════════════════
+INTERVIEW PREP PANEL UI
+═══════════════════════════════════════════════════════
+The prep panel appears BELOW the job card buttons row.
+It slides down smoothly (CSS transition max-height).
+
+Panel background: #0D1117 (darkest — distinct from card)
+Panel border: 1px solid #8957E5 (purple border)
+Border-radius: 0 0 8px 8px
+Padding: 20px
+Margin-top: -4px (connects to card above)
+
+Panel has 6 TABS across the top:
+  [🏢 Company] [📊 Industry] [🎯 Role]
+  [❓ Questions] [💡 Your Answers] [✅ Checklist]
+
+Tab styling:
+  Background: #1F2937
+  Active tab: #8957E5 background, white text
+  Inactive tab: #1F2937, grey text #8B949E
+  Border-radius: 6px 6px 0 0
+  Padding: 8px 14px
+  Font-size: 12px
+  Cursor: pointer
+
+TAB 1 — 🏢 Company:
+  Section: ABOUT [COMPANY NAME]
+    whatTheyDo (white text, 14px)
+    Size badge | Culture keywords as pills
+  Section: WHY YOU FIT
+    whyDheerajFits (green text #3FB950)
+  Section: RECENT NEWS
+    recentNews (grey italic)
+
+TAB 2 — 📊 Industry:
+  Sector badge (colored pill)
+  GCC Market: gccMarketSize
+  KEY TRENDS (3 items with → arrow prefix, light blue)
+  TOP COMPETITORS (3 company names as badges)
+
+TAB 3 — 🎯 Role:
+  TYPICAL RESPONSIBILITIES
+    4 bullet points
+  MEASURED BY (KPIs)
+    3 items with 📏 icon
+  CAREER PATH: → careerProgression
+  SALARY RANGE: salaryRange (gold text)
+
+TAB 4 — ❓ Interview Questions:
+  Four sub-sections:
+  BEHAVIOURAL (4 questions) — orange left border
+  TECHNICAL (3 questions) — blue left border
+  SITUATIONAL (3 questions) — green left border
+  COMPANY SPECIFIC (2 questions) — purple left border
+  Each question shown as a card with copy button
+
+TAB 5 — 💡 Your Answers:
+  TOP STRENGTH TO EMPHASISE (bold, gold)
+  STAR EXAMPLES — 3 expandable cards:
+    Each card shows: Situation | Task | Action | Result
+    In a 2x2 grid layout per STAR card
+  QUESTIONS TO ASK INTERVIEWER
+    4 questions in green pills
+
+TAB 6 — ✅ Checklist:
+  PRE-INTERVIEW CHECKLIST
+    6 checkbox items (clickable checkboxes)
+    Check state saved in localStorage per jobId
+  DRESS CODE
+    dresscode shown with 👔 icon
+  RED FLAGS (2 items shown with ⚠️ in orange)
+
+═══════════════════════════════════════════════════════
+LOADING STATE
+═══════════════════════════════════════════════════════
+While API is generating, show inside the panel:
+  A pulsing animation with text:
+  "🤖 Claude AI is preparing your interview brief..."
+  "Analysing [Company] and [JobTitle] role..."
+  Three animated dots
+
+If API has no credits:
+  Show a message:
+  "⚠️ Interview prep requires Anthropic API credits.
+  Add credits at console.anthropic.com then try again."
+  Show a basic static checklist instead:
+    ✅ Research [Company] on LinkedIn and website
+    ✅ Review the job description thoroughly
+    ✅ Prepare 3 STAR examples from your experience
+    ✅ Research GCC market for this industry
+    ✅ Prepare 5 questions to ask the interviewer
+    ✅ Review your CV and be ready to discuss each role
+
+═══════════════════════════════════════════════════════
+CACHING
+═══════════════════════════════════════════════════════
+Store generated prep in a module-level object:
+  const prepCache = {}
+
+Key: jobId
+Value: the full prep JSON object
+
+When route called:
+  If prepCache[jobId] exists: return it immediately
+  (no API call needed — saves credits)
+
+Also save to file: data/interview-prep-YYYY-MM-DD.json
+So prep survives dashboard restart within same day.
+
+On dashboard start, load existing prep from file
+into prepCache if file exists for today.
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+After making all changes:
+  node src/dashboard.js
+
+Confirm:
+  GET / → 200
+  GET /tracker → 200
+  GET /api/interview-prep/test → 200
+    (use a mock job, skip API call in test)
+
+Test the caching:
+  Call same jobId twice
+  Second call should return from cache instantly
+  Print: "Cache hit for jobId: [id]"
+
+Print: "Interview Prep feature built successfully"
+Print: "6 tabs: Company, Industry, Role, Questions,
+        Your Answers, Checklist"
+Print: "Purple INTERVIEW PREP button added to all job cards"

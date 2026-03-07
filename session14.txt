@@ -1,0 +1,167 @@
+Create ONE file: src/salaryEngine.js
+
+This file estimates salaries for GCC jobs when salary is not posted,
+and provides auto-fill salary recommendations for Dheeraj.
+
+Do NOT modify any existing files.
+
+═══════════════════════════════════════════════════════
+CANDIDATE SALARY CONTEXT
+═══════════════════════════════════════════════════════
+Current UK gross:        GBP 35,000/year
+Current UK take-home:    GBP 2,380/month
+AED equivalent:          AED 14,000/month
+Dubai minimum target:    AED 18,000/month
+Auto-fill salary:        AED 18,000 (never go below AED 14,000)
+Stretch target:          AED 25,000/month
+
+Currency conversion rates:
+  1 GBP = 4.75 AED
+  1 USD = 3.67 AED
+  1 EUR = 4.00 AED
+  1 SAR = 0.98 AED
+  1 QAR = 1.01 AED
+  1 KWD = 12.00 AED
+
+═══════════════════════════════════════════════════════
+GCC MARKET RATE REFERENCE TABLE
+Hardcode this table exactly as an array of objects
+═══════════════════════════════════════════════════════
+Each entry has: role, level, location, minAED, maxAED, typicalAED
+
+Business Development Manager, Mid, Dubai, 18000, 28000, 22000
+Business Development Manager, Senior, Dubai, 25000, 40000, 32000
+Business Development Executive, Junior, Dubai, 12000, 18000, 15000
+Sales Manager, Mid, Dubai, 18000, 30000, 24000
+Sales Executive, Junior, Dubai, 10000, 16000, 13000
+Sales Executive, Mid, Dubai, 15000, 22000, 18000
+Strategy Consultant, Mid, Dubai, 20000, 35000, 27000
+Strategy Consultant, Senior, Dubai, 30000, 50000, 40000
+Investment Analyst, Mid, Dubai, 18000, 28000, 23000
+Finance Analyst, Mid, Dubai, 15000, 25000, 20000
+Business Analyst, Mid, Dubai, 15000, 22000, 18000
+Account Manager, Mid, Dubai, 14000, 22000, 17000
+Relationship Manager, Mid, Dubai, 16000, 26000, 20000
+Commercial Manager, Senior, Dubai, 25000, 40000, 32000
+Partnerships Manager, Mid, Dubai, 18000, 28000, 22000
+
+Business Development Manager, Mid, Abu Dhabi, 17000, 26000, 21000
+Sales Manager, Mid, Abu Dhabi, 17000, 28000, 22000
+Strategy Consultant, Mid, Abu Dhabi, 19000, 33000, 25000
+Investment Analyst, Mid, Abu Dhabi, 17000, 26000, 21000
+Finance Analyst, Mid, Abu Dhabi, 14000, 23000, 18000
+
+Business Development Manager, Mid, Qatar, 15000, 24000, 19000
+Sales Manager, Mid, Qatar, 15000, 25000, 20000
+Strategy Consultant, Mid, Qatar, 18000, 30000, 24000
+Finance Analyst, Mid, Qatar, 13000, 22000, 17000
+
+Business Development Manager, Mid, Saudi Arabia, 14000, 22000, 18000
+Sales Manager, Mid, Saudi Arabia, 14000, 24000, 19000
+Strategy Consultant, Mid, Saudi Arabia, 17000, 28000, 22000
+Finance Analyst, Mid, Saudi Arabia, 12000, 20000, 16000
+
+Business Development Manager, Mid, Kuwait, 13000, 20000, 16000
+Business Development Manager, Mid, Bahrain, 11000, 18000, 14000
+Business Development Manager, Mid, Oman, 10000, 16000, 13000
+
+═══════════════════════════════════════════════════════
+ALLOWANCES REFERENCE TABLE
+Hardcode this as an object
+═══════════════════════════════════════════════════════
+housing:   { min: 3000, max: 8000, typical: 5000, unit: "AED/month" }
+car:       { min: 1500, max: 3000, typical: 2000, unit: "AED/month" }
+flights:   { min: 3000, max: 5000, typical: 4000, unit: "AED/year" }
+medical:   { description: "Self and family coverage" }
+phone:     { min: 300,  max: 500,  typical: 400,  unit: "AED/month" }
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. estimateSalary(title, location)
+   Looks up the market rate table for best match
+   Matches on role keywords in title (case-insensitive)
+   Matches on location keywords
+   If exact match found: returns the table entry
+   If no match: returns a default estimate based on location:
+     Dubai default:       { minAED: 15000, maxAED: 25000, typicalAED: 20000 }
+     Abu Dhabi default:   { minAED: 14000, maxAED: 23000, typicalAED: 18000 }
+     Qatar default:       { minAED: 13000, maxAED: 22000, typicalAED: 17000 }
+     Saudi Arabia default:{ minAED: 12000, maxAED: 20000, typicalAED: 16000 }
+     Kuwait default:      { minAED: 11000, maxAED: 18000, typicalAED: 14000 }
+     Bahrain default:     { minAED: 10000, maxAED: 16000, typicalAED: 13000 }
+     Oman default:        { minAED: 9000,  maxAED: 14000, typicalAED: 11000 }
+     Unknown default:     { minAED: 12000, maxAED: 20000, typicalAED: 16000 }
+   Returns object with:
+     minAED, maxAED, typicalAED,
+     matchedRole (string or "default estimate"),
+     confidence ("high" if table match, "estimated" if default)
+
+2. getAutoFillSalary(title, location)
+   Calls estimateSalary internally
+   Logic:
+     If typicalAED >= 18000: return 18000 (Dheeraj's target)
+     If typicalAED >= 14000: return typicalAED
+     If typicalAED < 14000:  return 14000 (never go below floor)
+   Returns object with:
+     autoFillAED (the value to type into salary fields)
+     minimumAED: 14000
+     targetAED: 18000
+     stretchAED: 25000
+     recommendation (string explaining the value)
+
+3. convertToAED(amount, currency)
+   Converts any currency amount to AED
+   Supports: GBP, USD, EUR, SAR, QAR, KWD, AED
+   Returns number rounded to nearest integer
+
+4. parseSalaryFromText(text)
+   Extracts salary numbers from job description text
+   Handles formats like:
+     "AED 18,000", "18000 AED", "AED18000"
+     "USD 5,000", "$5000"
+     "GBP 3,500", "£3500"
+     "15,000 - 20,000 AED"
+     "up to AED 25000"
+   Returns object with:
+     found (true/false)
+     currency (AED/USD/GBP/unknown)
+     minAED (converted to AED)
+     maxAED (converted to AED)
+     rawText (the matched portion)
+
+5. getSalaryReport(title, location, salaryText)
+   Master function combining all the above
+   If salaryText is provided and parseable: use parsed value
+   If salaryText empty or unparseable: use estimateSalary
+   Returns full report object with:
+     postedSalary (parsed or null)
+     estimatedSalary (from table)
+     autoFillRecommendation (from getAutoFillSalary)
+     allowances (the full allowances reference)
+     comparisonToUK: {
+       ukMonthlyTakehomeGBP: 2380,
+       ukMonthlyTakehomeAED: 14000,
+       gccTypicalAED: (typicalAED value),
+       realIncreasePercent: calculated percentage
+     }
+     verdict (string: one of these three)
+       "ABOVE TARGET" if typicalAED >= 18000
+       "AT MINIMUM"   if typicalAED >= 14000
+       "BELOW FLOOR"  if typicalAED < 14000
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at the bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Test 1: getSalaryReport("Business Development Manager", "Dubai", "")
+Test 2: getSalaryReport("Sales Executive", "Abu Dhabi", "AED 16,000")
+Test 3: getSalaryReport("Marketing Manager", "Oman", "")
+Test 4: getAutoFillSalary("Strategy Consultant", "Dubai")
+Test 5: convertToAED(35000, "GBP") — should return 166250
+
+Print all results clearly with labels.
+
+Then run: node src/salaryEngine.js

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-developer-platform)",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(pkill:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)"
+    ]
+  }
+}

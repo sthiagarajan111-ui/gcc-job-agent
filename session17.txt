@@ -1,0 +1,204 @@
+Create ONE file: src/appTracker.js
+
+This file records every job application Dheeraj submits,
+tracks the status through the pipeline, and sends follow-up
+reminder emails after 7 days of no response.
+
+Do NOT modify any existing files.
+
+═══════════════════════════════════════════════════════
+DEPENDENCIES TO INSTALL FIRST
+═══════════════════════════════════════════════════════
+Run: npm install nodemailer dotenv
+
+(nodemailer is likely already installed — npm install
+will skip it if so. dotenv also likely already present.)
+
+═══════════════════════════════════════════════════════
+DATA FILE
+═══════════════════════════════════════════════════════
+All application data is saved to:
+  data/applications.json
+
+Structure of applications.json:
+  An array of application objects.
+  Create the file with an empty array [] if it
+  does not exist.
+
+Each application object has these fields:
+  id:              unique string (company_title_date)
+  jobTitle:        string
+  company:         string
+  location:        string
+  applyUrl:        string (the job URL)
+  tier:            number (1, 2, 3 or 4)
+  tierLabel:       string
+  totalScore:      number
+  salaryAED:       number or null
+  appliedDate:     ISO date string (e.g. 2026-03-06)
+  status:          string — one of:
+                   "Applied", "Screening", "Interview",
+                   "Offer", "Rejected"
+  lastUpdated:     ISO date string
+  followUpSent:    boolean (default false)
+  followUpDate:    ISO date string or null
+  notes:           string (default empty)
+  contactEmail:    string or null (HR contact if found)
+  coverLetterPath: string or null (path to .docx file)
+
+═══════════════════════════════════════════════════════
+EMAIL CONFIG (read from .env file)
+═══════════════════════════════════════════════════════
+EMAIL_FROM:     sthiagarajan111@gmail.com
+EMAIL_PASSWORD: (from .env)
+SMTP_HOST:      smtp.gmail.com
+SMTP_PORT:      587
+
+Follow-up reminder emails go to: dheerajt1899@gmail.com
+Also CC: sthiagarajan111@gmail.com
+
+═══════════════════════════════════════════════════════
+FOLLOW-UP EMAIL TEMPLATE
+═══════════════════════════════════════════════════════
+Subject: Follow-up Reminder: [JobTitle] at [Company]
+
+Body:
+Hi Dheeraj,
+
+You applied for [JobTitle] at [Company] ([Location])
+on [appliedDate] — 7 days ago with no response yet.
+
+Job URL: [applyUrl]
+Your Tier: [tierLabel]
+Status: [status]
+
+Suggested follow-up action:
+1. Find the HR Manager on LinkedIn at [Company]
+2. Send a polite connection request referencing your application
+3. Email subject: "Following up — [JobTitle] Application"
+
+Template message:
+"Dear Hiring Manager,
+I applied for the [JobTitle] role at [Company] on [appliedDate]
+and wanted to follow up to express my continued interest.
+I am very enthusiastic about this opportunity and would welcome
+the chance to discuss how my background in business development
+and finance can add value to your team.
+Please let me know if you need any additional information.
+Kind regards,
+Dheeraj Thiagarajan
++44 7501069543"
+
+This is an automated reminder from your GCC Job Agent.
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. loadApplications()
+   Reads data/applications.json
+   Returns array of application objects
+   If file does not exist: creates it with [] and returns []
+
+2. saveApplications(applications)
+   Writes the full applications array to data/applications.json
+   Pretty printed with 2 space indent
+
+3. addApplication(job)
+   Input: job object with fields:
+     title, company, location, applyUrl, tier, tierLabel,
+     totalScore, salaryAED, coverLetterPath
+   Creates new application object with all fields above
+   Sets status: "Applied"
+   Sets appliedDate: today's date
+   Sets followUpSent: false
+   Checks for duplicates by id before adding
+   If duplicate found: log warning and skip
+   Saves to applications.json
+   Returns the new application object
+
+4. updateStatus(id, newStatus, notes)
+   Finds application by id
+   Updates status to newStatus
+   Updates lastUpdated to today
+   Appends notes if provided
+   Saves to applications.json
+   Valid statuses: Applied, Screening, Interview, Offer, Rejected
+   Returns updated application or null if not found
+
+5. getPipelineSummary()
+   Returns object with count of applications per status:
+   {
+     total: number,
+     Applied: number,
+     Screening: number,
+     Interview: number,
+     Offer: number,
+     Rejected: number,
+     tierBreakdown: { tier1: n, tier2: n, tier3: n, tier4: n }
+   }
+
+6. async checkFollowUps()
+   Loads all applications
+   For each application where:
+     status is "Applied" (no response yet)
+     AND appliedDate was 7 or more days ago
+     AND followUpSent is false
+   Calls sendFollowUpEmail(application)
+   Sets followUpSent: true, followUpDate: today
+   Saves updated applications
+   Returns: array of applications that got follow-up emails
+
+7. async sendFollowUpEmail(application)
+   Sends the follow-up email using nodemailer
+   Uses the template above
+   To: dheerajt1899@gmail.com
+   CC: sthiagarajan111@gmail.com
+   Logs: "Follow-up sent for [title] at [company]"
+   Returns: true if sent, false if failed
+
+8. getApplicationsByStatus(status)
+   Returns array of applications filtered by status
+
+9. getTier1And2Applications()
+   Returns all applications where tier is 1 or 2
+   Sorted by appliedDate descending (newest first)
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Run these tests in sequence:
+
+Test 1: Add 3 sample applications
+  Job 1: title="Business Development Manager",
+         company="Goldman Sachs", location="Dubai",
+         tier=1, tierLabel="APPLY TODAY", totalScore=93,
+         applyUrl="https://linkedin.com/jobs/1", salaryAED=22000
+  Job 2: title="Sales Executive", company="Emaar Properties",
+         location="Dubai", tier=2, tierLabel="APPLY THIS WEEK",
+         totalScore=75, applyUrl="https://linkedin.com/jobs/2",
+         salaryAED=18000
+  Job 3: title="Finance Analyst", company="ADNOC",
+         location="Abu Dhabi", tier=2, tierLabel="APPLY THIS WEEK",
+         totalScore=72, applyUrl="https://linkedin.com/jobs/3",
+         salaryAED=20000
+
+Test 2: Update Job 2 status to "Screening"
+  Call: updateStatus(job2.id, "Screening", "Recruiter called")
+
+Test 3: Get pipeline summary
+  Call: getPipelineSummary()
+  Print the full summary
+
+Test 4: Get Tier 1 and 2 applications
+  Call: getTier1And2Applications()
+  Print count and company names
+
+Test 5: Check follow-ups (should find none — all just added today)
+  Call: checkFollowUps()
+  Print: "Follow-ups due today: [count]"
+
+Print all results clearly.
+Then run: node src/appTracker.js

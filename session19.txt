@@ -1,0 +1,262 @@
+Create ONE file: src/reporterV2.js
+
+This file generates a fully upgraded daily HTML email report
+with Tier sections, Fortune 500 badges, salary estimates,
+application pipeline summary, and score breakdowns.
+It sends to all 4 email addresses.
+
+Do NOT modify any existing files including src/reporter.js
+
+═══════════════════════════════════════════════════════
+DEPENDENCIES — already installed, no new installs needed
+═══════════════════════════════════════════════════════
+nodemailer, dotenv — already in project
+
+═══════════════════════════════════════════════════════
+EMAIL CONFIG (from .env)
+═══════════════════════════════════════════════════════
+EMAIL_FROM:     sthiagarajan111@gmail.com
+EMAIL_PASSWORD: from .env
+SMTP_HOST:      smtp.gmail.com
+SMTP_PORT:      587
+
+Send to ALL 4 addresses:
+  dheerajt1899@gmail.com
+  jothidevchin@gmail.com
+  sthiagarajan111@gmail.com
+  sthiagarajan111@yahoo.com
+
+═══════════════════════════════════════════════════════
+EMAIL SUBJECT LINE
+═══════════════════════════════════════════════════════
+GCC Job Agent — [DATE] — [T1] Tier 1 + [T2] Tier 2 Jobs Found
+
+Example:
+GCC Job Agent — 6 Mar 2026 — 5 Tier 1 + 18 Tier 2 Jobs Found
+
+═══════════════════════════════════════════════════════
+HTML EMAIL STRUCTURE
+═══════════════════════════════════════════════════════
+The email must be a single self-contained HTML string.
+No external CSS files. All styles inline or in <style> tag.
+Must render well in Gmail.
+
+COLOR PALETTE:
+  Dark navy:    #1B2A4A
+  Medium blue:  #2E4A7A
+  Light blue:   #4A90D9
+  Gold:         #F5A623
+  Green:        #27AE60
+  Orange:       #E67E22
+  Red:          #E74C3C
+  Light grey:   #F8F9FA
+  White:        #FFFFFF
+
+SECTION 1 — EMAIL HEADER
+  Dark navy background, white text
+  Large title: GCC JOB AGENT — DAILY REPORT
+  Subtitle: [Full date] | [City: London → Dubai target]
+  Three stat boxes in a row:
+    Box 1: Total jobs today (number, gold)
+    Box 2: Tier 1 + Tier 2 count (number, green)
+    Box 3: Fortune 500 jobs count (number, light blue)
+
+SECTION 2 — APPLICATION PIPELINE BANNER
+  Medium blue background
+  Title: YOUR APPLICATION PIPELINE
+  Five status boxes in a row (use getPipelineSummary
+  from appTracker.js to get real numbers):
+    Applied | Screening | Interview | Offer | Rejected
+  Each box shows count in large white number
+  Color code: Applied=blue, Screening=orange,
+              Interview=green, Offer=gold, Rejected=red
+
+SECTION 3 — TIER 1 JOBS (APPLY TODAY)
+  Section header: dark navy background
+  🔥 TIER 1 — APPLY TODAY ([count] jobs)
+  For each Tier 1 job, show a job card:
+
+  JOB CARD DESIGN:
+  White card with left border 4px solid:
+    Tier 1 = green (#27AE60)
+    Tier 2 = light blue (#4A90D9)
+    Tier 3 = orange (#E67E22)
+    Tier 4 = grey (#95A5A6)
+  Box shadow: 0 2px 4px rgba(0,0,0,0.1)
+  Padding: 16px
+  Margin bottom: 12px
+
+  Card top row:
+    LEFT: Job title (bold, 16px, dark navy)
+          Company name (14px, medium blue)
+          Location (12px, grey) | [tierLabel badge]
+    RIGHT: Total score in large circle
+           Color: green if >=90, blue if >=70,
+                  orange if >=50, grey if below
+           Fortune 500 badge if applicable:
+           🏆 FORTUNE 500 (gold background, dark text)
+
+  Card middle row — Score breakdown bar:
+    Four mini score badges in a row:
+    📍 Location: [X]/25
+    🏢 Company: [X]/25
+    💰 Salary: [X]/25
+    🎯 Match: [X]/25
+
+  Card bottom row:
+    LEFT: Salary display:
+      If salary posted: show in green "AED X,XXX/month"
+      If not posted: show estimated range in grey italic
+        "Est. AED X,XXX – X,XXX/month"
+      Verdict badge: ABOVE TARGET (green) /
+                     AT MINIMUM (orange) /
+                     BELOW FLOOR (red)
+    RIGHT: Two buttons:
+      [VIEW JOB] — links to job applyUrl
+                   dark navy background, white text
+      [COVER LETTER] — links to cover letter if exists,
+                       grey if not generated yet
+
+SECTION 4 — TIER 2 JOBS (APPLY THIS WEEK)
+  Same card design as Tier 1 but blue left border
+  Section header: 📋 TIER 2 — APPLY THIS WEEK ([count] jobs)
+  Show maximum 30 Tier 2 jobs to keep email manageable
+
+SECTION 5 — TIER 3 SUMMARY (collapsed text, no cards)
+  Section header: TIER 3 — APPLY IF TIME ([count] jobs)
+  Just a simple table: Title | Company | Location | Score
+  No cards — keeps email size manageable
+
+SECTION 6 — SALARY INTELLIGENCE SUMMARY BOX
+  Light grey background box
+  Title: 💰 SALARY INTELLIGENCE
+  Two columns:
+    LEFT: Your UK take-home: GBP 2,380/month
+          AED equivalent: AED 14,000/month
+          Your target: AED 18,000/month
+          Your stretch: AED 25,000/month
+    RIGHT: Today's top salary offer found: AED X,XXX
+           Average Tier 1 salary: AED X,XXX
+           Jobs above your target: X jobs
+           Jobs above your stretch: X jobs
+
+SECTION 7 — EMAIL FOOTER
+  Dark navy background, white text, centered
+  "GCC Job Agent | Built for Dheeraj Thiagarajan"
+  "LSE GMIM Finance 2025 | Chicago Booth MBA Exchange"
+  "Target: Dubai | AED 18,000/month minimum"
+  "This report was auto-generated at [time]"
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. generateEmailHTML(jobs, pipelineSummary)
+   Input:
+     jobs: array of prioritized job objects from
+           jobPrioritizer.js (with tier, scores, etc.)
+     pipelineSummary: object from appTracker.js
+   Builds and returns the complete HTML string
+   Uses salaryEngine.js getSalaryReport for jobs
+   with no posted salary
+   All salary calculations done inline
+
+2. async sendReportEmail(jobs, pipelineSummary)
+   Calls generateEmailHTML to build the HTML
+   Sends via nodemailer to all 4 addresses
+   Saves HTML to: data/reportV2-YYYY-MM-DD.html
+   Logs: "ReporterV2 email sent to 4 recipients"
+   Returns: { success, filePath, tier1Count, tier2Count }
+
+3. async runDailyReport(jobs)
+   Master function called from index.js
+   Loads pipeline summary from appTracker.js
+   Calls sendReportEmail(jobs, pipelineSummary)
+   Returns result
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Create 8 sample jobs with realistic data to test
+the full email layout. Include a mix of:
+  - 2 Tier 1 jobs (one Fortune 500, one GCC conglomerate)
+  - 3 Tier 2 jobs (mix of companies)
+  - 2 Tier 3 jobs
+  - 1 Tier 4 job
+
+Sample jobs to use:
+
+Job 1: title="Business Development Manager",
+  company="Goldman Sachs", location="Dubai",
+  tier=1, tierLabel="APPLY TODAY", totalScore=93,
+  locationScore=25, companyScore=25, salaryScore=18,
+  matchScore=25, isFortuneCompany=true,
+  salaryAED=22000, applyUrl="https://linkedin.com/jobs/1"
+
+Job 2: title="Strategy Consultant",
+  company="Emaar Properties", location="Dubai",
+  tier=1, tierLabel="APPLY TODAY", totalScore=90,
+  locationScore=25, companyScore=20, salaryScore=25,
+  matchScore=20, isFortuneCompany=false,
+  isGCCConglomerate=true, salaryAED=27000,
+  applyUrl="https://linkedin.com/jobs/2"
+
+Job 3: title="Investment Analyst",
+  company="ADNOC", location="Abu Dhabi",
+  tier=2, tierLabel="APPLY THIS WEEK", totalScore=82,
+  locationScore=20, companyScore=25, salaryScore=18,
+  matchScore=19, isFortuneCompany=true,
+  salaryAED=null, applyUrl="https://linkedin.com/jobs/3"
+
+Job 4: title="Sales Manager",
+  company="Majid Al Futtaim", location="Dubai",
+  tier=2, tierLabel="APPLY THIS WEEK", totalScore=78,
+  locationScore=25, companyScore=20, salaryScore=10,
+  matchScore=23, isFortuneCompany=false,
+  isGCCConglomerate=true, salaryAED=null,
+  applyUrl="https://linkedin.com/jobs/4"
+
+Job 5: title="Commercial Manager",
+  company="Al Habtoor Group", location="Dubai",
+  tier=2, tierLabel="APPLY THIS WEEK", totalScore=75,
+  locationScore=25, companyScore=20, salaryScore=12,
+  matchScore=18, isFortuneCompany=false,
+  isGCCConglomerate=true, salaryAED=16000,
+  applyUrl="https://linkedin.com/jobs/5"
+
+Job 6: title="Business Analyst",
+  company="Etisalat", location="Abu Dhabi",
+  tier=3, tierLabel="APPLY IF TIME", totalScore=65,
+  locationScore=20, companyScore=20, salaryScore=10,
+  matchScore=15, isFortuneCompany=false,
+  salaryAED=null, applyUrl="https://linkedin.com/jobs/6"
+
+Job 7: title="Finance Analyst",
+  company="Regional Bank", location="Qatar",
+  tier=3, tierLabel="APPLY IF TIME", totalScore=55,
+  locationScore=15, companyScore=15, salaryScore=10,
+  matchScore=15, isFortuneCompany=false,
+  salaryAED=14000, applyUrl="https://linkedin.com/jobs/7"
+
+Job 8: title="Marketing Manager",
+  company="Unknown LLC", location="Oman",
+  tier=4, tierLabel="OPTIONAL", totalScore=30,
+  locationScore=8, companyScore=5, salaryScore=10,
+  matchScore=7, isFortuneCompany=false,
+  salaryAED=null, applyUrl="https://linkedin.com/jobs/8"
+
+Use a mock pipeline summary:
+  { total: 3, Applied: 2, Screening: 1,
+    Interview: 0, Offer: 0, Rejected: 0,
+    tierBreakdown: { tier1: 1, tier2: 2, tier3: 0, tier4: 0 } }
+
+Call: sendReportEmail(sampleJobs, mockPipeline)
+
+Confirm:
+1. HTML file saved to data/reportV2-[date].html
+2. Email sent successfully to all 4 addresses
+3. Print tier counts: Tier 1: X, Tier 2: X, Tier 3: X
+
+Then run: node src/reporterV2.js

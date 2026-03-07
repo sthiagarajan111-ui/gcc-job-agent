@@ -1,0 +1,235 @@
+Create ONE file: src/formFiller.js
+
+This file uses Puppeteer to open a recruiter job application page,
+auto-fill all possible form fields from Dheeraj's profile,
+highlight filled fields in yellow, show a review overlay message,
+and keep the browser open for Dheeraj to review and submit manually.
+
+Do NOT modify any existing files.
+
+═══════════════════════════════════════════════════════
+DEPENDENCIES TO INSTALL FIRST
+═══════════════════════════════════════════════════════
+Run: npm install puppeteer
+
+═══════════════════════════════════════════════════════
+CANDIDATE DATA TO AUTO-FILL (hardcoded)
+═══════════════════════════════════════════════════════
+firstName:        Dheeraj
+lastName:         Thiagarajan
+fullName:         Dheeraj Thiagarajan
+email:            dheerajt1899@gmail.com
+phone:            +44 7501069543
+linkedin:         https://www.linkedin.com/in/dheeraj-t1/
+location:         London, UK
+city:             London
+country:          United Kingdom
+noticePeriod:     1 Month
+currentSalary:    35000
+currentSalaryCurrency: GBP
+expectedSalary:   18000
+expectedSalaryCurrency: AED
+salaryText:       AED 18,000
+currentCompany:   Lovemore Sports
+currentTitle:     Investment and Partnerships Analyst
+yearsExperience:  4
+university:       London School of Economics
+degree:           MSc Management Finance
+graduationYear:   2025
+coverLetter:      (leave blank — filled separately)
+
+NOTE: Visa status — do NOT fill any visa or work
+permit fields. Leave them blank.
+
+═══════════════════════════════════════════════════════
+FIELD MATCHING STRATEGY
+═══════════════════════════════════════════════════════
+Match form fields by checking these attributes
+in order: name, id, placeholder, aria-label, type
+All matching must be case-insensitive.
+
+FIELD MAPPING — for each candidate value, try to
+match form inputs using these keyword patterns:
+
+Full Name fields:
+  keywords: full name, fullname, your name, name
+  fill with: Dheeraj Thiagarajan
+
+First Name fields:
+  keywords: first name, firstname, first_name, fname, given name
+  fill with: Dheeraj
+
+Last Name fields:
+  keywords: last name, lastname, last_name, lname, surname, family name
+  fill with: Thiagarajan
+
+Email fields:
+  keywords: email, e-mail, email address
+  OR type="email"
+  fill with: dheerajt1899@gmail.com
+
+Phone fields:
+  keywords: phone, mobile, telephone, contact number, tel
+  OR type="tel"
+  fill with: +44 7501069543
+
+LinkedIn fields:
+  keywords: linkedin, linked in, linkedin url, linkedin profile
+  fill with: https://www.linkedin.com/in/dheeraj-t1/
+
+Location / City fields:
+  keywords: location, city, current location, where are you based
+  fill with: London, UK
+
+Country fields:
+  keywords: country, country of residence
+  fill with: United Kingdom
+
+Notice Period fields:
+  keywords: notice period, notice, availability, available from
+  fill with: 1 Month
+
+Current Salary fields:
+  keywords: current salary, current ctc, present salary
+  fill with: 35000
+
+Expected / Desired Salary fields:
+  keywords: expected salary, desired salary, salary expectation,
+            target salary, minimum salary, salary requirement
+  fill with: 18000
+
+Current Company fields:
+  keywords: current company, current employer, present company,
+            current organization
+  fill with: Lovemore Sports
+
+Current Job Title fields:
+  keywords: current title, current position, current role,
+            job title, position title
+  fill with: Investment and Partnerships Analyst
+
+Years of Experience fields:
+  keywords: years of experience, years experience, total experience,
+            work experience years
+  fill with: 4
+
+University / College fields:
+  keywords: university, college, institution, school, education
+  fill with: London School of Economics
+
+Degree fields:
+  keywords: degree, qualification, highest qualification
+  fill with: MSc Management Finance
+
+Graduation Year fields:
+  keywords: graduation year, year of graduation, passing year
+  fill with: 2025
+
+Cover Letter textarea fields:
+  keywords: cover letter, covering letter, motivation letter
+  fill with: (leave blank — user will fill manually)
+
+Visa / Work Permit fields:
+  keywords: visa, work permit, right to work, work authorization,
+            sponsorship, work eligibility
+  action: DO NOT FILL — skip completely
+
+═══════════════════════════════════════════════════════
+YELLOW HIGHLIGHT AFTER FILLING
+═══════════════════════════════════════════════════════
+After filling each field, inject this CSS style
+on that element using page.evaluate:
+  background-color: #FFFF99
+  border: 2px solid #FFA500
+  transition: background-color 0.3s ease
+
+═══════════════════════════════════════════════════════
+REVIEW OVERLAY MESSAGE
+═══════════════════════════════════════════════════════
+After all fields are filled, inject a fixed overlay
+div at the top of the page using page.evaluate.
+The overlay must have:
+  Position: fixed, top: 0, left: 0, width: 100%
+  Background: #1B2A4A (dark navy)
+  Color: white
+  Padding: 15px 20px
+  Font: Arial 14px bold
+  Z-index: 999999
+  Text: "✅ GCC Job Agent has auto-filled [X] fields.
+         Please review all highlighted fields in yellow,
+         attach your CV, and click Submit when ready.
+         Visa fields have been left blank intentionally."
+  A close button [X] on the right side that removes
+  the overlay when clicked
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. async fillForm(url, job)
+   Input:
+     url: the job application page URL
+     job: object with title, company, location fields
+   Steps:
+     a. Launch Puppeteer with headless: false so browser is visible
+        Set defaultViewport: null for full window
+        Set args: ['--start-maximized']
+     b. Open the URL
+     c. Wait for page to load: waitForSelector('form', timeout 15000)
+        If no form found after 15s: log warning and continue anyway
+     d. Call fillAllFields(page) to fill all detected fields
+     e. Call injectOverlay(page, filledCount) to show the overlay
+     f. Log: "Form auto-filled for [title] at [company]"
+        Log: "Browser is open — please review and submit manually"
+        Log: "Fields filled: [X]"
+     g. Do NOT close the browser — leave it open for Dheeraj
+     h. Return: { filledCount, browser, page }
+
+2. async fillAllFields(page)
+   Gets all input, textarea and select elements on the page
+   For each element:
+     Reads name, id, placeholder, aria-label, type attributes
+     Tries to match against the field mapping above
+     If match found:
+       For input/textarea: use page.evaluate to set value directly
+         AND dispatch an input event and change event so the
+         form registers the value (important for React/Angular forms)
+       For select dropdowns: try to select the best matching option
+       Apply yellow highlight
+       Increment filledCount
+     Skips visa/work permit fields completely
+   Returns: filledCount (number of fields filled)
+
+3. async injectOverlay(page, filledCount)
+   Injects the fixed overlay div as described above
+   Replaces [X] in the text with the actual filledCount number
+
+4. async autoFillJobApplication(job)
+   Main entry point called from dashboard (Session 20)
+   Input: job object with applyUrl field
+   Calls fillForm(job.applyUrl, job)
+   Returns result from fillForm
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Test with a real public job form page.
+Use this URL which is a simple HTML form for testing:
+  https://httpbin.org/forms/post
+
+Test job object:
+  title: "Business Development Manager"
+  company: "Emirates Group"
+  location: "Dubai"
+  applyUrl: "https://httpbin.org/forms/post"
+
+Call: fillForm("https://httpbin.org/forms/post", testJob)
+The browser should open visibly.
+It should attempt to fill any matching fields.
+The overlay should appear at the top.
+The browser should stay open.
+Log all results.
+
+Then run: node src/formFiller.js

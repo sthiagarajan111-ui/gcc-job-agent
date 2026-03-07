@@ -1,0 +1,159 @@
+Create ONE file: src/jobPrioritizer.js
+
+This file is the full Tier 1 to 4 job scoring engine.
+It replaces the basic scoring in analyzer.js.
+Do NOT modify analyzer.js at all.
+
+SCORING SYSTEM — 4 factors, each worth 25 points (100 total):
+
+FACTOR 1 — Location (25 points max):
+  Dubai = 25
+  Abu Dhabi or UAE = 20
+  Qatar or Doha = 15
+  Saudi Arabia or Riyadh or Jeddah = 12
+  Kuwait or Bahrain = 10
+  Oman or Muscat = 8
+  Unknown = 5
+
+FACTOR 2 — Company Prestige (25 points max):
+  Fortune 500 company = 25
+  Top GCC conglomerate = 20
+  Well known regional company = 15
+  SME or Unknown = 5
+
+FACTOR 3 — Salary Level (25 points max):
+  Above AED 25000 = 25
+  AED 15000 to 25000 = 18
+  AED 8000 to 15000 = 12
+  Not mentioned = 10
+  Below AED 8000 = 5
+
+FACTOR 4 — Profile Match (25 points max):
+  Score 9-10 = 25
+  Score 7-8 = 18
+  Score 6 = 12
+  Below 6 = 5
+
+TIER SYSTEM (total out of 100):
+  90-100 = TIER 1 — APPLY TODAY
+  70-89  = TIER 2 — APPLY THIS WEEK
+  50-69  = TIER 3 — APPLY IF TIME
+  Below 50 = TIER 4 — OPTIONAL
+
+FORTUNE 500 LIST — hardcode these company name keywords (case-insensitive matching):
+Amazon, Apple, Microsoft, Google, Alphabet, Meta,
+ExxonMobil, Shell, BP, TotalEnergies, Chevron,
+JPMorgan, Goldman Sachs, Morgan Stanley, HSBC,
+Citigroup, Barclays, Deutsche Bank, UBS, BlackRock,
+McKinsey, Boston Consulting, Bain, Deloitte, PwC,
+Ernst Young, KPMG, Accenture, IBM, Oracle, SAP,
+Salesforce, Cisco, Intel, Samsung, Sony, Siemens,
+Unilever, Nestle, Procter Gamble, Johnson Johnson,
+Pfizer, Novartis, Roche, AstraZeneca, LVMH, Nike,
+Adidas, Toyota, BMW, Mercedes, Volkswagen, Ford,
+General Motors, Boeing, Airbus, Caterpillar,
+General Electric, Honeywell, 3M, ABB, Schlumberger,
+Halliburton, Baker Hughes, Aramco, ADNOC, Emirates,
+Etihad, Qatar Airways, DP World, Emaar, Aldar,
+DAMAC, Majid Al Futtaim, Al Futtaim, Chalhoub,
+Landmark Group, Jumeirah, Marriott, Hilton,
+Hyatt, IHG, Four Seasons, Mastercard, Visa,
+American Express, PayPal, Stripe, Bloomberg,
+Reuters, Mubadala, ADQ, PIF, QIA, Investcorp
+
+TOP GCC CONGLOMERATES — hardcode these keywords:
+Al Futtaim, Al Habtoor, Al Ghurair, Al Rostamani,
+Majid Al Futtaim, Chalhoub, Landmark, Jumeirah,
+Emaar, Aldar, DAMAC, Nakheel, Meraas, Dubai Holding,
+ICD, Mubadala, ADQ, ADNOC, Etisalat, du Telecom,
+STC, Zain, Ooredoo, Agility, Dallah, Abdul Latif Jameel,
+Olayan, Almana, Al Sayer, MBC, Rotana, OSN
+
+PROFILE MATCH SCORING — match job title and description against Dheeraj's profile:
+
+Strong match keywords (score 8-10):
+  business development, BD manager, sales manager,
+  sales executive, strategy consultant, investment
+  analyst, partnerships, commercial, revenue,
+  client acquisition, enterprise sales, B2B
+
+Medium match keywords (score 6-7):
+  finance analyst, business analyst, account manager,
+  relationship manager, project manager, consultant,
+  analyst, management, operations
+
+Weak match keywords (score 3-5):
+  marketing, HR, IT, engineering, logistics,
+  supply chain, legal, admin
+
+FUNCTIONS TO EXPORT:
+
+1. isFortuneCompany(companyName)
+   Returns true if company matches Fortune 500 list, false otherwise
+
+2. isGCCConglomerate(companyName)
+   Returns true if company matches GCC conglomerate list, false otherwise
+
+3. scoreLocation(location)
+   Returns points 5-25 based on location rules above
+
+4. scoreCompany(companyName)
+   Returns points 5-25 based on prestige rules above
+
+5. scoreSalary(salaryText)
+   Parses salary from text (handles AED, USD, GBP)
+   Converts USD to AED using rate 1 USD = 3.67 AED
+   Converts GBP to AED using rate 1 GBP = 4.75 AED
+   Returns points 5-25 based on salary rules above
+
+6. scoreProfileMatch(title, description)
+   Matches against strong/medium/weak keywords above
+   Returns points 5-25 based on match score
+
+7. prioritizeJob(job)
+   Takes a job object with fields: title, company, location, salary, description
+   Calls all 4 scoring functions
+   Returns the job object with these added fields:
+     locationScore (0-25)
+     companyScore (0-25)
+     salaryScore (0-25)
+     matchScore (0-25)
+     totalScore (0-100)
+     tier (1, 2, 3, or 4)
+     tierLabel (APPLY TODAY / APPLY THIS WEEK / APPLY IF TIME / OPTIONAL)
+     isFortuneCompany (true/false)
+     isGCCConglomerate (true/false)
+     fortuneBadge (string: "Fortune 500" or empty string)
+
+8. prioritizeAllJobs(jobsArray)
+   Runs prioritizeJob on every job in array
+   Returns array sorted by totalScore descending
+
+After creating src/jobPrioritizer.js, add a test block at the
+bottom inside: if (require.main === module) { ... }
+
+Test with these 3 sample jobs:
+
+Job 1:
+  title: "Business Development Manager"
+  company: "Goldman Sachs"
+  location: "Dubai"
+  salary: "AED 22000"
+  description: "enterprise sales B2B client acquisition revenue"
+
+Job 2:
+  title: "Sales Executive"
+  company: "Local Trading LLC"
+  location: "Abu Dhabi"
+  salary: ""
+  description: "sales account management B2B"
+
+Job 3:
+  title: "Marketing Manager"
+  company: "Unknown Startup"
+  location: "Oman"
+  salary: "AED 6000"
+  description: "marketing campaigns social media"
+
+Then run: node src/jobPrioritizer.js
+Print the tier and totalScore for all 3 test jobs clearly.

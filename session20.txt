@@ -1,0 +1,229 @@
+Create ONE file: src/dashboard.js
+
+This file is an Express.js web dashboard at http://localhost:3000
+It shows all jobs with filters, job cards, a Kanban application
+tracker board, cover letter downloads, and action buttons.
+
+Do NOT modify any existing files.
+
+═══════════════════════════════════════════════════════
+DEPENDENCIES TO INSTALL FIRST
+═══════════════════════════════════════════════════════
+Run: npm install express
+
+═══════════════════════════════════════════════════════
+SERVER SETUP
+═══════════════════════════════════════════════════════
+Port: 3000
+On start: console.log("GCC Job Agent Dashboard running at http://localhost:3000")
+Load today's jobs from: data/report-YYYY-MM-DD.json
+  where YYYY-MM-DD is today's date
+  If not found: show a friendly message "Run the agent first"
+Load applications from: data/applications.json via appTracker.js
+
+═══════════════════════════════════════════════════════
+COLOR PALETTE (same as reporterV2)
+═══════════════════════════════════════════════════════
+Dark navy:   #1B2A4A
+Medium blue: #2E4A7A
+Light blue:  #4A90D9
+Gold:        #F5A623
+Green:       #27AE60
+Orange:      #E67E22
+Red:         #E74C3C
+Light grey:  #F8F9FA
+
+═══════════════════════════════════════════════════════
+ROUTES
+═══════════════════════════════════════════════════════
+
+GET /
+  Main dashboard page — job cards with filters
+
+GET /tracker
+  Kanban application tracker board
+
+GET /api/jobs
+  Returns today's jobs as JSON array
+  Accepts query params: tier, location, role, fortune500
+
+GET /api/pipeline
+  Returns pipeline summary from appTracker.js
+
+GET /api/generate-cover-letter/:jobId
+  Calls generateSingleCoverLetter from coverLetter.js
+  Returns: { success, filePath, message }
+
+GET /api/autofill/:jobId
+  Calls autoFillJobApplication from formFiller.js
+  Returns: { success, message }
+
+POST /api/update-status
+  Body: { id, status, notes }
+  Calls updateStatus from appTracker.js
+  Returns: { success, application }
+
+POST /api/add-application
+  Body: job object
+  Calls addApplication from appTracker.js
+  Returns: { success, application }
+
+═══════════════════════════════════════════════════════
+MAIN DASHBOARD PAGE — GET /
+═══════════════════════════════════════════════════════
+Full HTML page served as a string from Express.
+All CSS inline in <style> tag. All JS inline in <script> tag.
+
+PAGE LAYOUT:
+
+TOP NAVBAR:
+  Dark navy background, full width
+  Left: GCC JOB AGENT logo text (white, bold)
+  Center: Two nav links: [Jobs] [Tracker]
+  Right: Date + "Dheeraj Thiagarajan"
+
+STATS BAR (below navbar):
+  5 stat boxes in a row, light grey background:
+  Total Jobs | Tier 1 | Tier 2 | Fortune 500 | Applied
+  Each with a large number and label below
+
+FILTER BAR:
+  White background, horizontal row of filters:
+
+  Filter 1 — Tier dropdown:
+    All Tiers | Tier 1 Only | Tier 2 Only | Tier 3 Only
+
+  Filter 2 — Location dropdown:
+    All Locations | Dubai | Abu Dhabi | Qatar |
+    Saudi Arabia | Kuwait | Bahrain | Oman
+
+  Filter 3 — Role dropdown:
+    All Roles | Business Development | Sales |
+    Strategy | Finance | Business Analyst
+
+  Filter 4 — Fortune 500 toggle button:
+    [Show Fortune 500 Only] — toggles on/off
+    Gold background when active
+
+  Filter 5 — Sort dropdown:
+    Highest Score | Lowest Score | Newest First
+
+  Filter 6 — Search box:
+    Type to search by company or job title
+
+  [Reset Filters] button — clears all filters
+
+JOB CARDS GRID:
+  2 columns on wide screen, 1 column on narrow
+  Each card matches the email report card design:
+
+  Card layout:
+    TOP ROW:
+      Job title (bold, dark navy, 15px)
+      Company (medium blue, 13px)
+      Location | Tier badge (colored pill)
+      Score circle (top right, colored by score)
+      Fortune 500 badge if applicable (gold)
+
+    MIDDLE ROW:
+      Score breakdown: Location/Company/Salary/Match
+      Each shown as X/25 with small colored bar
+
+    SALARY ROW:
+      Posted salary in green OR estimated range in grey
+      Verdict badge: ABOVE TARGET / AT MINIMUM / BELOW FLOOR
+
+    BUTTON ROW (4 buttons):
+      [VIEW JOB] — opens applyUrl in new tab
+                   dark navy, white text
+      [APPLY & TRACK] — adds to applications.json
+                        calls addApplication
+                        green button
+                        changes to "✅ Applied" after click
+                        and becomes disabled
+      [COVER LETTER] — calls /api/generate-cover-letter/:jobId
+                       blue button
+                       shows spinner while generating
+                       changes to [DOWNLOAD] with file link after
+      [AUTO-FILL] — calls /api/autofill/:jobId
+                    opens Puppeteer browser
+                    orange button
+
+  Cards filtered and re-rendered instantly when
+  filters change (client-side JS, no page reload)
+
+PAGINATION:
+  Show 20 cards per page
+  Previous / Next buttons at bottom
+  "Showing X-Y of Z jobs"
+
+═══════════════════════════════════════════════════════
+TRACKER PAGE — GET /tracker
+═══════════════════════════════════════════════════════
+Full Kanban board with 5 columns:
+  Applied | Screening | Interview | Offer | Rejected
+
+Each column:
+  Header with status name and count badge
+  Color coded header:
+    Applied = dark navy
+    Screening = orange
+    Interview = green
+    Offer = gold
+    Rejected = red
+
+Each application card in the column shows:
+  Job title (bold)
+  Company name
+  Location
+  Applied date
+  Tier badge
+  Dropdown to change status (Applied/Screening/
+    Interview/Offer/Rejected)
+  When status changed: POST to /api/update-status
+    Card moves to new column instantly
+
+Pipeline summary bar at top:
+  Total applied | Response rate % |
+  Interview rate % | Offer rate %
+
+Empty column message: "No applications here yet"
+
+═══════════════════════════════════════════════════════
+FUNCTIONS TO EXPORT
+═══════════════════════════════════════════════════════
+
+1. startDashboard()
+   Starts the Express server on port 3000
+   Loads today's jobs
+   Sets up all routes
+   Returns the Express app instance
+
+2. stopDashboard()
+   Closes the server gracefully
+
+3. loadTodaysJobs()
+   Reads data/report-YYYY-MM-DD.json for today
+   If not found: returns empty array
+   Applies prioritizeAllJobs from jobPrioritizer.js
+   Returns sorted jobs array
+
+═══════════════════════════════════════════════════════
+TEST BLOCK
+Add at bottom inside: if (require.main === module) { ... }
+═══════════════════════════════════════════════════════
+
+Call startDashboard()
+Print: "Dashboard started — open http://localhost:3000"
+Print: "Press Ctrl+C to stop"
+
+Keep server running (do not call stopDashboard in test)
+The server stays open so the browser can be used.
+
+Then run: node src/dashboard.js
+Open http://localhost:3000 in browser to verify.
+
+NOTE: If today's data/report-YYYY-MM-DD.json does not
+exist, the dashboard will show a friendly message.
+This is correct — it will show real data tomorrow
+when the agent runs at 8AM.
