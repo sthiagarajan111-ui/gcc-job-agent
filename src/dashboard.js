@@ -40,6 +40,48 @@ function loadTodaysJobs() {
 }
 
 // ═══════════════════════════════════════════════════════
+// LOAD ALL JOBS (all historic reports)
+// ═══════════════════════════════════════════════════════
+
+function loadAllJobs() {
+  const dataDir = path.join(__dirname, '../data');
+  if (!fs.existsSync(dataDir)) return [];
+
+  const files = fs.readdirSync(dataDir).filter(f => /^report-\d{4}-\d{2}-\d{2}\.json$/.test(f));
+  if (files.length === 0) return [];
+
+  const seen = new Set();
+  let combined = [];
+
+  for (const file of files) {
+    try {
+      const raw = fs.readJsonSync(path.join(dataDir, file));
+      const jobs = Array.isArray(raw) ? raw : (raw.jobs || []);
+      combined = combined.concat(jobs);
+    } catch (err) {
+      console.error(`[dashboard] Error loading ${file}:`, err.message);
+    }
+  }
+
+  // Deduplicate: prefer explicit id, fall back to title+company+location key
+  const deduped = [];
+  for (const job of combined) {
+    const key = job.id
+      ? String(job.id)
+      : `${(job.title || '').toLowerCase()}|${(job.company || '').toLowerCase()}|${(job.location || '').toLowerCase()}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(job);
+    }
+  }
+
+  // Prioritize then sort by totalScore descending
+  const prioritized = prioritizeAllJobs(deduped);
+  prioritized.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+  return prioritized;
+}
+
+// ═══════════════════════════════════════════════════════
 // HTML HELPERS
 // ═══════════════════════════════════════════════════════
 
@@ -69,12 +111,17 @@ function getSalaryVerdict(job) {
 // ═══════════════════════════════════════════════════════
 
 function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
+  const todayIso = new Date().toISOString().split('T')[0];
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const tier1 = jobs.filter(j => j.tier === 1).length;
   const tier2 = jobs.filter(j => j.tier === 2).length;
   const fortune500 = jobs.filter(j => j.isFortuneCompany).length;
   const applications = loadApplications();
   const applied = applications.length;
+  const todaysNew = jobs.filter(j => {
+    const d = (j.postedDate || j.addedDate || '');
+    return d.startsWith(todayIso);
+  }).length;
 
   // Pre-compute contact/networking fields per job
   const HR_TITLE_KW = ['hiring manager', 'talent acquisition', 'recruiter', 'hr manager', 'hr director'];
@@ -406,7 +453,11 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 <div class="stats-bar">
   <div class="stat-box">
     <div class="stat-number" id="stat-total">${jobs.length}</div>
-    <div class="stat-label">Total Jobs</div>
+    <div class="stat-label">Total Jobs (All Time)</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-number" style="color:#00D4FF">${todaysNew}</div>
+    <div class="stat-label">Today's New Jobs</div>
   </div>
   <div class="stat-box">
     <div class="stat-number" style="color:#3FB950">${tier1}</div>
@@ -1729,7 +1780,7 @@ function startDashboard() {
 
   // ── GET / ──────────────────────────────────────────
   app.get('/', async (req, res) => {
-    const jobs = loadTodaysJobs();
+    const jobs = loadAllJobs();
     const contactsData = await loadContacts();
     const networkingData = loadNetworkingPlans();
     res.send(buildDashboardHtml(jobs, contactsData, networkingData));
@@ -1742,7 +1793,7 @@ function startDashboard() {
 
   // ── GET /api/jobs ──────────────────────────────────
   app.get('/api/jobs', (req, res) => {
-    let jobs = loadTodaysJobs();
+    let jobs = loadAllJobs();
     const { tier, location, role, fortune500 } = req.query;
     if (tier) jobs = jobs.filter(j => String(j.tier) === tier);
     if (location) jobs = jobs.filter(j => (j.location || '').includes(location));
@@ -2098,7 +2149,7 @@ function stopDashboard() {
 // EXPORTS
 // ═══════════════════════════════════════════════════════
 
-module.exports = { startDashboard, stopDashboard, loadTodaysJobs };
+module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 
 // ═══════════════════════════════════════════════════════
 // TEST BLOCK
@@ -2109,7 +2160,5 @@ if (require.main === module) {
   startDashboard();
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');
-  console.log('Interview Prep feature built successfully');
-  console.log('6 tabs: Company, Industry, Role, Questions, Your Answers, Checklist');
-  console.log('Purple INTERVIEW PREP button added to all job cards');
+  console.log('loadAllJobs() built — shows all historic jobs combined & deduplicated');
 }
