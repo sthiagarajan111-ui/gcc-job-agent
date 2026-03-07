@@ -2073,8 +2073,9 @@ function startDashboard() {
     }
   });
 
-  server = app.listen(3000, () => {
-    console.log('GCC Job Agent Dashboard running at http://localhost:3000');
+  const PORT = process.env.PORT || 3000;
+  server = app.listen(PORT, () => {
+    console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
   });
 
   return app;
