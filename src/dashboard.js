@@ -728,6 +728,7 @@ function renderPage() {
 }
 
 function buildCard(job, idx) {
+  console.log('job.manuallyAdded:', job.manuallyAdded);
   const jobId = getJobId(job);
   const tierColor = getTierColor(job.tier);
   const scoreColor = getScoreColor(job.totalScore || 0);
@@ -1679,7 +1680,7 @@ function moveCard(id, newStatus) {
   const empty = targetCol.querySelector('.empty-col');
   if (empty) empty.remove();
 
-  const newCard = buildCard(app);
+  const newCard = buildKanbanCard(app);
   targetCol.insertAdjacentHTML('beforeend', newCard);
 
   // Update counts
@@ -1693,7 +1694,7 @@ function moveCard(id, newStatus) {
   });
 }
 
-function buildCard(app) {
+function buildKanbanCard(app) {
   if (!app) return '';
   return \`
     <div class="kanban-card" id="kcard-\${app.id}">
@@ -1966,9 +1967,11 @@ function startDashboard() {
         salary: job.salary || '',
         tier: job.tier || 2,
       };
+      console.log('Cover letter job object:', JSON.stringify(job));
       const result = await generateSingleCoverLetter(job);
       res.json({ success: true, filePath: result.filePath, message: 'Cover letter generated' });
     } catch (err) {
+      console.log('Cover letter error:', err.message, err.stack);
       console.error('[dashboard] Cover letter error:', err.message);
       res.json({ success: false, message: err.message || 'Failed to generate cover letter' });
     }
