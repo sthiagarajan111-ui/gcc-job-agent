@@ -1,0 +1,252 @@
+Update the existing file: data/candidates.json
+Also update: src/coverLetter.js
+
+Read both files first before making any changes.
+
+═══════════════════════════════════════════════════════
+UPDATE THIAGARAJAN'S PROFILE IN data/candidates.json
+═══════════════════════════════════════════════════════
+
+Find the candidate with id: "thiagarajan"
+Replace ALL fields with these correct details
+extracted from his CV:
+
+{
+  "id": "thiagarajan",
+  "name": "Thiagarajan Shanthakumar",
+  "email": "sthiagarajan111@yahoo.com",
+  "phone": "+968 95212246",
+  "linkedin": "https://www.linkedin.com/in/thiagarajan-s-66113012/",
+  "nationality": "Indian",
+  "noticePeriod": "1 Month",
+  "currentLocation": "Muscat, Oman",
+  "currentCompany": "Mohsin Haider Darwish (MHD), Muscat",
+  "currentTitle": "Head of After Sales",
+  "experienceYears": 38,
+  "targetSalaryAED": 47000,
+  "minimumSalaryAED": 45000,
+  "stretchSalaryAED": 55000,
+  "autoFillSalaryAED": 47000,
+  "color": "#3FB950",
+  "avatar": "TS",
+  "education": [
+    {
+      "institution": "University",
+      "degree": "Master of Business Administration (MBA)",
+      "grade": "",
+      "years": ""
+    },
+    {
+      "institution": "Polytechnic",
+      "degree": "Mechanical Engineering Diploma with Automobile Specialisation",
+      "grade": "",
+      "years": ""
+    }
+  ],
+  "experience": [
+    {
+      "company": "Mohsin Haider Darwish (MHD), Muscat",
+      "title": "Head of After Sales",
+      "period": "Oct 2022 – Present",
+      "highlights": [
+        "Head of After Sales for Jeep, Dodge, Ram, Alfa Romeo (May 2025–Present)",
+        "Head of After Sales for McLaren, MG, Jetour, Hongqi, Ineos (Oct 2022–May 2025)",
+        "After Sales 5 Star Distributor Award from MG",
+        "Best Distributor Award from Jetour",
+        "Global Gold Award from Hongqi"
+      ]
+    },
+    {
+      "company": "Lootah Group, Dubai",
+      "title": "General Manager – Automobile",
+      "period": "Feb 2022 – Oct 2022",
+      "highlights": [
+        "Headed overall auto business operations reporting to Chairman",
+        "Established Automotive Dealership Business in UAE",
+        "Signed exclusive agency with Changan Bus for UAE market in 3 months",
+        "Delivered 230 Changan buses to Government sector"
+      ]
+    },
+    {
+      "company": "Oman Trading Establishment (Suhail Bahwan Group), Muscat",
+      "title": "Deputy General Manager – After Sales",
+      "period": "Jan 2002 – Jan 2022 (20 years)",
+      "highlights": [
+        "DGM After Sales – Cadillac, Chevrolet, Isuzu, Hyundai CV, Carrier, Chery (2018–2022)",
+        "DGM Service – Cadillac & Chevrolet (2015–2018)",
+        "Divisional Manager Service – Cadillac & Chevrolet (2011–2014)",
+        "General Motors Grandmaster Award multiple years including 2019",
+        "Best Global After Sales Dealer Award 2021 from Isuzu",
+        "Best of the Best Service Manager Award from General Motors",
+        "Multiple Service Excellence Awards from General Motors",
+        "Best Distributor Service Award from Hyundai",
+        "Managed team of 700 multinational staff",
+        "Multi-brand, multi-location service operations"
+      ]
+    },
+    {
+      "company": "Eicher Motors Ltd, India",
+      "title": "Regional Manager – After Sales",
+      "period": "1991 – 2001 (10 years)",
+      "highlights": [
+        "Regional Manager After Sales (1996–2001)",
+        "Product Management at HQ Indore (1994–1995)",
+        "Service Engineer, Sales Engineer, User Trials Engineer",
+        "5 promotions in 10 years – fastest career growth in company",
+        "Rated best employee in entire marketing division"
+      ]
+    },
+    {
+      "company": "Ashok Leyland Ltd, Chennai, India",
+      "title": "Manufacturing Engineer",
+      "period": "1987 – 1991 (4 years)",
+      "highlights": [
+        "Worked in manufacturing – machine shop, fabrication, truck and bus assembly",
+        "Hinduja Group – 2nd largest Commercial Vehicle manufacturer in India"
+      ]
+    }
+  ],
+  "keyAchievements": [
+    "General Motors Grandmaster Award – multiple years",
+    "Best Global After Sales Dealer Award 2021 from Isuzu Motors",
+    "Best of the Best Service Manager Award from General Motors",
+    "Multiple Service Excellence Awards from General Motors",
+    "Best Distributor Service Award from Hyundai",
+    "After Sales 5 Star Distributor Award from MG",
+    "Global Gold Award from Hongqi",
+    "Managed 700+ multinational workforce",
+    "38 years automotive after sales experience",
+    "14 years OEM experience + 24 years GCC experience"
+  ],
+  "areasOfExpertise": [
+    "Automotive Aftersales Service",
+    "Managing Profit Centre / P&L",
+    "Dealership Processes",
+    "New Business Development",
+    "Establishing New Dealership Setups",
+    "Customer Retention / CSI / NPS",
+    "Multi-brand Service Operations",
+    "Multiple Location Management",
+    "Large Team Management (700+ staff)",
+    "OEM Relationship Management",
+    "Body Shop Business",
+    "Service Contract & Extended Warranty",
+    "Business Planning, Budgeting & Forecasting",
+    "Process Improvement & Operational Efficiency",
+    "Staff Localisation Programmes",
+    "Digital Initiatives in After Sales"
+  ],
+  "skills": [
+    "Automotive After Sales Management",
+    "P&L Management",
+    "Service Operations",
+    "Warranty Management",
+    "Team Leadership (700+ staff)",
+    "Multi-brand Management",
+    "OEM Relationship Management",
+    "Business Planning & Budgeting",
+    "Customer Satisfaction (CSI/NPS)",
+    "Body Shop Operations",
+    "SAP DMS",
+    "CDK Autoline",
+    "MS Office (Excel, Word, PowerPoint, VBA)"
+  ],
+  "languages": ["English", "Tamil", "Hindi"],
+  "certifications": [
+    "Certified I Care Leader – Up! Your Service by Ron Kaufman (for GM)",
+    "Hyundai Motor Corporation product training",
+    "Isuzu Motor Corporation product training",
+    "Carrier Transicold France training",
+    "MMC Japan – Passenger Car Electrical & Electronics training",
+    "MMC Japan – Mitsubishi Trucks training",
+    "Ashok Leyland – 2 years detailed manufacturing training",
+    "Various GM/Hyundai Service Management trainings",
+    "TQM, JIT, TEI, TQC, Kaizen, Kanban (Eicher Motors)"
+  ],
+  "targetRoles": [
+    "Head of After Sales",
+    "Director After Sales",
+    "General Manager After Sales",
+    "After Sales Director",
+    "VP After Sales",
+    "Service Director",
+    "General Manager Service",
+    "Head of Service Operations",
+    "Director Service Operations",
+    "General Manager Automobile",
+    "Chief Operating Officer",
+    "Aftersales Manager"
+  ],
+  "targetLocations": ["Dubai", "Abu Dhabi", "Sharjah", "Riyadh", "Doha", "Kuwait", "Muscat", "Bahrain"],
+  "active": true
+}
+
+═══════════════════════════════════════════════════════
+UPDATE COVER LETTER PROMPT IN src/coverLetter.js
+═══════════════════════════════════════════════════════
+
+Find the section that generates cover letters for
+candidateId === "thiagarajan"
+
+Replace the Claude API prompt with this detailed version:
+
+System: "You are an expert executive career consultant
+writing senior-level cover letters for C-suite and
+Director-level positions in the automotive industry."
+
+User prompt:
+"Write a professional executive cover letter for
+Thiagarajan Shanthakumar applying for the role of
+[job.title] at [job.company] in [job.location].
+
+CANDIDATE PROFILE:
+Name: Thiagarajan Shanthakumar
+Current Role: Head of After Sales, Mohsin Haider Darwish, Muscat
+Total Experience: 38 years in Automotive After Sales
+OEM Experience: 14 years (Eicher Motors, Ashok Leyland)
+GCC Experience: 24 years (Oman Trading Establishment, Lootah Group, MHD)
+Education: MBA + Mechanical Engineering Diploma
+LinkedIn: https://www.linkedin.com/in/thiagarajan-s-66113012/
+Target Salary: AED 47,000/month
+Location: Available to relocate anywhere in GCC, preference Dubai
+
+KEY ACHIEVEMENTS TO HIGHLIGHT:
+- General Motors Grandmaster Award (multiple years)
+- Best Global After Sales Dealer Award 2021 from Isuzu Motors
+- Best of the Best Service Manager Award from General Motors
+- Managed 700+ multinational workforce
+- 24 years GCC experience across multiple OEM brands
+- Successfully established new dealership in UAE (Lootah Group)
+- Record-high customer satisfaction and retention achievements
+- Proven P&L management and profit centre leadership
+- Multi-brand expertise: GM, Isuzu, Hyundai, Cadillac, McLaren,
+  JLR, MG, Changan, Jetour, Hongqi, Alfa Romeo
+
+CURRENT COMPANY BRANDS:
+Jeep, Dodge, Ram, Alfa Romeo, McLaren, MG, JLR, Jetour, Hongqi
+
+WRITING GUIDELINES:
+- Senior executive tone — confident, authoritative
+- Highlight 38 years of progressive leadership
+- Emphasise GCC market knowledge (24 years)
+- Mention relevant OEM awards and recognition
+- Show P&L and profit centre experience
+- Reference team management at scale (700+ staff)
+- Keep to 3-4 paragraphs, professional format
+- Do NOT mention visa or work permit status
+- End with strong call to action for interview"
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+
+After all changes:
+  node src/dashboard.js
+
+Confirm:
+  GET /api/candidates (if this route exists) → shows both
+  Cover letter prompt updated for Thiagarajan
+
+Print: "Thiagarajan full CV profile updated"
+Print: "38 years experience profile loaded"
+Print: "Cover letter prompt updated with full CV details"

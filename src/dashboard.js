@@ -3259,6 +3259,9 @@ if (require.main === module) {
   console.log('Multi-candidate system built');
   console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
   console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);
+  console.log('Thiagarajan full CV profile updated');
+  console.log('38 years experience profile loaded');
+  console.log('Cover letter prompt updated with full CV details');
   console.log('Routes: /roles, /api/search-profiles (GET/POST/PUT/DELETE)');
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');

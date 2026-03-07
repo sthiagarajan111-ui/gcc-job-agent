@@ -61,41 +61,7 @@ COVER LETTER WRITING RULES:
 
 Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
 
-const THIAGARAJAN_SYSTEM_PROMPT = `You are writing a professional cover letter for Thiagarajan Shanthakumar. Follow these rules exactly:
-
-CANDIDATE PROFILE:
-Name: Thiagarajan Shanthakumar
-Email: sthiagarajan111@gmail.com
-LinkedIn: https://www.linkedin.com/in/thiagarajan-s-66113012/
-Location: Muscat, Oman
-Notice Period: 1 Month
-Target Salary: AED 47,000/month
-
-Experience:
-- 35 years of experience in After Sales management across the GCC region
-- Current/Most Recent Title: Head of After Sales
-- Senior leadership expertise in service operations, warranty management, P&L responsibility
-- GCC market expertise with deep knowledge of automotive and service industries
-- Team leadership, customer satisfaction, and operational excellence focus
-
-Key Strengths:
-- 35 years of After Sales management experience — one of the most experienced in the GCC
-- Proven track record in senior leadership roles
-- Deep GCC market knowledge and relationships
-- P&L management and profitability focus
-- Service operations transformation and process improvement
-
-COVER LETTER WRITING RULES:
-1. Length: 3 paragraphs, maximum 350 words total
-2. Tone: Professional, senior executive — authoritative and results-focused
-3. Opening paragraph: Show genuine knowledge of the company and role, reference specific things about the company if known
-4. Middle paragraph: Pick the 2-3 most relevant experiences from Thiagarajan's background. Emphasise the 35 years of After Sales expertise, GCC market knowledge, and leadership track record.
-5. Closing paragraph: Express enthusiasm for the role, mention availability with 1 month notice, Dubai/GCC location preference, and a clear call to action.
-6. Never mention visa status or nationality.
-7. Never use clichés like "I am writing to apply" or "Please find attached my CV"
-8. Sign off as: Thiagarajan Shanthakumar
-
-Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
+const THIAGARAJAN_SYSTEM_PROMPT = `You are an expert executive career consultant writing senior-level cover letters for C-suite and Director-level positions in the automotive industry.`;
 
 // ═══════════════════════════════════════════════════════
 // HELPERS
@@ -142,9 +108,9 @@ function getCandidateHeaderInfo(candidateId) {
   if (candidateId === 'thiagarajan') {
     return {
       nameDisplay: 'THIAGARAJAN SHANTHAKUMAR',
-      contactLine: 'sthiagarajan111@gmail.com | Muscat, Oman',
+      contactLine: 'sthiagarajan111@yahoo.com | +968 95212246 | Muscat, Oman',
       linkedin: 'https://www.linkedin.com/in/thiagarajan-s-66113012/',
-      titleLine: 'Head of After Sales',
+      titleLine: 'Head of After Sales | 38 Years Automotive Experience',
       signoffName: 'THIAGARAJAN SHANTHAKUMAR',
     };
   }
@@ -306,13 +272,58 @@ async function generateCoverLetter(job, candidateId) {
 
   const client = new Anthropic();
 
-  const systemPrompt = candidateId === 'thiagarajan' ? THIAGARAJAN_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  let systemPrompt, userMessage;
 
-  const userMessage = `Write a cover letter for this job:
+  if (candidateId === 'thiagarajan') {
+    systemPrompt = THIAGARAJAN_SYSTEM_PROMPT;
+    userMessage = `Write a professional executive cover letter for Thiagarajan Shanthakumar applying for the role of ${job.title} at ${job.company} in ${job.location}.
+
+CANDIDATE PROFILE:
+Name: Thiagarajan Shanthakumar
+Current Role: Head of After Sales, Mohsin Haider Darwish, Muscat
+Total Experience: 38 years in Automotive After Sales
+OEM Experience: 14 years (Eicher Motors, Ashok Leyland)
+GCC Experience: 24 years (Oman Trading Establishment, Lootah Group, MHD)
+Education: MBA + Mechanical Engineering Diploma
+LinkedIn: https://www.linkedin.com/in/thiagarajan-s-66113012/
+Target Salary: AED 47,000/month
+Location: Available to relocate anywhere in GCC, preference Dubai
+
+KEY ACHIEVEMENTS TO HIGHLIGHT:
+- General Motors Grandmaster Award (multiple years)
+- Best Global After Sales Dealer Award 2021 from Isuzu Motors
+- Best of the Best Service Manager Award from General Motors
+- Managed 700+ multinational workforce
+- 24 years GCC experience across multiple OEM brands
+- Successfully established new dealership in UAE (Lootah Group)
+- Record-high customer satisfaction and retention achievements
+- Proven P&L management and profit centre leadership
+- Multi-brand expertise: GM, Isuzu, Hyundai, Cadillac, McLaren, JLR, MG, Changan, Jetour, Hongqi, Alfa Romeo
+
+CURRENT COMPANY BRANDS:
+Jeep, Dodge, Ram, Alfa Romeo, McLaren, MG, JLR, Jetour, Hongqi
+
+JOB DESCRIPTION:
+${job.description || 'Not provided'}
+
+WRITING GUIDELINES:
+- Senior executive tone — confident, authoritative
+- Highlight 38 years of progressive leadership
+- Emphasise GCC market knowledge (24 years)
+- Mention relevant OEM awards and recognition
+- Show P&L and profit centre experience
+- Reference team management at scale (700+ staff)
+- Keep to 3-4 paragraphs, professional format
+- Do NOT mention visa or work permit status
+- End with strong call to action for interview`;
+  } else {
+    systemPrompt = SYSTEM_PROMPT;
+    userMessage = `Write a cover letter for this job:
 Title: ${job.title}
 Company: ${job.company}
 Location: ${job.location}
 Job Description: ${job.description}`;
+  }
 
   let coverLetterText;
   try {
