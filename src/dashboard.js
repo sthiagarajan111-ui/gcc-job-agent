@@ -70,7 +70,10 @@ function loadAllJobs() {
   if (fs.existsSync(manualFilePath)) {
     try {
       const manualJobs = fs.readJsonSync(manualFilePath);
-      if (Array.isArray(manualJobs)) combined = combined.concat(manualJobs);
+      if (Array.isArray(manualJobs)) {
+        manualJobs.forEach(job => { job.manuallyAdded = true; }); // always force true
+        combined = combined.concat(manualJobs);
+      }
     } catch (err) {
       console.error('[dashboard] Error loading manual-jobs.json:', err.message);
     }
@@ -716,8 +719,7 @@ function formatDate(dateStr) {
 function getJobId(job) {
   if (job.id) return job.id;
   if (job._id) return String(job._id);
-  return ((job.title || '') + '_' + (job.company || '') + '_' +
-    (job.datePosted || '')).replace(/[^a-zA-Z0-9]/g, '_');
+  return ((job.title || '') + (job.company || '')).toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 function updateCompanyDropdown(jobs, selectedTier) {
@@ -2023,13 +2025,13 @@ function handleManualData(manualData, url, res) {
   });
   job.manuallyAdded = true;
   job.addedDate = new Date().toISOString();
+  const clientId = (job.title + job.company).toLowerCase().replace(/[^a-z0-9]/g, '');
+  job.id = clientId;
+  console.log('Manual job id set to:', job.id);
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
   saveJobToManualFile(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
-  if (!job.id) {
-    job.id = (job.title + '_' + job.company + '_' + (job.postedDate || '')).replace(/[^a-zA-Z0-9]/g, '_');
-  }
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
   console.log('manuallyAdded in response:', job.manuallyAdded);
@@ -2766,6 +2768,8 @@ function startDashboard() {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
       console.log('Cover letter requested for:', jobId);
+      console.log('All job IDs in memory:', loadAllJobs().slice(0,5).map(j => j.id));
+      console.log('Looking for jobId:', jobId);
       const foundJob = findJobById(jobId);
       console.log('Job found:', foundJob ? foundJob.title : 'NOT FOUND');
       const jobData = req.headers['x-job-data'];
