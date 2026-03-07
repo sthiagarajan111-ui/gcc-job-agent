@@ -104,7 +104,7 @@ function loadAllJobs() {
 
   // Filter out blocked jobs
   const blocked = loadBlockedJobs();
-  allJobs = prioritized.filter(job => {
+  const notBlocked = prioritized.filter(job => {
     if (blocked.find(b => b.id === job.id)) return false;
     if (blocked.find(b =>
       b.title && b.company &&
@@ -113,6 +113,38 @@ function loadAllJobs() {
     )) return false;
     return true;
   });
+
+  // Auto-delete jobs older than 90 days
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const blockedFilePath = path.join(__dirname, '../data/blocked-jobs.json');
+  let autoRemoved = 0;
+  allJobs = notBlocked.filter(job => {
+    const dateStr = job.postedDate || job.datePosted || job.date || job.addedDate || job.createdAt || '';
+    if (dateStr) {
+      const posted = new Date(dateStr);
+      if (!isNaN(posted.getTime()) && posted < ninetyDaysAgo) {
+        // Add to blocked-jobs.json
+        try {
+          let blockedList = [];
+          if (fs.existsSync(blockedFilePath)) blockedList = fs.readJsonSync(blockedFilePath);
+          if (!Array.isArray(blockedList)) blockedList = [];
+          const alreadyBlocked = blockedList.some(b => b.id === job.id ||
+            (b.title && b.company &&
+              b.title.toLowerCase() === (job.title || '').toLowerCase() &&
+              b.company.toLowerCase() === (job.company || '').toLowerCase()));
+          if (!alreadyBlocked) {
+            blockedList.push({ id: job.id, title: job.title, company: job.company, autoRemoved: true });
+            fs.writeJsonSync(blockedFilePath, blockedList, { spaces: 2 });
+          }
+        } catch (e) { /* ignore write errors */ }
+        autoRemoved++;
+        return false;
+      }
+    }
+    return true;
+  });
+  if (autoRemoved > 0) console.log(`Auto-removed ${autoRemoved} jobs older than 90 days`);
   return allJobs;
 }
 
@@ -605,6 +637,16 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <option value="senior">Senior (5+ yrs)</option>
     <option value="unknown">Unknown</option>
   </select>
+  <select id="filter-date" onchange="applyFilters()">
+    <option value="All Dates">All Dates</option>
+    <option value="1">Today</option>
+    <option value="3">Last 3 Days</option>
+    <option value="7">Last 7 Days</option>
+    <option value="14">Last 14 Days</option>
+    <option value="30">Last 30 Days</option>
+    <option value="60">Last 60 Days</option>
+    <option value="90">Last 90 Days</option>
+  </select>
   <select id="filter-sort" onchange="applyFilters()">
     <option value="high">Highest Score</option>
     <option value="low">Lowest Score</option>
@@ -729,6 +771,7 @@ function applyFilters() {
   const location = document.getElementById('filter-location').value;
   const role = document.getElementById('filter-role').value;
   const experience = document.getElementById('filter-experience').value;
+  const dateFilter = document.getElementById('filter-date').value;
   const sort = document.getElementById('filter-sort').value;
   const search = document.getElementById('filter-search').value.toLowerCase();
 
@@ -741,6 +784,16 @@ function applyFilters() {
     if (fortuneActive && !job.isFortuneCompany) return false;
     if (experience && (job.experienceLevel || 'unknown') !== experience) return false;
     if (search && !(job.company || '').toLowerCase().includes(search) && !(job.title || '').toLowerCase().includes(search)) return false;
+    if (dateFilter && dateFilter !== 'All Dates') {
+      const dateStr = job.postedDate || job.datePosted || job.date || job.addedDate || job.createdAt || '';
+      if (dateStr) {
+        const posted = new Date(dateStr);
+        if (!isNaN(posted.getTime())) {
+          const daysAgo = (new Date() - posted) / (1000 * 60 * 60 * 24);
+          if (daysAgo > parseInt(dateFilter)) return false;
+        }
+      }
+    }
     return true;
   });
 
@@ -767,6 +820,7 @@ function resetFilters() {
   document.getElementById('filter-location').value = '';
   document.getElementById('filter-role').value = '';
   document.getElementById('filter-experience').value = '';
+  document.getElementById('filter-date').value = 'All Dates';
   document.getElementById('filter-sort').value = 'high';
   document.getElementById('filter-search').value = '';
   fortuneActive = false;
@@ -828,6 +882,17 @@ function buildCard(job, idx) {
   // Info row fields
   const _source = escapeHtml(job.source || job.platform || job.board || job.origin || job.website || 'Unknown');
   const _datePosted = escapeHtml(formatDate(job.datePosted || job.date || job.postedAt || job.postedDate || ''));
+  const _dateAgeColor = (() => {
+    const ds = job.postedDate || job.datePosted || job.date || job.addedDate || job.createdAt || '';
+    if (!ds) return '#6E7681';
+    const d = new Date(ds);
+    if (isNaN(d.getTime())) return '#6E7681';
+    const days = (new Date() - d) / (1000 * 60 * 60 * 24);
+    if (days <= 7) return '#3FB950';
+    if (days <= 30) return '#58A6FF';
+    if (days <= 60) return '#D29922';
+    return '#F78166';
+  })();
   const _salaryHtml = (() => {
     if (job.salary || job.salaryText) return '<span style="color:#3FB950">' + escapeHtml(job.salary || job.salaryText) + '</span>';
     if (job.salaryEstimate) return '<span style="color:#8B949E;font-style:italic">Est. ' + escapeHtml(job.salaryEstimate) + '</span>';
@@ -866,7 +931,7 @@ function buildCard(job, idx) {
       <div style="background:#161B22;border-radius:6px;padding:8px 12px;border:1px solid #30363D;font-size:11px">
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:4px">
           <span><span style="color:#8B949E">🌐 Source: </span><span style="color:#E6EDF3">\${_source}</span></span>
-          <span><span style="color:#8B949E">📅 Posted: </span><span style="color:#E6EDF3">\${_datePosted}</span></span>
+          <span><span style="color:#8B949E">📅 Posted: </span><span style="color:\${_dateAgeColor}">\${_datePosted}</span></span>
           <span><span style="color:#8B949E">💰 Salary: </span>\${_salaryHtml}</span>
         </div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -1935,6 +2000,9 @@ function handleExtractedJob(extracted, url, res) {
   saveJobToTodaysReport(job);
   saveJobToManualFile(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
+  if (!job.id) {
+    job.id = (job.title + '_' + job.company + '_' + (job.postedDate || '')).replace(/[^a-zA-Z0-9]/g, '_');
+  }
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
   console.log('Sending job to client, manuallyAdded:', job.manuallyAdded);
@@ -1959,6 +2027,9 @@ function handleManualData(manualData, url, res) {
   saveJobToTodaysReport(job);
   saveJobToManualFile(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
+  if (!job.id) {
+    job.id = (job.title + '_' + job.company + '_' + (job.postedDate || '')).replace(/[^a-zA-Z0-9]/g, '_');
+  }
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
   console.log('manuallyAdded in response:', job.manuallyAdded);
@@ -2708,15 +2779,16 @@ function startDashboard() {
         return res.json({ success: false, message: 'Job not found' });
       }
       // Normalize fields so generateSingleCoverLetter never receives undefined
-      job = {
-        ...job,
+      const jobForLetter = {
         title: job.title || 'the role',
         company: job.company || 'the company',
         location: job.location || 'UAE',
         description: job.description || '',
         salary: job.salary || '',
         tier: job.tier || 2,
+        applyUrl: job.applyUrl || job.url || '',
       };
+      job = { ...job, ...jobForLetter };
       const result = await generateSingleCoverLetter(job);
       res.json({ success: true, filePath: result.filePath, message: 'Cover letter generated' });
     } catch (err) {
