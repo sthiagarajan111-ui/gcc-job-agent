@@ -552,11 +552,12 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 
 <div class="jobs-container" id="jobs-container">
   ${jobs.length === 0 ? `
-    <div class="no-jobs">
+    <div class="no-jobs" id="no-jobs-msg">
       <h2>No jobs found</h2>
       <p>Run the agent first to generate today's job report.</p>
     </div>
-  ` : `<div class="jobs-grid" id="jobs-grid"></div>`}
+  ` : ''}
+  <div class="jobs-grid" id="jobs-grid"></div>
 </div>
 
 <div class="pagination" id="pagination" style="display:none">
@@ -1311,6 +1312,9 @@ function showToast(msg) {
 }
 
 function addJobToGrid(job) {
+  console.log('Adding card to grid:', job.title);
+  const noJobsMsg = document.getElementById('no-jobs-msg');
+  if (noJobsMsg) noJobsMsg.remove();
   const grid = document.getElementById('jobs-grid');
   if (grid) {
     grid.insertAdjacentHTML('afterbegin', buildCard(job, 0));
@@ -1799,8 +1803,11 @@ function handleExtractedJob(extracted, url, res) {
     applyUrl: url,
     postedDate: new Date().toISOString().split('T')[0],
   });
+  console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
+  console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
+  console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
   return res.json({ success: true, job, extractedBy: 'fetch' });
 }
 
@@ -1815,8 +1822,11 @@ function handleManualData(manualData, url, res) {
     applyUrl: url || manualData.applyUrl || '',
     postedDate: new Date().toISOString().split('T')[0],
   });
+  console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
+  console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
+  console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
   return res.json({ success: true, job, extractedBy: 'manual' });
 }
 
