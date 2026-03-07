@@ -1,0 +1,114 @@
+{
+  "candidates": [
+    {
+      "id": "dheeraj",
+      "name": "Dheeraj Thiagarajan",
+      "email": "dheerajt1899@gmail.com",
+      "phone": "+44 7501069543",
+      "linkedin": "https://www.linkedin.com/in/dheeraj-t1/",
+      "nationality": "Indian",
+      "noticePeriod": "1 Month",
+      "currentLocation": "London, UK",
+      "currentCompany": "Lovemore Sports",
+      "currentTitle": "Investment & Partnerships Analyst",
+      "currentSalaryGBP": 35000,
+      "targetSalaryAED": 18000,
+      "minimumSalaryAED": 14000,
+      "stretchSalaryAED": 25000,
+      "autoFillSalaryAED": 18000,
+      "color": "#58A6FF",
+      "avatar": "DT",
+      "education": [
+        {
+          "institution": "London School of Economics",
+          "degree": "MSc Management Finance",
+          "grade": "Merit",
+          "years": "2023-2025"
+        },
+        {
+          "institution": "University of Chicago Booth",
+          "degree": "MBA Exchange",
+          "grade": "Merit",
+          "years": "Aug-Dec 2024"
+        },
+        {
+          "institution": "Newcastle University",
+          "degree": "BSc Business Management & Marketing",
+          "grade": "2:1",
+          "years": "2018-2021"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Lovemore Sports",
+          "title": "Investment & Partnerships Analyst",
+          "period": "Aug 2025-Present",
+          "highlights": ["Valuation models", "£1m+ Premier League partnerships", "Sell-side advisory"]
+        },
+        {
+          "company": "G.Network",
+          "title": "Business Development Associate",
+          "period": "Jan 2022-Mar 2023",
+          "highlights": ["65% conversion rate", "Top 3 by revenue", "50+ C-suite meetings"]
+        },
+        {
+          "company": "Durhamlane",
+          "title": "B2B Sales Associate",
+          "period": "Sep-Dec 2021",
+          "highlights": ["20% new client acquisition", "Investment bank stakeholders"]
+        }
+      ],
+      "skills": ["Python", "Advanced Excel", "PowerBI", "SQL", "Tableau", "Financial Modelling"],
+      "languages": ["English (Native)", "Tamil (Native)", "Hindi (Native)", "French (Beginner)", "Arabic (Beginner)"],
+      "targetRoles": ["Business Development Manager", "Investment Analyst", "Strategy Consultant", "Partnerships Manager", "Financial Analyst"],
+      "targetLocations": ["Dubai", "Abu Dhabi", "Sharjah"],
+      "experienceYears": 4,
+      "active": true
+    },
+    {
+      "id": "thiagarajan",
+      "name": "Thiagarajan Shanthakumar",
+      "email": "sthiagarajan111@gmail.com",
+      "phone": "",
+      "linkedin": "https://www.linkedin.com/in/thiagarajan-s-66113012/",
+      "nationality": "Indian",
+      "noticePeriod": "1 Month",
+      "currentLocation": "Muscat, Oman",
+      "currentCompany": "",
+      "currentTitle": "Head of After Sales",
+      "currentSalaryAED": 0,
+      "targetSalaryAED": 47000,
+      "minimumSalaryAED": 45000,
+      "stretchSalaryAED": 55000,
+      "autoFillSalaryAED": 47000,
+      "color": "#3FB950",
+      "avatar": "TS",
+      "education": [],
+      "experience": [
+        {
+          "company": "Current/Previous Employer",
+          "title": "Head of After Sales",
+          "period": "35 years experience",
+          "highlights": ["35 years in After Sales", "Senior leadership", "GCC market expertise"]
+        }
+      ],
+      "skills": ["After Sales Management", "Service Operations", "Warranty Management", "Team Leadership", "P&L Management", "Customer Satisfaction"],
+      "languages": ["English", "Tamil", "Hindi"],
+      "targetRoles": [
+        "Head of After Sales",
+        "Director After Sales",
+        "General Manager After Sales",
+        "After Sales Director",
+        "VP After Sales",
+        "Service Director",
+        "General Manager Service",
+        "Head of Service Operations",
+        "Director Service Operations",
+        "Chief Operating Officer"
+      ],
+      "targetLocations": ["Dubai", "Abu Dhabi", "Sharjah", "Riyadh", "Doha", "Kuwait", "Muscat", "Bahrain"],
+      "experienceYears": 35,
+      "active": true
+    }
+  ]
+}

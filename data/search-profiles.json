@@ -1,0 +1,368 @@
+{
+  "profiles": [
+    {
+      "id": "profile_1",
+      "candidateId": "dheeraj",
+      "role": "Business Development Manager",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "B2B",
+        "partnerships",
+        "revenue"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF"
+    },
+    {
+      "id": "profile_2",
+      "candidateId": "dheeraj",
+      "role": "Investment Analyst",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "finance",
+        "valuation",
+        "portfolio"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF"
+    },
+    {
+      "id": "profile_3",
+      "candidateId": "dheeraj",
+      "role": "Strategy Consultant",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai"
+      ],
+      "includeKeywords": [
+        "strategy",
+        "consulting",
+        "analysis"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF"
+    },
+    {
+      "role": "General Manager After Sales",
+      "candidateId": "dheeraj",
+      "experienceMin": 10,
+      "experienceMax": 10,
+      "locations": [
+        "Dubai",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F78166",
+      "id": "profile_1772888378666"
+    },
+    {
+      "role": "Director After Sales",
+      "candidateId": "dheeraj",
+      "experienceMin": 10,
+      "experienceMax": 10,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F78166",
+      "id": "profile_1772888424947"
+    },
+    {
+      "role": "Head After Sales",
+      "candidateId": "dheeraj",
+      "experienceMin": 10,
+      "experienceMax": 10,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F78166",
+      "id": "profile_1772888455998"
+    },
+    {
+      "role": "Sales Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888556975"
+    },
+    {
+      "role": "Business Development Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888589553"
+    },
+    {
+      "role": "Strategy Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888752334"
+    },
+    {
+      "role": "Business Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888787293"
+    },
+    {
+      "role": "Associate",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888810645"
+    },
+    {
+      "role": "Client Relationship Manager",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888836671"
+    },
+    {
+      "role": "Commercial Partnerships",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Manama",
+        "Kuwait City",
+        "Muscat",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888929943"
+    },
+    {
+      "id": "profile_ts_1",
+      "candidateId": "thiagarajan",
+      "role": "Head of After Sales",
+      "experienceMin": 15,
+      "experienceMax": 40,
+      "locations": ["Dubai", "Abu Dhabi", "Sharjah", "Riyadh", "Doha", "Kuwait", "Muscat"],
+      "includeKeywords": ["after sales", "service", "warranty", "automotive"],
+      "excludeKeywords": [],
+      "color": "#3FB950",
+      "active": true,
+      "createdDate": "2026-03-07"
+    },
+    {
+      "id": "profile_ts_2",
+      "candidateId": "thiagarajan",
+      "role": "Director After Sales",
+      "experienceMin": 15,
+      "experienceMax": 40,
+      "locations": ["Dubai", "Abu Dhabi", "GCC"],
+      "includeKeywords": ["after sales", "director", "service operations"],
+      "excludeKeywords": [],
+      "color": "#3FB950",
+      "active": true,
+      "createdDate": "2026-03-07"
+    },
+    {
+      "id": "profile_ts_3",
+      "candidateId": "thiagarajan",
+      "role": "General Manager After Sales",
+      "experienceMin": 15,
+      "experienceMax": 40,
+      "locations": ["Dubai", "Abu Dhabi", "GCC"],
+      "includeKeywords": ["after sales", "general manager", "service"],
+      "excludeKeywords": [],
+      "color": "#3FB950",
+      "active": true,
+      "createdDate": "2026-03-07"
+    },
+    {
+      "id": "profile_ts_4",
+      "candidateId": "thiagarajan",
+      "role": "Service Director",
+      "experienceMin": 15,
+      "experienceMax": 40,
+      "locations": ["Dubai", "UAE", "GCC"],
+      "includeKeywords": ["service", "director", "automotive", "operations"],
+      "excludeKeywords": [],
+      "color": "#3FB950",
+      "active": true,
+      "createdDate": "2026-03-07"
+    },
+    {
+      "id": "profile_ts_5",
+      "candidateId": "thiagarajan",
+      "role": "General Manager",
+      "experienceMin": 15,
+      "experienceMax": 40,
+      "locations": ["Dubai", "Abu Dhabi"],
+      "includeKeywords": ["operations", "P&L", "leadership", "automotive"],
+      "excludeKeywords": [],
+      "color": "#3FB950",
+      "active": true,
+      "createdDate": "2026-03-07"
+    }
+  ],
+  "lastUpdated": "2026-03-07"
+}

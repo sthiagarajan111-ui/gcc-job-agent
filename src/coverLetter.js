@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // ═══════════════════════════════════════════════════════
-// SYSTEM PROMPT (hardcoded candidate profile + instructions)
+// SYSTEM PROMPTS (one per candidate)
 // ═══════════════════════════════════════════════════════
 const SYSTEM_PROMPT = `You are writing a professional cover letter for Dheeraj Thiagarajan. Follow these rules exactly:
 
@@ -61,6 +61,42 @@ COVER LETTER WRITING RULES:
 
 Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
 
+const THIAGARAJAN_SYSTEM_PROMPT = `You are writing a professional cover letter for Thiagarajan Shanthakumar. Follow these rules exactly:
+
+CANDIDATE PROFILE:
+Name: Thiagarajan Shanthakumar
+Email: sthiagarajan111@gmail.com
+LinkedIn: https://www.linkedin.com/in/thiagarajan-s-66113012/
+Location: Muscat, Oman
+Notice Period: 1 Month
+Target Salary: AED 47,000/month
+
+Experience:
+- 35 years of experience in After Sales management across the GCC region
+- Current/Most Recent Title: Head of After Sales
+- Senior leadership expertise in service operations, warranty management, P&L responsibility
+- GCC market expertise with deep knowledge of automotive and service industries
+- Team leadership, customer satisfaction, and operational excellence focus
+
+Key Strengths:
+- 35 years of After Sales management experience — one of the most experienced in the GCC
+- Proven track record in senior leadership roles
+- Deep GCC market knowledge and relationships
+- P&L management and profitability focus
+- Service operations transformation and process improvement
+
+COVER LETTER WRITING RULES:
+1. Length: 3 paragraphs, maximum 350 words total
+2. Tone: Professional, senior executive — authoritative and results-focused
+3. Opening paragraph: Show genuine knowledge of the company and role, reference specific things about the company if known
+4. Middle paragraph: Pick the 2-3 most relevant experiences from Thiagarajan's background. Emphasise the 35 years of After Sales expertise, GCC market knowledge, and leadership track record.
+5. Closing paragraph: Express enthusiasm for the role, mention availability with 1 month notice, Dubai/GCC location preference, and a clear call to action.
+6. Never mention visa status or nationality.
+7. Never use clichés like "I am writing to apply" or "Please find attached my CV"
+8. Sign off as: Thiagarajan Shanthakumar
+
+Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
+
 // ═══════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════
@@ -99,10 +135,33 @@ function blankLine() {
 }
 
 // ═══════════════════════════════════════════════════════
+// CANDIDATE HEADER INFO
+// ═══════════════════════════════════════════════════════
+
+function getCandidateHeaderInfo(candidateId) {
+  if (candidateId === 'thiagarajan') {
+    return {
+      nameDisplay: 'THIAGARAJAN SHANTHAKUMAR',
+      contactLine: 'sthiagarajan111@gmail.com | Muscat, Oman',
+      linkedin: 'https://www.linkedin.com/in/thiagarajan-s-66113012/',
+      titleLine: 'Head of After Sales',
+      signoffName: 'THIAGARAJAN SHANTHAKUMAR',
+    };
+  }
+  return {
+    nameDisplay: 'DHEERAJ THIAGARAJAN',
+    contactLine: 'dheerajt1899@gmail.com | +44 7501069543 | London, UK',
+    linkedin: 'https://www.linkedin.com/in/dheeraj-t1/',
+    titleLine: 'Investment & Partnerships Analyst',
+    signoffName: 'DHEERAJ THIAGARAJAN',
+  };
+}
+
+// ═══════════════════════════════════════════════════════
 // FUNCTION 2: saveCoverLetterDocx
 // ═══════════════════════════════════════════════════════
 
-async function saveCoverLetterDocx(job, coverLetterText) {
+async function saveCoverLetterDocx(job, coverLetterText, candidateId) {
   const folder = getOutputFolder();
   const companyClean = sanitizeFileName(job.company);
   const titleClean = sanitizeFileName(job.title);
@@ -110,13 +169,14 @@ async function saveCoverLetterDocx(job, coverLetterText) {
   const filePath = path.join(folder, fileName);
 
   const paragraphs = coverLetterText.split(/\n\n+/).filter(p => p.trim().length > 0);
+  const candInfo = getCandidateHeaderInfo(candidateId);
 
   const children = [];
 
   // Header: Name
   children.push(new Paragraph({
     children: [new TextRun({
-      text: 'DHEERAJ THIAGARAJAN',
+      text: candInfo.nameDisplay,
       bold: true,
       size: 32,       // 16pt
       color: '1B2A4A',
@@ -127,7 +187,7 @@ async function saveCoverLetterDocx(job, coverLetterText) {
   // Header: Contact info
   children.push(new Paragraph({
     children: [new TextRun({
-      text: 'dheerajt1899@gmail.com | +44 7501069543 | London, UK',
+      text: candInfo.contactLine,
       size: 24,       // 12pt
       font: 'Calibri',
     })],
@@ -136,7 +196,7 @@ async function saveCoverLetterDocx(job, coverLetterText) {
   // Header: LinkedIn
   children.push(new Paragraph({
     children: [new TextRun({
-      text: 'https://www.linkedin.com/in/dheeraj-t1/',
+      text: candInfo.linkedin,
       size: 24,       // 12pt
       font: 'Calibri',
     })],
@@ -200,13 +260,13 @@ async function saveCoverLetterDocx(job, coverLetterText) {
   children.push(blankLine());
 
   children.push(new Paragraph({
-    children: [new TextRun({ text: 'DHEERAJ THIAGARAJAN', bold: true, size: 22, font: 'Calibri' })],
+    children: [new TextRun({ text: candInfo.signoffName, bold: true, size: 22, font: 'Calibri' })],
   }));
   children.push(new Paragraph({
-    children: [new TextRun({ text: 'Investment & Partnerships Analyst', size: 22, font: 'Calibri' })],
+    children: [new TextRun({ text: candInfo.titleLine, size: 22, font: 'Calibri' })],
   }));
   children.push(new Paragraph({
-    children: [new TextRun({ text: 'dheerajt1899@gmail.com | +44 7501069543', size: 22, font: 'Calibri' })],
+    children: [new TextRun({ text: candInfo.contactLine, size: 22, font: 'Calibri' })],
   }));
 
   const doc = new Document({
@@ -239,12 +299,14 @@ async function saveCoverLetterDocx(job, coverLetterText) {
 // FUNCTION 1: generateCoverLetter
 // ═══════════════════════════════════════════════════════
 
-async function generateCoverLetter(job) {
+async function generateCoverLetter(job, candidateId) {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new Error('ANTHROPIC_API_KEY is not set in environment variables. Please add it to your .env file.');
   }
 
   const client = new Anthropic();
+
+  const systemPrompt = candidateId === 'thiagarajan' ? THIAGARAJAN_SYSTEM_PROMPT : SYSTEM_PROMPT;
 
   const userMessage = `Write a cover letter for this job:
 Title: ${job.title}
@@ -257,7 +319,7 @@ Job Description: ${job.description}`;
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }],
     });
     coverLetterText = response.content[0].text;
@@ -266,7 +328,7 @@ Job Description: ${job.description}`;
     throw err;
   }
 
-  const filePath = await saveCoverLetterDocx(job, coverLetterText);
+  const filePath = await saveCoverLetterDocx(job, coverLetterText, candidateId);
   return { text: coverLetterText, filePath };
 }
 
@@ -281,7 +343,7 @@ async function generateForTierOneAndTwo(jobs) {
   for (const job of qualifying) {
     console.log(`Generating cover letter for ${job.title} at ${job.company}...`);
     try {
-      const { text, filePath } = await generateCoverLetter(job);
+      const { text, filePath } = await generateCoverLetter(job, job.candidateId || 'dheeraj');
       results.push({ job, filePath, text });
     } catch (err) {
       console.error(`Failed for ${job.title} at ${job.company}:`, err.message);
@@ -297,8 +359,8 @@ async function generateForTierOneAndTwo(jobs) {
 // FUNCTION 4: generateSingleCoverLetter
 // ═══════════════════════════════════════════════════════
 
-async function generateSingleCoverLetter(job) {
-  return generateCoverLetter(job);
+async function generateSingleCoverLetter(job, candidateId) {
+  return generateCoverLetter(job, candidateId || job.candidateId || 'dheeraj');
 }
 
 // ═══════════════════════════════════════════════════════

@@ -17,6 +17,32 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const prepCache = {};
 
+// ═══════════════════════════════════════════════════════
+// MULTI-CANDIDATE SUPPORT
+// ═══════════════════════════════════════════════════════
+
+const CANDIDATES_PATH = path.join(__dirname, '../data/candidates.json');
+
+function loadCandidates() {
+  try {
+    return fs.readJsonSync(CANDIDATES_PATH).candidates || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function detectCandidate(job) {
+  const title = (job.title || '').toLowerCase();
+  const afterSalesKeywords = [
+    'after sales', 'aftersales',
+    'service director', 'service manager', 'warranty',
+    'general manager', 'head of service', 'director service',
+  ];
+  const isAfterSales = afterSalesKeywords.some(k => title.includes(k));
+  if (isAfterSales) return 'thiagarajan';
+  return 'dheeraj';
+}
+
 let server = null;
 let app = null;
 let browserExtractionResult = null;
@@ -148,6 +174,14 @@ function loadAllJobs() {
     return true;
   });
   if (autoRemoved > 0) console.log(`Auto-removed ${autoRemoved} jobs older than 90 days`);
+
+  // Tag each job with candidateId
+  for (const job of allJobs) {
+    if (!job.candidateId) {
+      job.candidateId = detectCandidate(job);
+    }
+  }
+
   return allJobs;
 }
 
@@ -565,7 +599,11 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <a href="/roles">Roles</a>
   </div>
   <div class="navbar-right">
-    <strong>Dheeraj Thiagarajan</strong>
+    <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#58A6FF;color:white;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
+      <span style="color:#8B949E;font-size:12px">|</span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#3FB950;color:white;font-size:11px;font-weight:bold;flex-shrink:0">TS</span>
+    </div>
     ${today}
   </div>
 </nav>
@@ -598,6 +636,11 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 </div>
 
 <div class="filter-bar">
+  <select id="filter-candidate" onchange="applyFilters()">
+    <option value="">All Candidates</option>
+    <option value="dheeraj">🔵 Dheeraj Thiagarajan</option>
+    <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
+  </select>
   <select id="filter-tier" onchange="onTierChange()">
     <option value="">All Tiers</option>
     <option value="1">Tier 1 Only</option>
@@ -767,6 +810,7 @@ function onTierChange() {
 }
 
 function applyFilters() {
+  const candidate = document.getElementById('filter-candidate').value;
   const tier = document.getElementById('filter-tier').value;
   const company = document.getElementById('filter-company').value;
   const source = document.getElementById('filter-source').value;
@@ -778,6 +822,7 @@ function applyFilters() {
   const search = document.getElementById('filter-search').value.toLowerCase();
 
   filteredJobs = ALL_JOBS.filter(job => {
+    if (candidate && (job.candidateId || 'dheeraj') !== candidate) return false;
     if (tier && String(job.tier) !== tier) return false;
     if (company && company !== 'All Companies' && (job.company || '') !== company) return false;
     if (source && source !== 'All Sources' && (job.source || job.platform || job.board || job.origin || job.website || 'Unknown') !== source) return false;
@@ -816,6 +861,7 @@ function toggleFortune() {
 }
 
 function resetFilters() {
+  document.getElementById('filter-candidate').value = '';
   document.getElementById('filter-tier').value = '';
   updateCompanyDropdown(ALL_JOBS, '');
   updateSourceDropdown(ALL_JOBS, '');
@@ -921,6 +967,7 @@ function buildCard(job, idx) {
           <div class="card-meta">
             <span class="card-location">\${escapeHtml(job.location || '')}</span>
             <span class="tier-badge" style="background:\${tierColor}">TIER \${job.tier}</span>
+            \${(() => { const cid = job.candidateId || 'dheeraj'; const av = cid === 'thiagarajan' ? { i: 'TS', c: '#3FB950' } : { i: 'DT', c: '#58A6FF' }; return \`<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:\${av.c};color:white;font-size:11px;font-weight:bold;">\${av.i}</span>\`; })()}
             \${job.isFortuneCompany ? '<span class="fortune-badge">Fortune 500</span>' : ''}
             \${(job.experienceLevel || '') === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
             \${(job.experienceLevel || '') === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
@@ -1765,7 +1812,11 @@ function buildTrackerHtml() {
     <a href="/roles">Roles</a>
   </div>
   <div class="navbar-right">
-    <strong>Dheeraj Thiagarajan</strong>
+    <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#58A6FF;color:white;font-size:11px;font-weight:bold;flex-shrink:0">DT</span>
+      <span style="color:#8B949E;font-size:12px">|</span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#3FB950;color:white;font-size:11px;font-weight:bold;flex-shrink:0">TS</span>
+    </div>
     ${today}
   </div>
 </nav>
@@ -2793,7 +2844,7 @@ function startDashboard() {
         applyUrl: job.applyUrl || job.url || '',
       };
       job = { ...job, ...jobForLetter };
-      const result = await generateSingleCoverLetter(job);
+      const result = await generateSingleCoverLetter(job, job.candidateId || 'dheeraj');
       res.json({ success: true, filePath: result.filePath, message: 'Cover letter generated' });
     } catch (err) {
       console.log('Cover letter error:', err.message, err.stack);
@@ -3200,9 +3251,14 @@ module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 if (require.main === module) {
   loadPrepCache();
   loadSearchProfiles(); // ensure defaults created
+  const candidates = loadCandidates();
   startDashboard();
-  console.log('Search Profile Manager built successfully');
-  console.log('3 default profiles created');
+  const profileData = loadSearchProfiles();
+  const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
+  const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
+  console.log('Multi-candidate system built');
+  console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
+  console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);
   console.log('Routes: /roles, /api/search-profiles (GET/POST/PUT/DELETE)');
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');

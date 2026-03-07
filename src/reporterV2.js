@@ -207,18 +207,47 @@ function generateEmailHTML(jobs, pipelineSummary) {
       </div>
     </td>`).join('');
 
-  // Tier sections
-  const tier1Section = tier1Jobs.length
-    ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${tier1Jobs.length} jobs)`) + tier1Jobs.map(renderJobCard).join('')
-    : '';
+  // Detect candidateId if not set
+  function detectCandidateId(job) {
+    if (job.candidateId) return job.candidateId;
+    const title = (job.title || '').toLowerCase();
+    const afterSalesKeywords = ['after sales', 'aftersales', 'service director', 'service manager', 'warranty', 'general manager', 'head of service', 'director service'];
+    return afterSalesKeywords.some(k => title.includes(k)) ? 'thiagarajan' : 'dheeraj';
+  }
 
-  const tier2Section = tier2Jobs.length
-    ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${tier2Jobs.length} jobs)`) + tier2Jobs.map(renderJobCard).join('')
-    : '';
+  // Split jobs by candidate
+  const dheerajJobs = jobs.filter(j => detectCandidateId(j) === 'dheeraj');
+  const thiagarajanJobs = jobs.filter(j => detectCandidateId(j) === 'thiagarajan');
 
-  const tier3Section = tier3Jobs.length
-    ? sectionHeader(`📌 TIER 3 — APPLY IF TIME (${tier3Jobs.length} jobs)`) + renderTier3Table(tier3Jobs)
-    : '';
+  // Dheeraj tier sections
+  const dt1 = dheerajJobs.filter(j => j.tier === 1);
+  const dt2 = dheerajJobs.filter(j => j.tier === 2).slice(0, 30);
+  const dt3 = dheerajJobs.filter(j => j.tier === 3);
+
+  const dheerajSection = `
+    <div style="background:#1B2A4A;border-left:4px solid #58A6FF;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🔵 Dheeraj Thiagarajan — Jobs</h2>
+    </div>
+    ${dt1.length ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${dt1.length} jobs)`) + dt1.map(renderJobCard).join('') : ''}
+    ${dt2.length ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${dt2.length} jobs)`) + dt2.map(renderJobCard).join('') : ''}
+    ${dt3.length ? sectionHeader(`📌 TIER 3 — APPLY IF TIME (${dt3.length} jobs)`) + renderTier3Table(dt3) : ''}
+    ${!dt1.length && !dt2.length && !dt3.length ? '<p style="color:#888;padding:12px">No jobs found for Dheeraj today.</p>' : ''}
+  `;
+
+  // Thiagarajan tier sections
+  const ts1 = thiagarajanJobs.filter(j => j.tier === 1);
+  const ts2 = thiagarajanJobs.filter(j => j.tier === 2).slice(0, 30);
+  const ts3 = thiagarajanJobs.filter(j => j.tier === 3);
+
+  const thiagarajanSection = `
+    <div style="background:#1A2E1A;border-left:4px solid #3FB950;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟢 Thiagarajan Shanthakumar — Jobs</h2>
+    </div>
+    ${ts1.length ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${ts1.length} jobs)`) + ts1.map(renderJobCard).join('') : ''}
+    ${ts2.length ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${ts2.length} jobs)`) + ts2.map(renderJobCard).join('') : ''}
+    ${ts3.length ? sectionHeader(`📌 TIER 3 — APPLY IF TIME (${ts3.length} jobs)`) + renderTier3Table(ts3) : ''}
+    ${!ts1.length && !ts2.length && !ts3.length ? '<p style="color:#888;padding:12px">No jobs found for Thiagarajan today.</p>' : ''}
+  `;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -249,9 +278,8 @@ function generateEmailHTML(jobs, pipelineSummary) {
 
   <!-- SECTIONS 3 / 4 / 5 -->
   <div style="padding:16px 28px 24px">
-    ${tier1Section}
-    ${tier2Section}
-    ${tier3Section}
+    ${dheerajSection}
+    ${thiagarajanSection}
 
     <!-- SECTION 6: SALARY INTELLIGENCE -->
     <div style="background:#F8F9FA;border:1px solid #ddd;border-radius:6px;padding:20px;margin-top:28px">
