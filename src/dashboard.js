@@ -51,7 +51,6 @@ function loadAllJobs() {
   if (!fs.existsSync(dataDir)) { allJobs = []; return allJobs; }
 
   const files = fs.readdirSync(dataDir).filter(f => /^report-\d{4}-\d{2}-\d{2}\.json$/.test(f));
-  if (files.length === 0) { allJobs = []; return allJobs; }
 
   const seen = new Set();
   let combined = [];
@@ -65,6 +64,19 @@ function loadAllJobs() {
       console.error(`[dashboard] Error loading ${file}:`, err.message);
     }
   }
+
+  // Also load manual-jobs.json
+  const manualFilePath = path.join(dataDir, 'manual-jobs.json');
+  if (fs.existsSync(manualFilePath)) {
+    try {
+      const manualJobs = fs.readJsonSync(manualFilePath);
+      if (Array.isArray(manualJobs)) combined = combined.concat(manualJobs);
+    } catch (err) {
+      console.error('[dashboard] Error loading manual-jobs.json:', err.message);
+    }
+  }
+
+  if (combined.length === 0) { allJobs = []; return allJobs; }
 
   // Deduplicate: prefer explicit id, fall back to title+company+location key
   const deduped = [];
@@ -106,6 +118,25 @@ function saveJobToTodaysReport(job) {
   }
   existing.unshift(job);
   fs.writeJsonSync(filePath, existing, { spaces: 2 });
+}
+
+function saveJobToManualFile(job) {
+  const filePath = path.join(__dirname, '../data/manual-jobs.json');
+  fs.ensureDirSync(path.dirname(filePath));
+  let existing = [];
+  if (fs.existsSync(filePath)) {
+    try { existing = fs.readJsonSync(filePath); } catch (e) {}
+  }
+  if (!Array.isArray(existing)) existing = [];
+  // Avoid duplicates
+  const alreadyExists = existing.some(j =>
+    (j.id && j.id === job.id) ||
+    (j.title === job.title && j.company === job.company)
+  );
+  if (!alreadyExists) {
+    existing.unshift(job);
+    fs.writeJsonSync(filePath, existing, { spaces: 2 });
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1310,6 +1341,7 @@ async function submitManual() {
   const data = await r.json();
   if (data.success && data.job) {
     console.log('job from server:', data.job.manuallyAdded);
+    data.job.manuallyAdded = true; // force it client side
     closeAddJobModal();
     addJobToGrid(data.job);
   } else alert(data.message || 'Error saving job');
@@ -1357,6 +1389,9 @@ function addJobToGrid(job) {
   if (grid) {
     grid.insertAdjacentHTML('afterbegin', buildCard(job, 0));
   }
+  ALL_JOBS.push(job);
+  updateSourceDropdown(ALL_JOBS, document.getElementById('filter-tier').value);
+  updateCompanyDropdown(ALL_JOBS, document.getElementById('filter-tier').value);
   const statTotal = document.getElementById('stat-total');
   if (statTotal) statTotal.textContent = parseInt(statTotal.textContent || '0') + 1;
   const statToday = document.getElementById('stat-today');
@@ -1845,6 +1880,7 @@ function handleExtractedJob(extracted, url, res) {
   job.addedDate = new Date().toISOString();
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
+  saveJobToManualFile(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
@@ -1868,6 +1904,7 @@ function handleManualData(manualData, url, res) {
   job.addedDate = new Date().toISOString();
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
+  saveJobToManualFile(job);
   console.log(`[add-job] Job saved to file: ${job.title} at ${job.company}`);
   if (allJobs !== null) allJobs.unshift(job);
   console.log(`[add-job] allJobs array length after add: ${allJobs !== null ? allJobs.length : 'null'}`);
@@ -1948,13 +1985,16 @@ function startDashboard() {
   // ── GET /api/generate-cover-letter/:jobId ─────────
   app.get('/api/generate-cover-letter/:jobId', async (req, res) => {
     try {
+      const jobId = decodeURIComponent(req.params.jobId);
+      console.log('Cover letter requested for:', jobId);
+      const foundJob = findJobById(jobId);
+      console.log('Job found:', foundJob ? foundJob.title : 'NOT FOUND');
       const jobData = req.headers['x-job-data'];
       let job;
       if (jobData) {
         job = JSON.parse(jobData);
       } else {
-        const jobId = decodeURIComponent(req.params.jobId);
-        job = findJobById(jobId);
+        job = foundJob;
       }
       if (!job) {
         return res.json({ success: false, message: 'Job not found' });
@@ -2297,6 +2337,23 @@ function startDashboard() {
         }
       }
 
+      // Remove from manual-jobs.json
+      const manualFilePath = path.join(__dirname, '../data/manual-jobs.json');
+      if (fs.existsSync(manualFilePath)) {
+        try {
+          let manualJobs = fs.readJsonSync(manualFilePath);
+          if (!Array.isArray(manualJobs)) manualJobs = [];
+          const before = manualJobs.length;
+          manualJobs = manualJobs.filter(j => j.id !== job.id);
+          if (manualJobs.length === before) {
+            manualJobs = manualJobs.filter(j => !(j.title === job.title && j.company === job.company));
+          }
+          fs.writeJsonSync(manualFilePath, manualJobs, { spaces: 2 });
+        } catch (e) {
+          console.error('[remove-job] Error updating manual-jobs.json:', e.message);
+        }
+      }
+
       res.json({ success: true });
     } catch (err) {
       console.error('[remove-job] Error:', err.message);
@@ -2338,6 +2395,7 @@ module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 if (require.main === module) {
   loadPrepCache();
   startDashboard();
+  console.log('All 4 manual job fixes applied');
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');
   console.log('loadAllJobs() built — shows all historic jobs combined & deduplicated');
