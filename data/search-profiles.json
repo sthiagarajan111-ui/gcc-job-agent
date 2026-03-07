@@ -76,77 +76,6 @@
       "color": "#58A6FF"
     },
     {
-      "role": "General Manager After Sales",
-      "candidateId": "dheeraj",
-      "experienceMin": 10,
-      "experienceMax": 10,
-      "locations": [
-        "Dubai",
-        "Sharjah",
-        "Riyadh",
-        "Doha",
-        "Manama",
-        "Kuwait City",
-        "Muscat",
-        "All UAE",
-        "All GCC"
-      ],
-      "includeKeywords": [],
-      "excludeKeywords": [],
-      "active": true,
-      "createdDate": "2026-03-07",
-      "color": "#F78166",
-      "id": "profile_1772888378666"
-    },
-    {
-      "role": "Director After Sales",
-      "candidateId": "dheeraj",
-      "experienceMin": 10,
-      "experienceMax": 10,
-      "locations": [
-        "Dubai",
-        "Abu Dhabi",
-        "Sharjah",
-        "Riyadh",
-        "Doha",
-        "Manama",
-        "Kuwait City",
-        "Muscat",
-        "All UAE",
-        "All GCC"
-      ],
-      "includeKeywords": [],
-      "excludeKeywords": [],
-      "active": true,
-      "createdDate": "2026-03-07",
-      "color": "#F78166",
-      "id": "profile_1772888424947"
-    },
-    {
-      "role": "Head After Sales",
-      "candidateId": "dheeraj",
-      "experienceMin": 10,
-      "experienceMax": 10,
-      "locations": [
-        "Dubai",
-        "Abu Dhabi",
-        "Sharjah",
-        "Riyadh",
-        "Doha",
-        "Manama",
-        "Kuwait City",
-        "Muscat",
-        "All UAE",
-        "All GCC"
-      ],
-      "includeKeywords": [],
-      "excludeKeywords": [],
-      "active": true,
-      "createdDate": "2026-03-07",
-      "color": "#F78166",
-      "id": "profile_1772888455998"
-    },
-    {
       "role": "Sales Executive",
       "candidateId": "dheeraj",
       "experienceMin": 1,
@@ -304,8 +233,21 @@
       "role": "Head of After Sales",
       "experienceMin": 15,
       "experienceMax": 40,
-      "locations": ["Dubai", "Abu Dhabi", "Sharjah", "Riyadh", "Doha", "Kuwait", "Muscat"],
-      "includeKeywords": ["after sales", "service", "warranty", "automotive"],
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Riyadh",
+        "Doha",
+        "Muscat",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "after sales",
+        "service",
+        "warranty",
+        "automotive"
+      ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
@@ -317,8 +259,16 @@
       "role": "Director After Sales",
       "experienceMin": 15,
       "experienceMax": 40,
-      "locations": ["Dubai", "Abu Dhabi", "GCC"],
-      "includeKeywords": ["after sales", "director", "service operations"],
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "after sales",
+        "director",
+        "service operations"
+      ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
@@ -330,8 +280,16 @@
       "role": "General Manager After Sales",
       "experienceMin": 15,
       "experienceMax": 40,
-      "locations": ["Dubai", "Abu Dhabi", "GCC"],
-      "includeKeywords": ["after sales", "general manager", "service"],
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "after sales",
+        "general manager",
+        "service"
+      ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
@@ -343,8 +301,16 @@
       "role": "Service Director",
       "experienceMin": 15,
       "experienceMax": 40,
-      "locations": ["Dubai", "UAE", "GCC"],
-      "includeKeywords": ["service", "director", "automotive", "operations"],
+      "locations": [
+        "Dubai",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "service",
+        "director",
+        "automotive",
+        "operations"
+      ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
@@ -356,12 +322,37 @@
       "role": "General Manager",
       "experienceMin": 15,
       "experienceMax": 40,
-      "locations": ["Dubai", "Abu Dhabi"],
-      "includeKeywords": ["operations", "P&L", "leadership", "automotive"],
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "operations",
+        "P&L",
+        "leadership",
+        "automotive"
+      ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
       "createdDate": "2026-03-07"
+    },
+    {
+      "role": "Financial Analyst",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772903958115"
     }
   ],
   "lastUpdated": "2026-03-07"
