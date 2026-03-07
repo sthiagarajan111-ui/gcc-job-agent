@@ -1,11 +1,28 @@
+const path = require('path')
+const fs = require('fs-extra')
 const { scrapeLinkedIn } = require('./scrapers/linkedin')
 const { scrapeGulfTalent, scrapeNaukriGulf, scrapeBayt } = require('./scrapers/gulf')
-const { scrapeIndeedGulf, scrapeMichaelPage, scrapeMonsterGulf } = require('./scrapers/extra')
+const {
+  scrapeIndeedGulf, scrapeMichaelPage, scrapeMonsterGulf,
+  scrapeDubizzle, scrapeJobsAe, scrapeGulfRecruiter, scrapeKhaleejTimes, scrapeCvLibrary,
+} = require('./scrapers/extra')
+
+function loadBlockedJobs() {
+  const filePath = path.join(__dirname, '../data/blocked-jobs.json')
+  if (!fs.existsSync(filePath)) return []
+  try {
+    const data = fs.readJsonSync(filePath)
+    return Array.isArray(data) ? data : []
+  } catch (e) {
+    return []
+  }
+}
 
 async function scrapeAllSites(role, location) {
   const scraperNames = [
     'LinkedIn', 'GulfTalent', 'NaukriGulf', 'Bayt',
-    'IndeedGulf', 'MichaelPage', 'MonsterGulf'
+    'IndeedGulf', 'MichaelPage', 'MonsterGulf',
+    'Dubizzle', 'Jobs.ae', 'GulfRecruiter', 'Khaleej Times', 'CV Library',
   ]
 
   const results = await Promise.allSettled([
@@ -15,7 +32,12 @@ async function scrapeAllSites(role, location) {
     scrapeBayt(role, location),
     scrapeIndeedGulf(role, location),
     scrapeMichaelPage(role, location),
-    scrapeMonsterGulf(role, location)
+    scrapeMonsterGulf(role, location),
+    scrapeDubizzle(),
+    scrapeJobsAe(),
+    scrapeGulfRecruiter(),
+    scrapeKhaleejTimes(),
+    scrapeCvLibrary(),
   ])
 
   const summary = results
@@ -44,9 +66,21 @@ async function scrapeAllSites(role, location) {
       .replace(/^-|-$/g, '')
   }))
 
-  console.log(`Total unique jobs found: ${withIds.length}`)
+  // Filter out blocked jobs
+  const blocked = loadBlockedJobs()
+  const notBlocked = withIds.filter(job => {
+    if (blocked.find(b => b.id === job.id)) return false
+    if (blocked.find(b =>
+      b.title && b.company &&
+      b.title.toLowerCase() === (job.title || '').toLowerCase() &&
+      b.company.toLowerCase() === (job.company || '').toLowerCase()
+    )) return false
+    return true
+  })
 
-  return withIds
+  console.log(`Total unique jobs found: ${notBlocked.length} (${withIds.length - notBlocked.length} blocked)`)
+
+  return notBlocked
 }
 
 module.exports = { scrapeAllSites }

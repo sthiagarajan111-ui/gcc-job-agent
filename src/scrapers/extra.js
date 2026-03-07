@@ -155,4 +155,158 @@ async function scrapeMonsterGulf(role, location) {
   }
 }
 
-module.exports = { scrapeIndeedGulf, scrapeMichaelPage, scrapeMonsterGulf };
+async function scrapeDubizzle() {
+  await delay(1000);
+  try {
+    const url = 'https://uae.dubizzle.com/jobs/';
+    const { data } = await axios.get(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const $ = cheerio.load(data);
+    const jobs = [];
+
+    $('[class*="job"], article, li[class*="job"], [class*="listing"]').each((_, card) => {
+      if (jobs.length >= 10) return false;
+      const title = $(card).find('h2, h3, [class*="title"]').first().text().trim();
+      if (!title) return;
+      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
+      const loc = $(card).find('[class*="location"]').first().text().trim();
+      let href = $(card).find('a').first().attr('href') || '';
+      if (href && !href.startsWith('http')) href = 'https://uae.dubizzle.com' + href;
+      jobs.push(buildJob(title, company, loc, href, 'Dubizzle'));
+    });
+
+    return jobs;
+  } catch (err) {
+    console.error('Dubizzle scraper error:', err.message);
+    return [];
+  }
+}
+
+async function scrapeJobsAe() {
+  await delay(1000);
+  try {
+    const url = 'https://www.jobs.ae/jobs/in-uae';
+    const { data } = await axios.get(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const $ = cheerio.load(data);
+    const jobs = [];
+
+    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
+      if (jobs.length >= 10) return false;
+      const title = $(card).find('h2, h3, [class*="title"], a[class*="job"]').first().text().trim();
+      if (!title) return;
+      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
+      const loc = $(card).find('[class*="location"]').first().text().trim();
+      let href = $(card).find('a').first().attr('href') || '';
+      if (href && !href.startsWith('http')) href = 'https://www.jobs.ae' + href;
+      jobs.push(buildJob(title, company, loc, href, 'Jobs.ae'));
+    });
+
+    return jobs;
+  } catch (err) {
+    console.error('Jobs.ae scraper error:', err.message);
+    return [];
+  }
+}
+
+async function scrapeGulfRecruiter() {
+  await delay(1000);
+  try {
+    const url = 'https://www.gulfrecruiter.com/jobs';
+    const { data } = await axios.get(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const $ = cheerio.load(data);
+    const jobs = [];
+
+    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
+      if (jobs.length >= 10) return false;
+      const title = $(card).find('h2, h3, [class*="title"], a').first().text().trim();
+      if (!title) return;
+      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
+      const loc = $(card).find('[class*="location"]').first().text().trim();
+      let href = $(card).find('a').first().attr('href') || '';
+      if (href && !href.startsWith('http')) href = 'https://www.gulfrecruiter.com' + href;
+      jobs.push(buildJob(title, company, loc, href, 'GulfRecruiter'));
+    });
+
+    return jobs;
+  } catch (err) {
+    console.error('GulfRecruiter scraper error:', err.message);
+    return [];
+  }
+}
+
+async function scrapeKhaleejTimes() {
+  await delay(1000);
+  try {
+    const url = 'https://jobs.khaleejtimes.com/jobs';
+    const { data } = await axios.get(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const $ = cheerio.load(data);
+    const jobs = [];
+
+    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
+      if (jobs.length >= 10) return false;
+      const title = $(card).find('h2, h3, [class*="title"], a').first().text().trim();
+      if (!title) return;
+      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
+      const loc = $(card).find('[class*="location"]').first().text().trim();
+      let href = $(card).find('a').first().attr('href') || '';
+      if (href && !href.startsWith('http')) href = 'https://jobs.khaleejtimes.com' + href;
+      jobs.push(buildJob(title, company, loc, href, 'Khaleej Times'));
+    });
+
+    return jobs;
+  } catch (err) {
+    console.error('KhaleejTimes scraper error:', err.message);
+    return [];
+  }
+}
+
+async function scrapeCvLibrary() {
+  await delay(1000);
+  try {
+    const url = 'https://www.cv-library.co.uk/jobs/in-united-arab-emirates';
+    const { data } = await axios.get(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const $ = cheerio.load(data);
+    const jobs = [];
+
+    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
+      if (jobs.length >= 10) return false;
+      const title = $(card).find('h2, h3, [class*="title"], a[class*="job"]').first().text().trim();
+      if (!title) return;
+      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
+      const loc = $(card).find('[class*="location"]').first().text().trim();
+      let href = $(card).find('a').first().attr('href') || '';
+      if (href && !href.startsWith('http')) href = 'https://www.cv-library.co.uk' + href;
+      jobs.push(buildJob(title, company, loc, href, 'CV Library'));
+    });
+
+    return jobs;
+  } catch (err) {
+    console.error('CV Library scraper error:', err.message);
+    return [];
+  }
+}
+
+module.exports = {
+  scrapeIndeedGulf,
+  scrapeMichaelPage,
+  scrapeMonsterGulf,
+  scrapeDubizzle,
+  scrapeJobsAe,
+  scrapeGulfRecruiter,
+  scrapeKhaleejTimes,
+  scrapeCvLibrary,
+};

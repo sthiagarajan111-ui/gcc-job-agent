@@ -101,7 +101,18 @@ function loadAllJobs() {
   // Prioritize then sort by totalScore descending
   const prioritized = prioritizeAllJobs(deduped);
   prioritized.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
-  allJobs = prioritized;
+
+  // Filter out blocked jobs
+  const blocked = loadBlockedJobs();
+  allJobs = prioritized.filter(job => {
+    if (blocked.find(b => b.id === job.id)) return false;
+    if (blocked.find(b =>
+      b.title && b.company &&
+      b.title.toLowerCase() === (job.title || '').toLowerCase() &&
+      b.company.toLowerCase() === (job.company || '').toLowerCase()
+    )) return false;
+    return true;
+  });
   return allJobs;
 }
 
@@ -136,6 +147,17 @@ function saveJobToManualFile(job) {
   if (!alreadyExists) {
     existing.unshift(job);
     fs.writeJsonSync(filePath, existing, { spaces: 2 });
+  }
+}
+
+function loadBlockedJobs() {
+  const filePath = path.join(__dirname, '../data/blocked-jobs.json');
+  if (!fs.existsSync(filePath)) return [];
+  try {
+    const data = fs.readJsonSync(filePath);
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    return [];
   }
 }
 
@@ -344,6 +366,10 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     font-size: 11px; font-weight: bold; color: #1B2A4A;
     background: #F5A623; padding: 2px 8px; border-radius: 12px;
   }
+  .exp-badge {
+    font-size: 11px; font-weight: bold; color: white;
+    padding: 2px 8px; border-radius: 12px;
+  }
   .score-circle {
     width: 48px; height: 48px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -501,6 +527,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   <div class="navbar-links">
     <a href="/" class="active">Jobs</a>
     <a href="/tracker">Tracker</a>
+    <a href="/roles">Roles</a>
   </div>
   <div class="navbar-right">
     <strong>Dheeraj Thiagarajan</strong>
@@ -571,6 +598,13 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <option value="Business Analyst">Business Analyst</option>
   </select>
   <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Show Fortune 500 Only</button>
+  <select id="filter-experience" onchange="applyFilters()">
+    <option value="">All Levels</option>
+    <option value="entry">Entry Level (0-1 yr)</option>
+    <option value="mid">Mid Level (2-3 yrs)</option>
+    <option value="senior">Senior (5+ yrs)</option>
+    <option value="unknown">Unknown</option>
+  </select>
   <select id="filter-sort" onchange="applyFilters()">
     <option value="high">Highest Score</option>
     <option value="low">Lowest Score</option>
@@ -694,6 +728,7 @@ function applyFilters() {
   const source = document.getElementById('filter-source').value;
   const location = document.getElementById('filter-location').value;
   const role = document.getElementById('filter-role').value;
+  const experience = document.getElementById('filter-experience').value;
   const sort = document.getElementById('filter-sort').value;
   const search = document.getElementById('filter-search').value.toLowerCase();
 
@@ -704,6 +739,7 @@ function applyFilters() {
     if (location && !(job.location || '').includes(location)) return false;
     if (role && !(job.title || '').toLowerCase().includes(role.toLowerCase())) return false;
     if (fortuneActive && !job.isFortuneCompany) return false;
+    if (experience && (job.experienceLevel || 'unknown') !== experience) return false;
     if (search && !(job.company || '').toLowerCase().includes(search) && !(job.title || '').toLowerCase().includes(search)) return false;
     return true;
   });
@@ -730,6 +766,7 @@ function resetFilters() {
   updateSourceDropdown(ALL_JOBS, '');
   document.getElementById('filter-location').value = '';
   document.getElementById('filter-role').value = '';
+  document.getElementById('filter-experience').value = '';
   document.getElementById('filter-sort').value = 'high';
   document.getElementById('filter-search').value = '';
   fortuneActive = false;
@@ -807,6 +844,9 @@ function buildCard(job, idx) {
             <span class="card-location">\${escapeHtml(job.location || '')}</span>
             <span class="tier-badge" style="background:\${tierColor}">TIER \${job.tier}</span>
             \${job.isFortuneCompany ? '<span class="fortune-badge">Fortune 500</span>' : ''}
+            \${job.experienceLevel === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
+            \${job.experienceLevel === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
+            \${job.experienceLevel === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
           </div>
         </div>
         <div class="score-circle" style="background:\${scoreColor}">\${job.totalScore || 0}</div>
@@ -863,11 +903,12 @@ function buildCard(job, idx) {
           onclick="handleInterviewPrep(this, '\${escapeHtml(jobId)}', \${JSON.stringify(job).replace(/"/g, '&quot;')})">
           INTERVIEW PREP
         </button>
-        \${job.manuallyAdded ? \`<button class="btn"
-          style="background:#DA3633;color:white;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:bold;"
+        <button class="btn"
+          style="background:#DA3633;color:white;font-size:11px;padding:5px 10px;border-radius:6px;margin-left:auto;"
+          title="Remove this job permanently"
           onclick="handleRemoveJob(this, '\${escapeHtml(jobId)}')">
-          🗑 Remove
-        </button>\` : ''}
+          🗑
+        </button>
       </div>
     </div>
     <div class="prep-panel" id="prep-panel-\${escapeHtml(jobId)}">
@@ -956,7 +997,7 @@ async function handleAutofill(btn, job) {
 }
 
 async function handleRemoveJob(btn, jobId) {
-  if (!confirm('Remove this job from your list?')) return;
+  if (!confirm('Remove this job permanently?\nIt will never appear again in future scrapes.')) return;
   btn.disabled = true;
   btn.textContent = 'Removing...';
   try {
@@ -971,7 +1012,7 @@ async function handleRemoveJob(btn, jobId) {
         el.style.opacity = '0';
         setTimeout(() => el.remove(), 400);
       }
-      showToast('Job removed');
+      showToast('Job permanently removed');
     } else {
       btn.textContent = '🗑 Remove';
       btn.disabled = false;
@@ -1643,6 +1684,7 @@ function buildTrackerHtml() {
   <div class="navbar-links">
     <a href="/">Jobs</a>
     <a href="/tracker" class="active">Tracker</a>
+    <a href="/roles">Roles</a>
   </div>
   <div class="navbar-right">
     <strong>Dheeraj Thiagarajan</strong>
@@ -1945,6 +1987,604 @@ function findJobById(jobId) {
   return null;
 }
 
+// ═══════════════════════════════════════════════════════
+// SEARCH PROFILES HELPERS
+// ═══════════════════════════════════════════════════════
+
+const SEARCH_PROFILES_PATH = path.join(__dirname, '../data/search-profiles.json');
+
+const DEFAULT_PROFILES = [
+  {
+    id: 'profile_1',
+    role: 'Business Development Manager',
+    experienceMin: 2,
+    experienceMax: 4,
+    locations: ['Dubai', 'Abu Dhabi', 'Sharjah'],
+    includeKeywords: ['B2B', 'partnerships', 'revenue'],
+    excludeKeywords: [],
+    active: true,
+    createdDate: '2026-03-07',
+    color: '#58A6FF'
+  },
+  {
+    id: 'profile_2',
+    role: 'Investment Analyst',
+    experienceMin: 1,
+    experienceMax: 3,
+    locations: ['Dubai', 'Abu Dhabi'],
+    includeKeywords: ['finance', 'valuation', 'portfolio'],
+    excludeKeywords: [],
+    active: true,
+    createdDate: '2026-03-07',
+    color: '#3FB950'
+  },
+  {
+    id: 'profile_3',
+    role: 'Strategy Consultant',
+    experienceMin: 2,
+    experienceMax: 4,
+    locations: ['Dubai', 'UAE'],
+    includeKeywords: ['strategy', 'consulting', 'analysis'],
+    excludeKeywords: [],
+    active: true,
+    createdDate: '2026-03-07',
+    color: '#8957E5'
+  }
+];
+
+function loadSearchProfiles() {
+  if (!fs.existsSync(SEARCH_PROFILES_PATH)) {
+    const data = { profiles: DEFAULT_PROFILES, lastUpdated: new Date().toISOString().split('T')[0] };
+    fs.ensureDirSync(path.dirname(SEARCH_PROFILES_PATH));
+    fs.writeJsonSync(SEARCH_PROFILES_PATH, data, { spaces: 2 });
+    console.log('[search-profiles] Created data/search-profiles.json with 3 default profiles');
+    return data;
+  }
+  try {
+    return fs.readJsonSync(SEARCH_PROFILES_PATH);
+  } catch (e) {
+    return { profiles: DEFAULT_PROFILES, lastUpdated: new Date().toISOString().split('T')[0] };
+  }
+}
+
+function saveSearchProfiles(data) {
+  data.lastUpdated = new Date().toISOString().split('T')[0];
+  fs.ensureDirSync(path.dirname(SEARCH_PROFILES_PATH));
+  fs.writeJsonSync(SEARCH_PROFILES_PATH, data, { spaces: 2 });
+}
+
+const ROLE_SUGGESTIONS = [
+  'Business Development Manager','Business Development Executive','Sales Manager',
+  'Senior Sales Manager','Account Manager','Key Account Manager','Regional Sales Manager',
+  'Investment Analyst','Investment Associate','Financial Analyst','Corporate Finance Analyst',
+  'M&A Analyst','Private Equity Analyst','Venture Capital Analyst','Portfolio Manager',
+  'Asset Manager','Strategy Consultant','Management Consultant','Business Analyst',
+  'Corporate Development Manager','Partnerships Manager','Strategic Partnerships Manager',
+  'Commercial Manager','Revenue Manager','Growth Manager','Market Development Manager',
+  'Corporate Strategy Manager','Deal Sourcing Analyst','Capital Markets Associate',
+  'Relationship Manager','Client Relationship Manager','Operations Manager','Project Manager',
+  'Program Manager','Product Manager','Marketing Manager','Digital Marketing Manager',
+  'Brand Manager','Communications Manager','PR Manager','HR Manager',
+  'Talent Acquisition Manager','Finance Manager','Treasury Analyst','Risk Analyst',
+  'Compliance Officer','Procurement Manager','Supply Chain Manager','Logistics Manager',
+  'General Manager'
+];
+
+function getExperienceLabel(min, max) {
+  const avg = (min + max) / 2;
+  if (avg <= 1) return 'Entry Level / Graduate';
+  if (avg <= 3) return 'Mid Level';
+  if (avg <= 6) return 'Senior';
+  return 'Leadership';
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH PROFILES PAGE HTML
+// ═══════════════════════════════════════════════════════
+
+function buildSearchProfilesHtml() {
+  const data = loadSearchProfiles();
+  const profiles = data.profiles || [];
+  const activeProfiles = profiles.filter(p => p.active);
+  const allLocations = [...new Set(profiles.flatMap(p => p.locations || []))];
+  const minExp = profiles.length ? Math.min(...profiles.map(p => p.experienceMin)) : 0;
+  const maxExp = profiles.length ? Math.max(...profiles.map(p => p.experienceMax)) : 0;
+
+  const profileCardsHtml = profiles.map(p => {
+    const locStr = (p.locations || []).join(', ') || 'Any';
+    const incKw = (p.includeKeywords || []);
+    const excKw = (p.excludeKeywords || []);
+    const incPills = incKw.map(k => `<span class="kw-pill kw-inc">${k}</span>`).join('');
+    const excPills = excKw.map(k => `<span class="kw-pill kw-exc">${k}</span>`).join('');
+    const kwRow = (incKw.length || excKw.length) ? `
+      <div class="card-kw-row">
+        ${incKw.length ? `<span class="kw-label">✅ Include:</span> ${incPills}` : ''}
+        ${excKw.length ? `<span class="kw-label" style="margin-left:8px">❌ Exclude:</span> ${excPills}` : ''}
+      </div>` : '';
+    return `
+    <div class="profile-card" data-id="${p.id}" style="border-left:4px solid ${p.color}">
+      <div class="card-top-row">
+        <span class="card-role-name">${p.role}</span>
+        <div class="card-actions">
+          <label class="toggle-switch" title="Toggle active">
+            <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleProfile('${p.id}', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="btn-edit" onclick="openEditModal('${p.id}')">✏️ Edit</button>
+          <button class="btn-delete" onclick="deleteProfile('${p.id}')">🗑 Delete</button>
+        </div>
+      </div>
+      <div class="card-details-row">
+        <span class="detail-pill">📅 ${p.experienceMin} - ${p.experienceMax} years exp</span>
+        <span class="detail-pill">📍 ${locStr}</span>
+      </div>
+      ${kwRow}
+      <div class="card-footer">
+        <span>Searches LinkedIn, GulfTalent, Bayt + 7 more sources</span>
+        <span>Created: ${p.createdDate || 'N/A'}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Profile Manager — GCC Job Agent</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #0D1117; color: #E6EDF3; }
+
+  .navbar {
+    background: #161B22; padding: 0 24px; display: flex; align-items: center;
+    justify-content: space-between; height: 56px; position: sticky; top: 0;
+    z-index: 100; border-bottom: 1px solid #58A6FF;
+  }
+  .navbar-logo { color: white; font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+  .navbar-links { display: flex; gap: 8px; }
+  .navbar-links a {
+    color: white; text-decoration: none; padding: 6px 16px;
+    border-radius: 4px; font-size: 14px; border: 1px solid transparent;
+  }
+  .navbar-links a:hover, .navbar-links a.active { background: #30363D; border: 1px solid #58A6FF; }
+  .navbar-right { color: #8B949E; font-size: 13px; text-align: right; }
+  .navbar-right strong { color: white; display: block; font-size: 14px; }
+
+  .page-header { padding: 32px 32px 0; }
+  .page-title { font-size: 28px; font-weight: bold; color: white; margin-bottom: 6px; }
+  .page-subtitle { color: #8B949E; font-size: 15px; }
+
+  .main-content { padding: 24px 32px; max-width: 1000px; }
+
+  /* Profile Cards */
+  .profile-card {
+    background: #1F2937; border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 16px; border: 1px solid #30363D;
+    transition: border-color 0.15s;
+  }
+  .profile-card:hover { border-color: #58A6FF; }
+
+  .card-top-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+  }
+  .card-role-name { font-size: 16px; font-weight: bold; color: white; }
+  .card-actions { display: flex; align-items: center; gap: 8px; }
+
+  /* Toggle Switch */
+  .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: #374151; border-radius: 24px;
+    transition: 0.2s;
+  }
+  .toggle-slider:before {
+    content: ''; position: absolute; height: 18px; width: 18px;
+    left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s;
+  }
+  input:checked + .toggle-slider { background: #3FB950; }
+  input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+  .btn-edit {
+    background: #374151; color: #E6EDF3; border: 1px solid #4B5563;
+    padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 13px;
+  }
+  .btn-edit:hover { background: #4B5563; }
+  .btn-delete {
+    background: #2D1A1A; color: #F78166; border: 1px solid #5A1E1E;
+    padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 13px;
+  }
+  .btn-delete:hover { background: #5A1E1E; }
+
+  .card-details-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .detail-pill {
+    background: #161B22; border: 1px solid #30363D; border-radius: 20px;
+    padding: 3px 12px; font-size: 13px; color: #8B949E;
+  }
+
+  .card-kw-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 8px; }
+  .kw-label { font-size: 12px; color: #8B949E; }
+  .kw-pill { padding: 2px 10px; border-radius: 20px; font-size: 12px; }
+  .kw-inc { background: #12261A; color: #3FB950; border: 1px solid #1F4C2C; }
+  .kw-exc { background: #2D1A1A; color: #F78166; border: 1px solid #5A1E1E; }
+
+  .card-footer {
+    display: flex; justify-content: space-between; font-size: 12px;
+    color: #6E7681; margin-top: 8px; flex-wrap: wrap; gap: 4px;
+  }
+
+  /* Add Button */
+  .btn-add-profile {
+    width: 100%; height: 50px; background: #12261A; color: #3FB950;
+    border: 2px dashed #3FB950; border-radius: 8px; font-size: 16px;
+    font-weight: bold; cursor: pointer; margin-bottom: 24px; transition: background 0.15s;
+  }
+  .btn-add-profile:hover { background: #1A3A22; }
+
+  /* Summary Box */
+  .summary-box {
+    background: #161B22; border: 1px solid #30363D; border-radius: 10px;
+    padding: 20px; margin-bottom: 24px;
+  }
+  .summary-title { font-size: 14px; font-weight: bold; color: #8B949E; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #21262D; font-size: 14px; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: #8B949E; }
+  .summary-val { color: #E6EDF3; text-align: right; max-width: 60%; word-break: break-word; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #161B22; border: 1px solid #30363D; border-radius: 12px;
+    padding: 28px; width: 560px; max-width: 96vw; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 20px; font-weight: bold; color: white; margin-bottom: 20px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 13px; color: #8B949E; margin-bottom: 6px; }
+  .form-input {
+    width: 100%; background: #0D1117; border: 1px solid #30363D; border-radius: 6px;
+    color: #E6EDF3; padding: 8px 12px; font-size: 14px;
+  }
+  .form-input:focus { outline: none; border-color: #58A6FF; }
+
+  .suggestions-box { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; min-height: 0; }
+  .suggestion-pill {
+    background: #1F2937; border: 1px solid #374151; border-radius: 20px;
+    padding: 4px 12px; font-size: 12px; color: #58A6FF; cursor: pointer;
+  }
+  .suggestion-pill:hover { background: #30363D; }
+
+  .exp-row { display: flex; gap: 12px; align-items: center; }
+  .exp-input { width: 80px; }
+  .exp-label { font-size: 13px; color: #6E7681; }
+  .exp-level { font-size: 12px; color: #3FB950; margin-top: 6px; }
+
+  .location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .loc-item { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+  .loc-item input[type=checkbox] { accent-color: #58A6FF; }
+
+  .tag-input-container {
+    display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px;
+    background: #0D1117; border: 1px solid #30363D; border-radius: 6px;
+    min-height: 40px; align-items: center; cursor: text;
+  }
+  .tag-input-container:focus-within { border-color: #58A6FF; }
+  .tag-input-real { background: none; border: none; outline: none; color: #E6EDF3; font-size: 14px; min-width: 100px; flex: 1; }
+  .tag-hint { font-size: 11px; color: #6E7681; margin-top: 4px; }
+
+  .color-swatches { display: flex; gap: 10px; margin-top: 6px; }
+  .color-swatch {
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    border: 3px solid transparent; transition: transform 0.1s;
+  }
+  .color-swatch.selected { border-color: white; transform: scale(1.15); }
+
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .btn-cancel {
+    background: #374151; color: #E6EDF3; border: 1px solid #4B5563;
+    padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;
+  }
+  .btn-save {
+    background: #12261A; color: #3FB950; border: 1px solid #3FB950;
+    padding: 8px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;
+  }
+  .btn-save:hover { background: #1A3A22; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="navbar-logo">GCC JOB AGENT</div>
+  <div class="navbar-links">
+    <a href="/">Jobs</a>
+    <a href="/tracker">Tracker</a>
+    <a href="/roles" class="active">Roles</a>
+  </div>
+  <div class="navbar-right">
+    <strong>Search Profile Manager</strong>
+    ${profiles.length} profiles configured
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="page-title">🎯 Search Profile Manager</div>
+  <div class="page-subtitle">Configure exactly what jobs the agent searches for every morning at 8:10 AM</div>
+</div>
+
+<div class="main-content">
+
+  <div id="profiles-container">
+    ${profileCardsHtml || '<p style="color:#6E7681;padding:20px 0">No profiles yet. Add one below.</p>'}
+  </div>
+
+  <button class="btn-add-profile" onclick="openAddModal()">+ Add New Search Profile</button>
+
+  <div class="summary-box">
+    <div class="summary-title">Search Summary</div>
+    <div class="summary-row">
+      <span class="summary-key">Total active profiles</span>
+      <span class="summary-val" id="sum-active">${activeProfiles.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Total roles being searched</span>
+      <span class="summary-val" id="sum-roles">${activeProfiles.map(p => p.role).join(', ') || 'None'}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Experience range covered</span>
+      <span class="summary-val">${profiles.length ? minExp + ' - ' + maxExp + ' years' : 'N/A'}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Locations covered</span>
+      <span class="summary-val">${allLocations.join(', ') || 'None'}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Next search run</span>
+      <span class="summary-val">Tomorrow at 8:10 AM Gulf time</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Estimated jobs per day</span>
+      <span class="summary-val">${activeProfiles.length} profiles × ~50 jobs each = ~${activeProfiles.length * 50} jobs</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">🎯 Add Search Profile</div>
+
+    <input type="hidden" id="edit-profile-id" value="">
+
+    <div class="form-group">
+      <label class="form-label">What job role are you looking for? *</label>
+      <input type="text" class="form-input" id="field-role" placeholder="e.g. Business Development Manager" oninput="fetchSuggestions(this.value)">
+      <div class="suggestions-box" id="suggestions-box"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Your years of experience</label>
+      <div class="exp-row">
+        <span class="exp-label">From</span>
+        <input type="number" class="form-input exp-input" id="field-exp-min" value="2" min="0" max="10" oninput="updateExpLabel()">
+        <span class="exp-label">years to</span>
+        <input type="number" class="form-input exp-input" id="field-exp-max" value="4" min="0" max="10" oninput="updateExpLabel()">
+        <span class="exp-label">years</span>
+      </div>
+      <div class="exp-level" id="exp-level-label">Mid Level</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Target locations</label>
+      <div class="location-grid" id="location-grid">
+        ${['Dubai','Abu Dhabi','Sharjah','Riyadh','Doha','Manama','Kuwait City','Muscat','All UAE','All GCC'].map(loc =>
+          `<label class="loc-item"><input type="checkbox" value="${loc}" ${['Dubai','Abu Dhabi'].includes(loc) ? 'checked' : ''}> ${loc}</label>`
+        ).join('')}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Must include these keywords (optional)</label>
+      <div class="tag-input-container" id="inc-tag-container" onclick="document.getElementById('inc-tag-real').focus()">
+        <input type="text" class="tag-input-real" id="inc-tag-real" placeholder="Type and press Enter..." onkeydown="handleTagKey(event,'inc')">
+      </div>
+      <div class="tag-hint">Jobs must contain at least one of these words</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Exclude jobs with these keywords (optional)</label>
+      <div class="tag-input-container" id="exc-tag-container" onclick="document.getElementById('exc-tag-real').focus()">
+        <input type="text" class="tag-input-real" id="exc-tag-real" placeholder="Type and press Enter..." onkeydown="handleTagKey(event,'exc')">
+      </div>
+      <div class="tag-hint">Jobs containing these words will be filtered out</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Profile color</label>
+      <div class="color-swatches" id="color-swatches">
+        ${['#58A6FF','#3FB950','#8957E5','#D29922','#F78166','#79C0FF'].map((c, i) =>
+          `<div class="color-swatch ${i===0?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProfile()">Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedColor = '#58A6FF';
+let incKeywords = [];
+let excKeywords = [];
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent = '🎯 Add Search Profile';
+  document.getElementById('edit-profile-id').value = '';
+  document.getElementById('field-role').value = '';
+  document.getElementById('field-exp-min').value = '2';
+  document.getElementById('field-exp-max').value = '4';
+  incKeywords = []; excKeywords = [];
+  renderTags('inc'); renderTags('exc');
+  document.querySelectorAll('#location-grid input[type=checkbox]').forEach(cb => {
+    cb.checked = ['Dubai','Abu Dhabi'].includes(cb.value);
+  });
+  selectColor('#58A6FF');
+  updateExpLabel();
+  document.getElementById('suggestions-box').innerHTML = '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openEditModal(id) {
+  fetch('/api/search-profiles').then(r=>r.json()).then(data => {
+    const p = (data.profiles || []).find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('modal-title').textContent = '✏️ Edit Profile';
+    document.getElementById('edit-profile-id').value = p.id;
+    document.getElementById('field-role').value = p.role || '';
+    document.getElementById('field-exp-min').value = p.experienceMin || 0;
+    document.getElementById('field-exp-max').value = p.experienceMax || 4;
+    incKeywords = [...(p.includeKeywords || [])];
+    excKeywords = [...(p.excludeKeywords || [])];
+    renderTags('inc'); renderTags('exc');
+    document.querySelectorAll('#location-grid input[type=checkbox]').forEach(cb => {
+      cb.checked = (p.locations || []).includes(cb.value);
+    });
+    selectColor(p.color || '#58A6FF');
+    updateExpLabel();
+    document.getElementById('suggestions-box').innerHTML = '';
+    document.getElementById('modal-overlay').classList.add('open');
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function selectColor(color) {
+  selectedColor = color;
+  document.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.classList.toggle('selected', sw.dataset.color === color);
+  });
+}
+
+function updateExpLabel() {
+  const min = parseInt(document.getElementById('field-exp-min').value) || 0;
+  const max = parseInt(document.getElementById('field-exp-max').value) || 0;
+  const avg = (min + max) / 2;
+  let label = 'Entry Level / Graduate';
+  if (avg > 1 && avg <= 3) label = 'Mid Level';
+  else if (avg > 3 && avg <= 6) label = 'Senior';
+  else if (avg > 6) label = 'Leadership';
+  document.getElementById('exp-level-label').textContent = label;
+}
+
+function fetchSuggestions(q) {
+  if (!q || q.length < 2) { document.getElementById('suggestions-box').innerHTML = ''; return; }
+  fetch('/api/role-suggestions?q=' + encodeURIComponent(q))
+    .then(r => r.json())
+    .then(roles => {
+      document.getElementById('suggestions-box').innerHTML = roles.map(r =>
+        '<span class="suggestion-pill" onclick="selectRole(\\'' + r.replace(/'/g,"\\\\'") + '\\')">' + r + '</span>'
+      ).join('');
+    });
+}
+
+function selectRole(role) {
+  document.getElementById('field-role').value = role;
+  document.getElementById('suggestions-box').innerHTML = '';
+}
+
+function handleTagKey(e, type) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = e.target.value.trim();
+    if (!val) return;
+    if (type === 'inc') { if (!incKeywords.includes(val)) incKeywords.push(val); }
+    else { if (!excKeywords.includes(val)) excKeywords.push(val); }
+    e.target.value = '';
+    renderTags(type);
+  }
+}
+
+function renderTags(type) {
+  const keywords = type === 'inc' ? incKeywords : excKeywords;
+  const container = document.getElementById(type + '-tag-container');
+  const real = document.getElementById(type + '-tag-real');
+  const cls = type === 'inc' ? 'kw-inc' : 'kw-exc';
+  container.querySelectorAll('.kw-pill').forEach(el => el.remove());
+  keywords.forEach((kw, i) => {
+    const pill = document.createElement('span');
+    pill.className = 'kw-pill ' + cls;
+    pill.textContent = kw + ' ×';
+    pill.style.cursor = 'pointer';
+    pill.onclick = () => {
+      if (type === 'inc') incKeywords.splice(i, 1); else excKeywords.splice(i, 1);
+      renderTags(type);
+    };
+    container.insertBefore(pill, real);
+  });
+}
+
+function getSelectedLocations() {
+  return [...document.querySelectorAll('#location-grid input[type=checkbox]:checked')].map(cb => cb.value);
+}
+
+function saveProfile() {
+  const role = document.getElementById('field-role').value.trim();
+  if (!role) { alert('Please enter a job role.'); return; }
+  const profileData = {
+    role,
+    experienceMin: parseInt(document.getElementById('field-exp-min').value) || 0,
+    experienceMax: parseInt(document.getElementById('field-exp-max').value) || 0,
+    locations: getSelectedLocations(),
+    includeKeywords: [...incKeywords],
+    excludeKeywords: [...excKeywords],
+    active: true,
+    createdDate: new Date().toISOString().split('T')[0],
+    color: selectedColor
+  };
+  const editId = document.getElementById('edit-profile-id').value;
+  if (editId) {
+    fetch('/api/search-profiles/' + editId, {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(profileData)
+    }).then(r=>r.json()).then(() => { closeModal(); location.reload(); });
+  } else {
+    fetch('/api/search-profiles', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(profileData)
+    }).then(r=>r.json()).then(() => { closeModal(); location.reload(); });
+  }
+}
+
+function deleteProfile(id) {
+  if (!confirm('Delete this search profile?')) return;
+  fetch('/api/search-profiles/' + id, { method: 'DELETE' })
+    .then(r=>r.json()).then(() => location.reload());
+}
+
+function toggleProfile(id, active) {
+  fetch('/api/search-profiles/' + id + '/toggle', { method: 'POST' })
+    .then(r=>r.json());
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>`;
+}
+
 function startDashboard() {
   app = express();
   app.use(express.json());
@@ -1964,6 +2604,63 @@ function startDashboard() {
   // ── GET /tracker ───────────────────────────────────
   app.get('/tracker', (req, res) => {
     res.send(buildTrackerHtml());
+  });
+
+  // ── GET /roles ─────────────────────────────────────
+  app.get('/roles', (req, res) => {
+    res.send(buildSearchProfilesHtml());
+  });
+
+  // ── GET /api/search-profiles ───────────────────────
+  app.get('/api/search-profiles', (req, res) => {
+    res.json(loadSearchProfiles());
+  });
+
+  // ── POST /api/search-profiles ──────────────────────
+  app.post('/api/search-profiles', (req, res) => {
+    const data = loadSearchProfiles();
+    const profile = { ...req.body, id: 'profile_' + Date.now() };
+    data.profiles.push(profile);
+    saveSearchProfiles(data);
+    res.json({ success: true, profile });
+  });
+
+  // ── PUT /api/search-profiles/:id ──────────────────
+  app.put('/api/search-profiles/:id', (req, res) => {
+    const data = loadSearchProfiles();
+    const idx = data.profiles.findIndex(p => p.id === req.params.id);
+    if (idx === -1) return res.json({ success: false, message: 'Profile not found' });
+    data.profiles[idx] = { ...data.profiles[idx], ...req.body, id: req.params.id };
+    saveSearchProfiles(data);
+    res.json({ success: true });
+  });
+
+  // ── DELETE /api/search-profiles/:id ───────────────
+  app.delete('/api/search-profiles/:id', (req, res) => {
+    const data = loadSearchProfiles();
+    const before = data.profiles.length;
+    data.profiles = data.profiles.filter(p => p.id !== req.params.id);
+    if (data.profiles.length === before) return res.json({ success: false, message: 'Profile not found' });
+    saveSearchProfiles(data);
+    res.json({ success: true });
+  });
+
+  // ── POST /api/search-profiles/:id/toggle ──────────
+  app.post('/api/search-profiles/:id/toggle', (req, res) => {
+    const data = loadSearchProfiles();
+    const profile = data.profiles.find(p => p.id === req.params.id);
+    if (!profile) return res.json({ success: false, message: 'Profile not found' });
+    profile.active = !profile.active;
+    saveSearchProfiles(data);
+    res.json({ success: true, active: profile.active });
+  });
+
+  // ── GET /api/role-suggestions ──────────────────────
+  app.get('/api/role-suggestions', (req, res) => {
+    const q = (req.query.q || '').toLowerCase();
+    if (!q) return res.json([]);
+    const matches = ROLE_SUGGESTIONS.filter(r => r.toLowerCase().includes(q)).slice(0, 5);
+    res.json(matches);
   });
 
   // ── GET /api/jobs ──────────────────────────────────
@@ -2354,6 +3051,27 @@ function startDashboard() {
         }
       }
 
+      // Add to blocklist
+      const blockedFilePath = path.join(__dirname, '../data/blocked-jobs.json');
+      fs.ensureDirSync(path.dirname(blockedFilePath));
+      let blockedJobs = [];
+      if (fs.existsSync(blockedFilePath)) {
+        try { blockedJobs = fs.readJsonSync(blockedFilePath); } catch (e) {}
+      }
+      if (!Array.isArray(blockedJobs)) blockedJobs = [];
+      const alreadyBlocked = blockedJobs.some(b => b.id === job.id ||
+        (b.title && b.company && b.title.toLowerCase() === (job.title || '').toLowerCase() &&
+          b.company.toLowerCase() === (job.company || '').toLowerCase()));
+      if (!alreadyBlocked) {
+        blockedJobs.push({
+          id: job.id,
+          title: job.title || '',
+          company: job.company || '',
+          blockedDate: new Date().toISOString(),
+        });
+        fs.writeJsonSync(blockedFilePath, blockedJobs, { spaces: 2 });
+      }
+
       res.json({ success: true });
     } catch (err) {
       console.error('[remove-job] Error:', err.message);
@@ -2394,9 +3112,11 @@ module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 
 if (require.main === module) {
   loadPrepCache();
+  loadSearchProfiles(); // ensure defaults created
   startDashboard();
-  console.log('All 4 manual job fixes applied');
+  console.log('Search Profile Manager built successfully');
+  console.log('3 default profiles created');
+  console.log('Routes: /roles, /api/search-profiles (GET/POST/PUT/DELETE)');
   console.log('Dashboard started — open http://localhost:3000');
   console.log('Press Ctrl+C to stop');
-  console.log('loadAllJobs() built — shows all historic jobs combined & deduplicated');
 }

@@ -143,13 +143,44 @@ function scoreProfileMatch(title, description) {
   return 5; // Below 6
 }
 
+function detectExperienceLevel(job) {
+  const text = normalize(`${job.title || ''} ${job.description || ''}`);
+
+  const seniorKeywords = [
+    'senior', 'lead', 'head of', 'director', 'vp', 'vice president',
+    'principal', '5+ years', '5 years', '6 years', '7+ years', '8+ years',
+    '10+ years',
+  ];
+  const yearsForManager = ['5+ years', '5 years', '6 years', '7+ years', '8+ years', '10+ years'];
+  const isSenior = seniorKeywords.some(k => text.includes(k)) ||
+    (text.includes('manager') && yearsForManager.some(k => text.includes(k)));
+  if (isSenior) return 'senior';
+
+  const entryKeywords = [
+    'entry level', 'graduate', 'junior', 'trainee', 'intern',
+    'fresh graduate', '0-1 year', 'no experience', 'entry-level',
+    'associate', 'analyst',
+  ];
+  if (entryKeywords.some(k => text.includes(k))) return 'entry';
+
+  const midKeywords = [
+    '2 years', '3 years', '2-3 years', '2+ years', '3+ years',
+    'mid level', 'mid-level', 'experienced',
+  ];
+  if (midKeywords.some(k => text.includes(k))) return 'mid';
+
+  return 'unknown';
+}
+
 function prioritizeJob(job) {
   const locationScore = scoreLocation(job.location);
   const companyScore = scoreCompany(job.company);
   const salaryScore = scoreSalary(job.salary);
   const matchScore = scoreProfileMatch(job.title, job.description);
+  const experienceLevel = detectExperienceLevel(job);
+  const experienceAdjustment = experienceLevel === 'senior' ? -20 : 0;
 
-  const totalScore = locationScore + companyScore + salaryScore + matchScore;
+  const totalScore = locationScore + companyScore + salaryScore + matchScore + experienceAdjustment;
 
   let tier, tierLabel;
   if (totalScore >= 80) {
@@ -177,6 +208,7 @@ function prioritizeJob(job) {
     isFortuneCompany: fortuneFlag,
     isGCCConglomerate: gccFlag,
     fortuneBadge: fortuneFlag ? 'Fortune 500' : '',
+    experienceLevel,
   };
 }
 
@@ -191,6 +223,7 @@ module.exports = {
   scoreCompany,
   scoreSalary,
   scoreProfileMatch,
+  detectExperienceLevel,
   prioritizeJob,
   prioritizeAllJobs,
 };
