@@ -7,7 +7,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 
-const { addApplication, updateStatus, getPipelineSummary, loadApplications } = require('./appTracker');
+const { addApplication, updateStatus, getPipelineSummary, loadApplications, saveApplications } = require('./appTracker');
 const { generateSingleCoverLetter } = require('./coverLetter');
 const { autoFillJobApplication } = require('./formFiller');
 const { prioritizeAllJobs, prioritizeJob } = require('./jobPrioritizer');
@@ -2172,6 +2172,7 @@ function buildKanbanCard(app) {
   const hidden = (currentTrackerCandidate !== 'all' && cid !== currentTrackerCandidate) ? 'style="display:none"' : '';
   return \`
     <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" \${hidden}>
+      <button onclick="deleteTrackerCard('\${app.id}', '\${app.status}', this.closest('.kanban-card'))" style="float:right;background:#DA3633;color:white;font-size:11px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;margin-left:8px" title="Remove from tracker">🗑</button>
       <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
         <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:\${dotColor};flex-shrink:0" title="\${dotTitle}"></span>
         \${escHtml(app.jobTitle || '')}
@@ -2191,6 +2192,43 @@ function buildKanbanCard(app) {
       </select>
     </div>
   \`;
+}
+
+async function deleteTrackerCard(applicationId, status, cardElement) {
+  if (!confirm('Remove this application from tracker?\\nThis cannot be undone.')) return;
+  try {
+    const res = await fetch('/api/tracker/' + encodeURIComponent(applicationId), { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      cardElement.style.transition = 'opacity 0.3s';
+      cardElement.style.opacity = '0';
+      setTimeout(() => {
+        cardElement.remove();
+        updateTrackerColCounts();
+        updateTrackerStatsAfterDelete(status);
+      }, 300);
+      showToast('Application removed');
+    }
+  } catch (e) {
+    console.error('Failed to delete application:', e);
+  }
+}
+
+function updateTrackerStatsAfterDelete(status) {
+  const totalEl = document.getElementById('stat-total');
+  if (totalEl) totalEl.textContent = Math.max(0, parseInt(totalEl.textContent) - 1);
+
+  const statusMap = {
+    'Applied': 'stat-applied',
+    'Interview': 'stat-interview',
+    'Offer': 'stat-offer',
+    'Rejected': 'stat-rejected'
+  };
+  const statId = statusMap[status];
+  if (statId) {
+    const el = document.getElementById(statId);
+    if (el) el.textContent = Math.max(0, parseInt(el.textContent) - 1);
+  }
 }
 
 function escHtml(str) {
@@ -3517,6 +3555,24 @@ function startDashboard() {
       res.json({ success: true });
     } catch (err) {
       console.error('[remove-job] Error:', err.message);
+      res.json({ success: false, message: err.message });
+    }
+  });
+
+  // ── DELETE /api/tracker/:applicationId ─────────────
+  app.delete('/api/tracker/:applicationId', (req, res) => {
+    try {
+      const applicationId = decodeURIComponent(req.params.applicationId);
+      const applications = loadApplications();
+      const idx = applications.findIndex(a => a.id === applicationId);
+      if (idx === -1) {
+        return res.json({ success: false, message: 'Application not found' });
+      }
+      applications.splice(idx, 1);
+      saveApplications(applications);
+      res.json({ success: true });
+    } catch (err) {
+      console.error('[delete-tracker] Error:', err.message);
       res.json({ success: false, message: err.message });
     }
   });

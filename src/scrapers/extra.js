@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -86,46 +87,59 @@ async function scrapeIndeedGulf(role, location) {
   }
 }
 
+function getMichaelPageCategory(role) {
+  const r = role.toLowerCase();
+  if (r.includes('finance') || r.includes('financial') || r.includes('analyst') || r.includes('investment')) {
+    return 'banking-financial-services';
+  }
+  if (r.includes('strategy') || r.includes('consultant') || r.includes('business analyst')) {
+    return 'strategy-management';
+  }
+  return 'sales';
+}
+
 async function scrapeMichaelPage(role, location) {
   await delay(3000);
+  let browser;
   try {
-    const rolePath = role.toLowerCase().replace(/\s+/g, '-');
-    const locPath = (location || 'uae').toLowerCase().replace(/\s+/g, '-');
-    const url = `https://www.michaelpage.ae/jobs/${rolePath}/in/${locPath}`;
-    const data = await fetchWithRetry(url);
-    const $ = cheerio.load(data);
-    const jobs = [];
+    const category = getMichaelPageCategory(role);
+    const url = `https://www.michaelpage.ae/jobs/${category}`;
 
-    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
-      if (jobs.length >= 10) return false;
-      const title = $(card)
-        .find('.job-title, h2 a, .title a')
-        .first()
-        .text()
-        .trim();
-      if (!title) return;
-      const company = $(card)
-        .find('.job-company, .company, span.employer')
-        .first()
-        .text()
-        .trim();
-      const loc = $(card)
-        .find('.job-location, .location, span.location')
-        .first()
-        .text()
-        .trim();
-      let href =
-        $(card).find('.job-title, h2 a, .title a').first().attr('href') ||
-        $(card).find('a').first().attr('href') ||
-        '';
-      if (href && !href.startsWith('http')) href = 'https://www.michaelpage.ae' + href;
-      jobs.push(buildJob(title, company, loc, href, 'Michael Page'));
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+    await page.setUserAgent(HEADERS['User-Agent']);
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+    await new Promise(r => setTimeout(r, 5000));
+
+    const jobs = await page.evaluate(() => {
+      const rows = document.querySelectorAll('.views-row');
+      return Array.from(rows).slice(0, 10).map(row => {
+        const anchor = row.querySelector('h3 a, h2 a');
+        const title = anchor ? anchor.innerText.trim() : '';
+        if (!title) return null;
+        const locEl = row.querySelector('.job-location');
+        const salEl = row.querySelector('.salary');
+        return {
+          title,
+          location: locEl ? locEl.innerText.trim() : '',
+          salary: salEl ? salEl.innerText.trim() : '',
+          applyUrl: anchor ? anchor.href : '',
+        };
+      }).filter(Boolean);
     });
 
+    await browser.close();
     console.log(`[MichaelPage] scraper: ${jobs.length} jobs found`);
-    return jobs;
+    return jobs.map(j => ({
+      ...buildJob(j.title, '', j.location, j.applyUrl, 'Michael Page'),
+      salary: j.salary || 'Not listed',
+    }));
   } catch (err) {
     console.log(`[MichaelPage] scraper error: ${err.message}`);
+    if (browser) await browser.close();
     return [];
   }
 }
@@ -201,85 +215,19 @@ async function scrapeDubizzle() {
   }
 }
 
+// Domain has expired / DNS failure — disabled
 async function scrapeJobsAe() {
-  await delay(1000);
-  try {
-    const url = 'https://www.jobs.ae/jobs/in-uae';
-    const data = await fetchWithRetry(url);
-    const $ = cheerio.load(data);
-    const jobs = [];
-
-    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
-      if (jobs.length >= 10) return false;
-      const title = $(card).find('h2, h3, [class*="title"], a[class*="job"]').first().text().trim();
-      if (!title) return;
-      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
-      const loc = $(card).find('[class*="location"]').first().text().trim();
-      let href = $(card).find('a').first().attr('href') || '';
-      if (href && !href.startsWith('http')) href = 'https://www.jobs.ae' + href;
-      jobs.push(buildJob(title, company, loc, href, 'Jobs.ae'));
-    });
-
-    console.log(`[Jobs.ae] scraper: ${jobs.length} jobs found`);
-    return jobs;
-  } catch (err) {
-    console.log(`[Jobs.ae] scraper error: ${err.message}`);
-    return [];
-  }
+  return [];
 }
 
+// Domain is parked — disabled
 async function scrapeGulfRecruiter() {
-  await delay(1000);
-  try {
-    const url = 'https://www.gulfrecruiter.com/jobs';
-    const data = await fetchWithRetry(url);
-    const $ = cheerio.load(data);
-    const jobs = [];
-
-    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
-      if (jobs.length >= 10) return false;
-      const title = $(card).find('h2, h3, [class*="title"], a').first().text().trim();
-      if (!title) return;
-      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
-      const loc = $(card).find('[class*="location"]').first().text().trim();
-      let href = $(card).find('a').first().attr('href') || '';
-      if (href && !href.startsWith('http')) href = 'https://www.gulfrecruiter.com' + href;
-      jobs.push(buildJob(title, company, loc, href, 'GulfRecruiter'));
-    });
-
-    console.log(`[GulfRecruiter] scraper: ${jobs.length} jobs found`);
-    return jobs;
-  } catch (err) {
-    console.log(`[GulfRecruiter] scraper error: ${err.message}`);
-    return [];
-  }
+  return [];
 }
 
+// jobs.khaleejtimes.com DNS dead; khaleejtimes.com/jobs is news, not a job board — disabled
 async function scrapeKhaleejTimes() {
-  await delay(1000);
-  try {
-    const url = 'https://jobs.khaleejtimes.com/jobs';
-    const data = await fetchWithRetry(url);
-    const $ = cheerio.load(data);
-    const jobs = [];
-
-    $('[class*="job"], article, li[class*="job"]').each((_, card) => {
-      if (jobs.length >= 10) return false;
-      const title = $(card).find('h2, h3, [class*="title"], a').first().text().trim();
-      if (!title) return;
-      const company = $(card).find('[class*="company"], [class*="employer"]').first().text().trim();
-      const loc = $(card).find('[class*="location"]').first().text().trim();
-      let href = $(card).find('a').first().attr('href') || '';
-      if (href && !href.startsWith('http')) href = 'https://jobs.khaleejtimes.com' + href;
-      jobs.push(buildJob(title, company, loc, href, 'Khaleej Times'));
-    });
-
-    console.log(`[KhaleejTimes] scraper: ${jobs.length} jobs found`);
-    return jobs;
-  } catch (err) {
-    console.log(`[KhaleejTimes] scraper error: ${err.message}`);
-    return [];
-  }
+  return [];
 }
 
 async function scrapeCvLibrary() {

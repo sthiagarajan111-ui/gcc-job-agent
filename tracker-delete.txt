@@ -1,0 +1,115 @@
+Update the existing file: src/dashboard.js
+
+Read the current src/dashboard.js first before making any changes.
+
+═══════════════════════════════════════════════════════
+FEATURE — DELETE BUTTON ON TRACKER KANBAN CARDS
+═══════════════════════════════════════════════════════
+
+In src/dashboard.js:
+
+ADD DELETE BUTTON TO EACH KANBAN CARD:
+
+In the buildKanbanCard() function, add a small
+red delete button to each card.
+
+Button style:
+  Text: 🗑
+  Background: #DA3633
+  Color: white
+  Font-size: 11px
+  Padding: 3px 8px
+  Border-radius: 4px
+  Float: right or position absolute top-right
+  Title tooltip: "Remove from tracker"
+
+When clicked:
+  Show confirm dialog:
+  "Remove this application from tracker?
+  This cannot be undone."
+  If confirmed:
+    Call DELETE /api/tracker/:applicationId
+    Remove the card from the Kanban column
+    Update column count
+    Update stats bar counters
+    Show toast: "Application removed"
+
+ADD NEW ROUTE: DELETE /api/tracker/:applicationId
+
+In the server:
+  Read data/applications.json
+  Find application by id field
+  Remove it from the array
+  Save updated array back to data/applications.json
+  Also update in-memory applications array if exists
+  Return: { success: true }
+
+If application not found:
+  Return: { success: false, message: "Application not found" }
+
+UPDATE STATS BAR AFTER DELETE:
+
+After successful delete:
+1. Remove card from DOM with fade animation
+2. Decrement the column card count by 1
+3. Update tracker stats bar:
+   - Decrement total applications by 1
+   - Decrement the relevant status counter
+     (Applied/Interview/Offer/Rejected) by 1
+4. If candidate filter is active:
+   Only update counts for the selected candidate
+
+CLIENT SIDE deleteTrackerCard(applicationId, status, cardElement):
+  fetch('DELETE /api/tracker/' + applicationId)
+  .then(data => {
+    if (data.success) {
+      // Fade out card
+      cardElement.style.opacity = '0'
+      cardElement.style.transition = 'opacity 0.3s'
+      setTimeout(() => cardElement.remove(), 300)
+      
+      // Update column count
+      updateColumnCount(status)
+      
+      // Update stats bar
+      updateTrackerStatsAfterDelete(status)
+      
+      // Show toast
+      showToast('Application removed')
+    }
+  })
+
+function updateTrackerStatsAfterDelete(status):
+  // Decrement total
+  const totalEl = document.getElementById('stat-total')
+  if (totalEl) totalEl.textContent = 
+    parseInt(totalEl.textContent) - 1
+
+  // Decrement status-specific counter
+  const statusMap = {
+    'Applied': 'stat-applied',
+    'Interview': 'stat-interview', 
+    'Offer': 'stat-offer',
+    'Rejected': 'stat-rejected'
+  }
+  const statId = statusMap[status]
+  if (statId) {
+    const el = document.getElementById(statId)
+    if (el) el.textContent = 
+      Math.max(0, parseInt(el.textContent) - 1)
+  }
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+
+After all changes:
+  node src/dashboard.js
+
+Confirm:
+  GET /tracker → 200, each card has red 🗑 button
+  DELETE /api/tracker/test → returns not found (correct)
+
+Print: "Tracker delete button added"
+Print: "Route: DELETE /api/tracker/:applicationId"
+Print: "Stats update after delete: YES"
