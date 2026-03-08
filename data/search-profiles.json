@@ -353,6 +353,23 @@
       "createdDate": "2026-03-07",
       "color": "#58A6FF",
       "id": "profile_1772903958115"
+    },
+    {
+      "role": "Business Consultant",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All GCC"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F0E68C",
+      "id": "profile_1772907805999"
     }
   ],
   "lastUpdated": "2026-03-07"

@@ -43,6 +43,7 @@ function addApplication(job) {
     tierLabel: job.tierLabel,
     totalScore: job.totalScore,
     salaryAED: job.salaryAED !== undefined ? job.salaryAED : null,
+    candidateId: job.candidateId || 'dheeraj',
     appliedDate: today,
     status: 'Applied',
     lastUpdated: today,

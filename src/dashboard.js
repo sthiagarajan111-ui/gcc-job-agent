@@ -661,93 +661,99 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 </nav>
 
 <div class="stats-bar">
-  <div class="stat-box">
-    <div class="stat-number" id="stat-total">${jobs.length}</div>
+  <div class="stat-box" style="border-left:4px solid #8B949E">
+    <div class="stat-number" id="stat-total" style="color:#E6EDF3">${jobs.length}</div>
     <div class="stat-label">Total Jobs (All Time)</div>
   </div>
-  <div class="stat-box">
+  <div class="stat-box" style="border-left:4px solid #00D4FF">
     <div class="stat-number" id="stat-today" style="color:#00D4FF">${todaysNew}</div>
     <div class="stat-label">Today's New Jobs</div>
   </div>
-  <div class="stat-box">
-    <div class="stat-number" style="color:#3FB950">${tier1}</div>
-    <div class="stat-label">Tier 1</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-number" style="color:#58A6FF">${tier2}</div>
-    <div class="stat-label">Tier 2</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-number" style="color:#F5A623">${fortune500}</div>
+  <div class="stat-box" style="border-left:4px solid #D29922">
+    <div class="stat-number" id="stat-fortune500" style="color:#D29922">${fortune500}</div>
     <div class="stat-label">Fortune 500</div>
   </div>
-  <div class="stat-box">
-    <div class="stat-number" style="color:#D29922">${applied}</div>
+  <div class="stat-box" style="border-left:4px solid #3FB950">
+    <div class="stat-number" id="stat-tier1" style="color:#3FB950">${tier1}</div>
+    <div class="stat-label">Tier 1</div>
+  </div>
+  <div class="stat-box" style="border-left:4px solid #58A6FF">
+    <div class="stat-number" id="stat-tier2" style="color:#58A6FF">${tier2}</div>
+    <div class="stat-label">Tier 2</div>
+  </div>
+  <div class="stat-box" style="border-left:4px solid #8957E5">
+    <div class="stat-number" id="stat-applied" style="color:#8957E5">${applied}</div>
     <div class="stat-label">Applied</div>
   </div>
 </div>
 
-<div class="filter-bar">
-  <select id="filter-candidate" onchange="applyFilters()">
-    <option value="">All Candidates</option>
-    <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
-    <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
-  </select>
-  <select id="filter-tier" onchange="onTierChange()">
-    <option value="">All Tiers</option>
-    <option value="1">Tier 1 Only</option>
-    <option value="2">Tier 2 Only</option>
-    <option value="3">Tier 3 Only</option>
-    <option value="4">Tier 4 Only</option>
-  </select>
-  <div style="display:inline-block;vertical-align:top">
-    <select id="filter-company" onchange="applyFilters()">
-      <option value="All Companies">All Companies</option>
+<div class="filter-bar" style="flex-wrap:nowrap;border-bottom:1px solid #30363D">
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1">
+    <select id="filter-candidate" onchange="applyFilters()">
+      <option value="">All Candidates</option>
+      <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
+      <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
     </select>
-    <div style="font-size:10px;color:#6E7681;font-style:italic;margin-top:2px">Updates with Tier filter</div>
+    <select id="filter-tier" onchange="onTierChange()">
+      <option value="">All Tiers</option>
+      <option value="1">Tier 1 Only</option>
+      <option value="2">Tier 2 Only</option>
+      <option value="3">Tier 3 Only</option>
+      <option value="4">Tier 4 Only</option>
+    </select>
+    <div style="display:inline-block;vertical-align:top">
+      <select id="filter-company" onchange="applyFilters()">
+        <option value="All Companies">All Companies</option>
+      </select>
+      <div style="font-size:10px;color:#6E7681;font-style:italic;margin-top:2px">Updates with Tier filter</div>
+    </div>
+    <select id="filter-source" onchange="applyFilters()">
+      <option value="All Sources">All Sources</option>
+    </select>
+    <select id="filter-location" onchange="applyFilters()">
+      <option value="">All Locations</option>
+      <option value="Dubai">Dubai</option>
+      <option value="Abu Dhabi">Abu Dhabi</option>
+      <option value="Qatar">Qatar</option>
+      <option value="Saudi Arabia">Saudi Arabia</option>
+      <option value="Kuwait">Kuwait</option>
+      <option value="Bahrain">Bahrain</option>
+      <option value="Oman">Oman</option>
+    </select>
+    <select id="filter-role" onchange="applyFilters()">
+      <option value="">All Roles</option>
+    </select>
+    <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Show Fortune 500 Only</button>
+    <select id="filter-experience" onchange="applyFilters()">
+      <option value="">All Levels</option>
+      <option value="entry">Entry Level (0-1 yr)</option>
+      <option value="mid">Mid Level (2-3 yrs)</option>
+      <option value="senior">Senior (5+ yrs)</option>
+      <option value="unknown">Unknown</option>
+    </select>
+    <select id="filter-date" onchange="applyFilters()">
+      <option value="All Dates">All Dates</option>
+      <option value="1">Today</option>
+      <option value="3">Last 3 Days</option>
+      <option value="7">Last 7 Days</option>
+      <option value="14">Last 14 Days</option>
+      <option value="30">Last 30 Days</option>
+      <option value="60">Last 60 Days</option>
+      <option value="90">Last 90 Days</option>
+    </select>
+    <select id="filter-sort" onchange="applyFilters()">
+      <option value="high">Highest Score</option>
+      <option value="low">Lowest Score</option>
+      <option value="newest">Newest First</option>
+    </select>
   </div>
-  <select id="filter-source" onchange="applyFilters()">
-    <option value="All Sources">All Sources</option>
-  </select>
-  <select id="filter-location" onchange="applyFilters()">
-    <option value="">All Locations</option>
-    <option value="Dubai">Dubai</option>
-    <option value="Abu Dhabi">Abu Dhabi</option>
-    <option value="Qatar">Qatar</option>
-    <option value="Saudi Arabia">Saudi Arabia</option>
-    <option value="Kuwait">Kuwait</option>
-    <option value="Bahrain">Bahrain</option>
-    <option value="Oman">Oman</option>
-  </select>
-  <select id="filter-role" onchange="applyFilters()">
-    <option value="">All Roles</option>
-  </select>
-  <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Show Fortune 500 Only</button>
-  <select id="filter-experience" onchange="applyFilters()">
-    <option value="">All Levels</option>
-    <option value="entry">Entry Level (0-1 yr)</option>
-    <option value="mid">Mid Level (2-3 yrs)</option>
-    <option value="senior">Senior (5+ yrs)</option>
-    <option value="unknown">Unknown</option>
-  </select>
-  <select id="filter-date" onchange="applyFilters()">
-    <option value="All Dates">All Dates</option>
-    <option value="1">Today</option>
-    <option value="3">Last 3 Days</option>
-    <option value="7">Last 7 Days</option>
-    <option value="14">Last 14 Days</option>
-    <option value="30">Last 30 Days</option>
-    <option value="60">Last 60 Days</option>
-    <option value="90">Last 90 Days</option>
-  </select>
-  <select id="filter-sort" onchange="applyFilters()">
-    <option value="high">Highest Score</option>
-    <option value="low">Lowest Score</option>
-    <option value="newest">Newest First</option>
-  </select>
-  <input type="text" id="filter-search" placeholder="Search company or title..." oninput="applyFilters()" style="min-width:180px">
-  <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
-  <button class="btn-add-job" onclick="openAddJobModal()">➕ Add Job from URL</button>
+  <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:10px">
+    <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
+    <button class="btn-add-job" onclick="openAddJobModal()">➕ Add Job from URL</button>
+  </div>
+</div>
+<div style="background:#161B22;border-bottom:2px solid #30363D;padding:8px 24px">
+  <input type="text" id="filter-search" placeholder="Search company or title..." oninput="applyFilters()" style="width:100%;box-sizing:border-box;border:1px solid #484F58;border-radius:4px;padding:7px 10px;font-size:13px;color:#E6EDF3;background:#1F2937">
 </div>
 
 <div class="jobs-container" id="jobs-container">
@@ -768,6 +774,8 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 
 <script>
 const ALL_JOBS = ${jobsJson};
+const ALL_APPLICATIONS = ${JSON.stringify(applications).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')};
+const TODAY_ISO = '${todayIso}';
 const PAGE_SIZE = 20;
 let currentPage = 1;
 let filteredJobs = [...ALL_JOBS];
@@ -913,9 +921,31 @@ function applyFilters() {
   else if (sort === 'low') filteredJobs.sort((a, b) => (a.totalScore || 0) - (b.totalScore || 0));
   else if (sort === 'newest') filteredJobs.sort((a, b) => (b.postedDate || '').localeCompare(a.postedDate || ''));
 
-  document.getElementById('stat-total').textContent = filteredJobs.length;
+  updateStatsBar(filteredJobs);
   currentPage = 1;
   renderPage();
+}
+
+function updateStatsBar(jobs) {
+  const candidate = document.getElementById('filter-candidate').value;
+  const total = jobs.length;
+  const todaysNew = jobs.filter(j => {
+    const d = j.postedDate || j.addedDate || '';
+    return d.startsWith(TODAY_ISO);
+  }).length;
+  const fortune500 = jobs.filter(j => j.isFortuneCompany).length;
+  const tier1 = jobs.filter(j => j.tier === 1).length;
+  const tier2 = jobs.filter(j => j.tier === 2).length;
+  let applied = ALL_APPLICATIONS.length;
+  if (candidate) {
+    applied = ALL_APPLICATIONS.filter(a => (a.candidateId || 'dheeraj') === candidate).length;
+  }
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-today').textContent = todaysNew;
+  document.getElementById('stat-fortune500').textContent = fortune500;
+  document.getElementById('stat-tier1').textContent = tier1;
+  document.getElementById('stat-tier2').textContent = tier2;
+  document.getElementById('stat-applied').textContent = applied;
 }
 
 function toggleFortune() {
@@ -1447,6 +1477,8 @@ if (ALL_JOBS.length > 0) {
   updateSourceDropdown(ALL_JOBS, '');
   updateRoleDropdown(ALL_JOBS);
   applyFilters();
+} else {
+  updateStatsBar(ALL_JOBS);
 }
 
 // ─── ADD JOB MODAL ───────────────────────────────────────
@@ -1767,9 +1799,16 @@ function buildTrackerHtml() {
 
   const columnsHtml = columns.map(col => {
     const colApps = applications.filter(a => a.status === col.status);
-    const cards = colApps.map(app => `
-      <div class="kanban-card" id="kcard-${app.id}">
-        <div class="kcard-title">${escHtml(app.jobTitle || '')}</div>
+    const cards = colApps.map(app => {
+      const cid = app.candidateId || 'dheeraj';
+      const dotColor = cid === 'thiagarajan' ? '#3FB950' : '#D29922';
+      const dotTitle = cid === 'thiagarajan' ? 'Thiagarajan Shanthakumar' : 'Dheeraj Thiagarajan';
+      return `
+      <div class="kanban-card" id="kcard-${app.id}" data-candidate-id="${cid}">
+        <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0" title="${dotTitle}"></span>
+          ${escHtml(app.jobTitle || '')}
+        </div>
         <div class="kcard-company">${escHtml(app.company || '')}</div>
         <div class="kcard-meta">
           <span class="kcard-location">${escHtml(app.location || '')}</span>
@@ -1784,7 +1823,8 @@ function buildTrackerHtml() {
           <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
         </select>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     return `
       <div class="kanban-col">
@@ -1879,6 +1919,20 @@ function buildTrackerHtml() {
   ::-webkit-scrollbar-track { background: #0D1117; }
   ::-webkit-scrollbar-thumb { background: #30363D; border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: #58A6FF; }
+
+  /* CANDIDATE FILTER */
+  .cand-filter-bar {
+    background: #161B22; border-bottom: 1px solid #30363D;
+    padding: 10px 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .cand-filter-label { font-size: 13px; color: #8B949E; font-weight: bold; margin-right: 4px; }
+  .cand-filter-btn {
+    background: #1F2937; color: #8B949E; border: 1px solid #30363D;
+    border-radius: 20px; padding: 5px 14px; cursor: pointer; font-size: 13px;
+    transition: all 0.15s;
+  }
+  .cand-filter-btn.active { background: #30363D; color: #E6EDF3; border-color: #58A6FF; }
+  .cand-filter-btn:hover { background: #30363D; color: #E6EDF3; }
 </style>
 </head>
 <body>
@@ -1921,6 +1975,13 @@ function buildTrackerHtml() {
   </div>
 </div>
 
+<div class="cand-filter-bar">
+  <span class="cand-filter-label">Candidate:</span>
+  <button class="cand-filter-btn active" id="cand-btn-all" onclick="filterTrackerByCandidate('all', this)">All Candidates</button>
+  <button class="cand-filter-btn" id="cand-btn-dheeraj" onclick="filterTrackerByCandidate('dheeraj', this)">🟡 Dheeraj Thiagarajan</button>
+  <button class="cand-filter-btn" id="cand-btn-thiagarajan" onclick="filterTrackerByCandidate('thiagarajan', this)">🟢 Thiagarajan Shanthakumar</button>
+</div>
+
 <div class="kanban-wrapper">
   <div class="kanban-board">
     ${columnsHtml}
@@ -1929,6 +1990,7 @@ function buildTrackerHtml() {
 
 <script>
 let allApps = ${appsJson};
+let currentTrackerCandidate = 'all';
 
 function getTierColor(tier) {
   if (tier === 1) return '#3FB950';
@@ -1970,22 +2032,61 @@ function moveCard(id, newStatus) {
   const newCard = buildKanbanCard(app);
   targetCol.insertAdjacentHTML('beforeend', newCard);
 
-  // Update counts
+  // Update visible counts
+  updateTrackerColCounts();
+}
+
+function updateTrackerColCounts() {
   const columns = ['Applied', 'Screening', 'Interview', 'Offer', 'Rejected'];
   columns.forEach(status => {
     const colBody = document.getElementById('col-' + status);
+    if (!colBody) return;
     const header = colBody.closest('.kanban-col').querySelector('.col-count');
-    const count = colBody.querySelectorAll('.kanban-card').length;
-    header.textContent = count;
-    if (count === 0) colBody.innerHTML = '<div class="empty-col">No applications here yet</div>';
+    const allCards = colBody.querySelectorAll('.kanban-card');
+    let count = 0;
+    allCards.forEach(c => { if (c.style.display !== 'none') count++; });
+    if (header) header.textContent = count;
+    if (allCards.length === 0) {
+      if (!colBody.querySelector('.empty-col')) {
+        colBody.innerHTML = '<div class="empty-col">No applications here yet</div>';
+      }
+    } else {
+      const empty = colBody.querySelector('.empty-col');
+      if (empty) empty.remove();
+    }
   });
+}
+
+function filterTrackerByCandidate(selected, btn) {
+  currentTrackerCandidate = selected;
+  document.querySelectorAll('.cand-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const cards = document.querySelectorAll('.kanban-card');
+  cards.forEach(card => {
+    const cardCandidate = card.dataset.candidateId;
+    if (selected === 'all' || cardCandidate === selected) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  updateTrackerColCounts();
 }
 
 function buildKanbanCard(app) {
   if (!app) return '';
+  const cid = app.candidateId || 'dheeraj';
+  const dotColor = cid === 'thiagarajan' ? '#3FB950' : '#D29922';
+  const dotTitle = cid === 'thiagarajan' ? 'Thiagarajan Shanthakumar' : 'Dheeraj Thiagarajan';
+  const hidden = (currentTrackerCandidate !== 'all' && cid !== currentTrackerCandidate) ? 'style="display:none"' : '';
   return \`
-    <div class="kanban-card" id="kcard-\${app.id}">
-      <div class="kcard-title">\${escHtml(app.jobTitle || '')}</div>
+    <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" \${hidden}>
+      <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
+        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:\${dotColor};flex-shrink:0" title="\${dotTitle}"></span>
+        \${escHtml(app.jobTitle || '')}
+      </div>
       <div class="kcard-company">\${escHtml(app.company || '')}</div>
       <div class="kcard-meta">
         <span class="kcard-location">\${escHtml(app.location || '')}</span>
@@ -3370,11 +3471,10 @@ if (require.main === module) {
   const profileData = loadSearchProfiles();
   const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
   const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
-  console.log('All 6 fixes applied');
-  console.log('Candidate field in roles: YES');
-  console.log('Role filter dynamic: YES');
-  console.log('Dheeraj color: #F0E68C (light yellow)');
-  console.log('Scraper fixes applied: YES');
+  console.log('Dashboard layout v2 complete');
+  console.log('Stats bar order: Total, Today, Fortune500, T1, T2, Applied');
+  console.log('Tracker candidate filter: YES');
+  console.log('Reset+AddJob moved to filter row: YES');
   console.log('Multi-candidate system built');
   console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
   console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);
