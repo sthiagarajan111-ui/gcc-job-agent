@@ -1,9 +1,9 @@
 require('dotenv').config()
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('[index.js] Production mode - job agent disabled, use dashboard only')
-  process.exit(0)
-}
+  console.log('[index.js] Production mode - starting dashboard')
+  require('./src/dashboard.js')
+} else {
 
 const cron = require('node-cron')
 const config = require('./src/config')
@@ -220,3 +220,4 @@ runJobAgent()
 
 console.log('=== Scheduler active. 8AM Gulf Time daily ===')
 console.log('=== Running now... ===')
+}
