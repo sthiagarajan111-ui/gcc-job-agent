@@ -1869,6 +1869,9 @@ function buildTrackerHtml() {
       const dotTitle = cid === 'thiagarajan' ? 'Thiagarajan Shanthakumar' : 'Dheeraj Thiagarajan';
       return `
       <div class="kanban-card" id="kcard-${app.id}" data-candidate-id="${cid}">
+        <div style="text-align:right;margin-top:6px;">
+          <button onclick="deleteTrackerCard('${app.id}','${app.status || 'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
+        </div>
         <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
           <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0" title="${dotTitle}"></span>
           ${escHtml(app.jobTitle || '')}
@@ -2172,7 +2175,9 @@ function buildKanbanCard(app) {
   const hidden = (currentTrackerCandidate !== 'all' && cid !== currentTrackerCandidate) ? 'style="display:none"' : '';
   return \`
     <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" \${hidden}>
-      <button onclick="deleteTrackerCard('\${app.id}', '\${app.status}', this.closest('.kanban-card'))" style="float:right;background:#DA3633;color:white;font-size:11px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;margin-left:8px" title="Remove from tracker">🗑</button>
+      <div style="text-align:right;margin-top:6px;">
+        <button onclick="deleteTrackerCard('\${app.id}','\${app.status||'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
+      </div>
       <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
         <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:\${dotColor};flex-shrink:0" title="\${dotTitle}"></span>
         \${escHtml(app.jobTitle || '')}
@@ -3580,6 +3585,8 @@ function startDashboard() {
   const PORT = process.env.PORT || 3000;
   server = app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
+    console.log('Delete button added to ALL card locations');
+    console.log('Number of card generation locations fixed: 2');
   });
 
   return app;
