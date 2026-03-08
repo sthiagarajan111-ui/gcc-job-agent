@@ -126,6 +126,7 @@ function loadTodaysJobs() {
 // ═══════════════════════════════════════════════════════
 
 function loadAllJobs() {
+  try {
   if (allJobs !== null) return allJobs;
 
   const dataDir = path.join(__dirname, '../data');
@@ -241,6 +242,11 @@ function loadAllJobs() {
   }
 
   return allJobs;
+  } catch (err) {
+    console.error('[loadAllJobs] Error:', err.message);
+    allJobs = [];
+    return allJobs;
+  }
 }
 
 function saveJobToTodaysReport(job) {
@@ -3072,16 +3078,31 @@ function startDashboard() {
   app = express();
   app.use(express.json());
 
+  // ── Bind port IMMEDIATELY so Render health check passes ──
+  const PORT = process.env.PORT || 3000;
+  server = app.listen(PORT, () => {
+    console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
+    console.log('Fast startup fix applied for Render');
+  });
+
+  // ── Health check — responds instantly before any data loads ──
+  app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+
   // Serve cover letter files
   const coverLetterDir = path.join(__dirname, '../data/cover-letters');
   app.use('/cover-letter', express.static(coverLetterDir));
 
   // ── GET / ──────────────────────────────────────────
   app.get('/', async (req, res) => {
-    const jobs = loadAllJobs();
-    const contactsData = await loadContacts();
-    const networkingData = loadNetworkingPlans();
-    res.send(buildDashboardHtml(jobs, contactsData, networkingData));
+    try {
+      const jobs = loadAllJobs();
+      const contactsData = await loadContacts().catch(() => []);
+      const networkingData = (() => { try { return loadNetworkingPlans(); } catch(e) { return []; } })();
+      res.send(buildDashboardHtml(jobs, contactsData, networkingData));
+    } catch (err) {
+      console.error('[GET /] Error:', err.message);
+      res.send('<h2 style="font-family:sans-serif;color:#E6EDF3;background:#0D1117;padding:40px">Dashboard loading...</h2>');
+    }
   });
 
   // ── GET /tracker ───────────────────────────────────
@@ -3585,12 +3606,6 @@ function startDashboard() {
     }
   });
 
-  const PORT = process.env.PORT || 3000;
-  server = app.listen(PORT, () => {
-    console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
-    console.log('Render deployment fixes applied');
-  });
-
   return app;
 }
 
@@ -3618,10 +3633,16 @@ module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 // ═══════════════════════════════════════════════════════
 
 if (require.main === module) {
-  loadPrepCache();
-  loadSearchProfiles(); // ensure defaults created
-  const candidates = loadCandidates();
+  // Start server FIRST so Render health check passes immediately
   startDashboard();
+
+  // Load data in background after port is already bound
+  setImmediate(() => {
+    loadPrepCache();
+    loadSearchProfiles(); // ensure defaults created
+    loadCandidates();
+  });
+
   const profileData = loadSearchProfiles();
   const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
   const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
