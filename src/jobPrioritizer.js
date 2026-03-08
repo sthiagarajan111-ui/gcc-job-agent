@@ -183,14 +183,14 @@ function prioritizeJob(job) {
   const totalScore = locationScore + companyScore + salaryScore + matchScore + experienceAdjustment;
 
   let tier, tierLabel;
-  if (totalScore >= 80) {
+  if (totalScore >= 70) {
     tier = 1; tierLabel = 'APPLY TODAY';
-  } else if (totalScore >= 60) {
-    tier = 2; tierLabel = 'APPLY THIS WEEK';
-  } else if (totalScore >= 40) {
-    tier = 3; tierLabel = 'APPLY IF TIME';
+  } else if (totalScore >= 50) {
+    tier = 2; tierLabel = 'STRONG MATCH';
+  } else if (totalScore >= 30) {
+    tier = 3; tierLabel = 'CONSIDER';
   } else {
-    tier = 4; tierLabel = 'OPTIONAL';
+    tier = 4; tierLabel = 'WEAK MATCH';
   }
 
   const fortuneFlag = isFortuneCompany(job.company);

@@ -227,6 +227,9 @@ function loadAllJobs() {
   });
   if (autoRemoved > 0) console.log(`Auto-removed ${autoRemoved} jobs older than 90 days`);
 
+  // Re-score all jobs with current thresholds
+  allJobs = allJobs.map(job => prioritizeJob(job));
+
   // Tag each job with candidateId
   for (const job of allJobs) {
     if (!job.candidateId) {
@@ -409,43 +412,55 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     border-radius: 8px;
     padding: 12px 16px;
     border: 1px solid #30363D;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, filter 0.15s, box-shadow 0.15s;
+    cursor: pointer;
   }
-  .stat-box:hover { border-color: #58A6FF; }
+  .stat-box:hover { border-color: #58A6FF; filter: brightness(1.15); }
   .stat-number { font-size: 28px; font-weight: bold; color: #58A6FF; }
   .stat-label { font-size: 12px; color: #8B949E; margin-top: 4px; }
 
-  /* FILTER BAR */
-  .filter-bar {
-    background: #161B22;
-    border-top: 1px solid #30363D;
-    border-bottom: 2px solid #30363D;
-    padding: 12px 24px;
+  /* FILTER AREA */
+  .filter-area {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #161B22;
+    border-bottom: 1px solid #30363D;
+  }
+  .filter-row {
+    display: flex;
     align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
-  .filter-bar select, .filter-bar input {
-    border: 1px solid #484F58;
-    border-radius: 4px;
-    padding: 7px 10px;
-    font-size: 13px;
-    color: #E6EDF3;
+  .filter-row select, .filter-row input {
+    height: 34px;
+    padding: 4px 8px;
+    font-size: 12px;
     background: #1F2937;
+    color: white;
+    border: 1px solid #484F58;
+    border-radius: 6px;
   }
-  .filter-bar select:focus, .filter-bar input:focus {
+  .filter-row select:focus, .filter-row input:focus {
     outline: none;
     border: 2px solid #58A6FF;
   }
+  .filter-row .search-box {
+    flex: 1;
+    min-width: 200px;
+  }
   .btn-fortune {
     background: #30363D; color: white; border: 1px solid #F5A623;
-    border-radius: 4px; padding: 7px 14px; cursor: pointer; font-size: 13px;
+    border-radius: 6px; height: 34px; padding: 0 12px; cursor: pointer; font-size: 12px;
+    white-space: nowrap;
   }
-  .btn-fortune.active { background: #F5A623; }
+  .btn-fortune.active { background: #F5A623; color: #1B2A4A; }
   .btn-reset {
     background: #30363D; color: white; border: 1px solid #484F58;
-    border-radius: 4px; padding: 7px 14px; cursor: pointer; font-size: 13px;
+    border-radius: 6px; height: 34px; padding: 0 12px; cursor: pointer; font-size: 12px;
+    white-space: nowrap;
   }
 
   /* JOB GRID */
@@ -591,7 +606,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   .modal-success-card .sc-company { color:#58A6FF;font-size:12px; }
   .modal-success-card .sc-meta { display:flex;gap:10px;font-size:11px;color:#8B949E;margin-top:6px;flex-wrap:wrap; }
   .modal-success-card .sc-score { font-size:22px;font-weight:bold;color:#3FB950; }
-  .btn-add-job { background:#238636;border:none;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap; }
+  .btn-add-job { background:#238636;border:none;color:white;height:34px;padding:0 14px;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap; }
   .btn-add-job:hover { background:#2ea043; }
 
   /* INTERVIEW PREP PANEL */
@@ -661,56 +676,54 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 </nav>
 
 <div class="stats-bar">
-  <div class="stat-box" style="border-left:4px solid #8B949E">
+  <div class="stat-box" style="border-left:4px solid #8B949E" onclick="statTotalClick()" title="Click to reset all filters">
     <div class="stat-number" id="stat-total" style="color:#E6EDF3">${jobs.length}</div>
     <div class="stat-label">Total Jobs (All Time)</div>
   </div>
-  <div class="stat-box" style="border-left:4px solid #00D4FF">
+  <div class="stat-box" style="border-left:4px solid #00D4FF" onclick="statTodayClick()" title="Click to show today's jobs">
     <div class="stat-number" id="stat-today" style="color:#00D4FF">${todaysNew}</div>
     <div class="stat-label">Today's New Jobs</div>
   </div>
-  <div class="stat-box" style="border-left:4px solid #D29922">
+  <div class="stat-box" style="border-left:4px solid #D29922" onclick="statFortune500Click()" title="Click to filter Fortune 500 only">
     <div class="stat-number" id="stat-fortune500" style="color:#D29922">${fortune500}</div>
     <div class="stat-label">Fortune 500</div>
   </div>
-  <div class="stat-box" style="border-left:4px solid #3FB950">
+  <div class="stat-box" style="border-left:4px solid #3FB950" onclick="statTier1Click()" title="Click to show Tier 1 jobs">
     <div class="stat-number" id="stat-tier1" style="color:#3FB950">${tier1}</div>
     <div class="stat-label">Tier 1</div>
   </div>
-  <div class="stat-box" style="border-left:4px solid #58A6FF">
+  <div class="stat-box" style="border-left:4px solid #58A6FF" onclick="statTier2Click()" title="Click to show Tier 2 jobs">
     <div class="stat-number" id="stat-tier2" style="color:#58A6FF">${tier2}</div>
     <div class="stat-label">Tier 2</div>
   </div>
-  <div class="stat-box" style="border-left:4px solid #8957E5">
+  <div class="stat-box" style="border-left:4px solid #8957E5" onclick="window.location.href='/tracker'" title="Click to open Tracker">
     <div class="stat-number" id="stat-applied" style="color:#8957E5">${applied}</div>
     <div class="stat-label">Applied</div>
   </div>
 </div>
 
-<div class="filter-bar" style="flex-wrap:nowrap;border-bottom:1px solid #30363D">
-  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1">
-    <select id="filter-candidate" onchange="applyFilters()">
+<div class="filter-area">
+  <!-- Row 1: main filters + action buttons -->
+  <div class="filter-row">
+    <select id="filter-candidate" onchange="applyFilters()" style="min-width:180px">
       <option value="">All Candidates</option>
       <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
       <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
     </select>
-    <select id="filter-tier" onchange="onTierChange()">
+    <select id="filter-tier" onchange="onTierChange()" style="min-width:100px">
       <option value="">All Tiers</option>
       <option value="1">Tier 1 Only</option>
       <option value="2">Tier 2 Only</option>
       <option value="3">Tier 3 Only</option>
       <option value="4">Tier 4 Only</option>
     </select>
-    <div style="display:inline-block;vertical-align:top">
-      <select id="filter-company" onchange="applyFilters()">
-        <option value="All Companies">All Companies</option>
-      </select>
-      <div style="font-size:10px;color:#6E7681;font-style:italic;margin-top:2px">Updates with Tier filter</div>
-    </div>
-    <select id="filter-source" onchange="applyFilters()">
+    <select id="filter-company" onchange="applyFilters()" style="min-width:160px">
+      <option value="All Companies">All Companies</option>
+    </select>
+    <select id="filter-source" onchange="applyFilters()" style="min-width:130px">
       <option value="All Sources">All Sources</option>
     </select>
-    <select id="filter-location" onchange="applyFilters()">
+    <select id="filter-location" onchange="applyFilters()" style="min-width:130px">
       <option value="">All Locations</option>
       <option value="Dubai">Dubai</option>
       <option value="Abu Dhabi">Abu Dhabi</option>
@@ -720,10 +733,16 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
       <option value="Bahrain">Bahrain</option>
       <option value="Oman">Oman</option>
     </select>
+    <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Fortune 500</button>
+    <button class="btn-reset" onclick="resetFilters()" style="margin-left:auto">Reset Filters</button>
+    <button class="btn-add-job" onclick="openAddJobModal()">➕ Add Job from URL</button>
+  </div>
+  <!-- Row 2: search + secondary filters -->
+  <div class="filter-row">
+    <input type="text" id="filter-search" class="search-box" placeholder="Search company or title..." oninput="applyFilters()">
     <select id="filter-role" onchange="applyFilters()">
       <option value="">All Roles</option>
     </select>
-    <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Show Fortune 500 Only</button>
     <select id="filter-experience" onchange="applyFilters()">
       <option value="">All Levels</option>
       <option value="entry">Entry Level (0-1 yr)</option>
@@ -747,13 +766,6 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
       <option value="newest">Newest First</option>
     </select>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:10px">
-    <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
-    <button class="btn-add-job" onclick="openAddJobModal()">➕ Add Job from URL</button>
-  </div>
-</div>
-<div style="background:#161B22;border-bottom:2px solid #30363D;padding:8px 24px">
-  <input type="text" id="filter-search" placeholder="Search company or title..." oninput="applyFilters()" style="width:100%;box-sizing:border-box;border:1px solid #484F58;border-radius:4px;padding:7px 10px;font-size:13px;color:#E6EDF3;background:#1F2937">
 </div>
 
 <div class="jobs-container" id="jobs-container">
@@ -969,7 +981,59 @@ function resetFilters() {
   document.getElementById('filter-search').value = '';
   fortuneActive = false;
   document.getElementById('btn-fortune').classList.remove('active');
+  clearStatActive();
   applyFilters();
+}
+
+// ── CLICKABLE STATS BAR ───────────────────────────────
+
+function clearStatActive() {
+  ['stat-total','stat-today','stat-fortune500','stat-tier1','stat-tier2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.closest('.stat-box').style.boxShadow = '';
+  });
+}
+
+function setStatActive(id, color) {
+  clearStatActive();
+  const el = document.getElementById(id);
+  if (el) el.closest('.stat-box').style.boxShadow = '0 0 0 2px ' + color;
+}
+
+function statTotalClick() {
+  clearStatActive();
+  resetFilters();
+}
+
+function statTodayClick() {
+  document.getElementById('filter-date').value = '1';
+  setStatActive('stat-today', '#00D4FF');
+  applyFilters();
+  document.getElementById('jobs-grid').scrollIntoView({ behavior: 'smooth' });
+}
+
+function statFortune500Click() {
+  toggleFortune();
+  if (fortuneActive) {
+    setStatActive('stat-fortune500', '#D29922');
+  } else {
+    clearStatActive();
+  }
+  document.getElementById('jobs-grid').scrollIntoView({ behavior: 'smooth' });
+}
+
+function statTier1Click() {
+  document.getElementById('filter-tier').value = '1';
+  onTierChange();
+  setStatActive('stat-tier1', '#3FB950');
+  document.getElementById('jobs-grid').scrollIntoView({ behavior: 'smooth' });
+}
+
+function statTier2Click() {
+  document.getElementById('filter-tier').value = '2';
+  onTierChange();
+  setStatActive('stat-tier2', '#58A6FF');
+  document.getElementById('jobs-grid').scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderPage() {
@@ -1865,15 +1929,17 @@ function buildTrackerHtml() {
   .navbar-right { color: #8B949E; font-size: 13px; text-align: right; }
   .navbar-right strong { color: white; display: block; font-size: 14px; }
 
-  .pipeline-bar {
-    background: #1F2937; border: 1px solid #30363D; border-radius: 8px;
-    padding: 14px 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+  .tracker-stats-bar {
+    background: #161B22; border-bottom: 1px solid #30363D;
+    padding: 12px 24px; display: flex; gap: 12px; flex-wrap: wrap;
   }
-  .pipeline-stat { text-align: center; border-right: 1px solid #30363D; padding-right: 16px; }
-  .pipeline-stat:last-child { border-right: none; padding-right: 0; }
-  .pipeline-num { font-size: 22px; font-weight: bold; color: white; }
-  .pipeline-label { font-size: 12px; color: #8B949E; }
-  .pipeline-div { width: 1px; background: #30363D; height: 36px; }
+  .tstat-box {
+    flex: 1; min-width: 100px; text-align: center;
+    background: #1F2937; border-radius: 8px; padding: 10px 14px;
+    border: 1px solid #30363D;
+  }
+  .tstat-num { font-size: 24px; font-weight: bold; }
+  .tstat-label { font-size: 12px; color: #8B949E; margin-top: 4px; }
 
   .kanban-wrapper { padding: 20px 24px; overflow-x: auto; }
   .kanban-board { display: flex; gap: 14px; min-width: 900px; }
@@ -1953,25 +2019,26 @@ function buildTrackerHtml() {
   </div>
 </nav>
 
-<div class="pipeline-bar">
-  <div class="pipeline-stat">
-    <div class="pipeline-num">${pipeline.total}</div>
-    <div class="pipeline-label">Total Applied</div>
+<div class="tracker-stats-bar">
+  <div class="tstat-box" style="border-left:4px solid #8B949E">
+    <div class="tstat-num" id="stat-total" style="color:#E6EDF3">${pipeline.total}</div>
+    <div class="tstat-label">Total Applications</div>
   </div>
-  <div class="pipeline-div"></div>
-  <div class="pipeline-stat">
-    <div class="pipeline-num" style="color:#58A6FF">${responseRate}%</div>
-    <div class="pipeline-label">Response Rate</div>
+  <div class="tstat-box" style="border-left:4px solid #1F6FEB">
+    <div class="tstat-num" id="stat-applied" style="color:#1F6FEB">${pipeline.Applied}</div>
+    <div class="tstat-label">Applied</div>
   </div>
-  <div class="pipeline-div"></div>
-  <div class="pipeline-stat">
-    <div class="pipeline-num" style="color:#3FB950">${interviewRate}%</div>
-    <div class="pipeline-label">Interview Rate</div>
+  <div class="tstat-box" style="border-left:4px solid #D29922">
+    <div class="tstat-num" id="stat-interview" style="color:#D29922">${pipeline.Interview}</div>
+    <div class="tstat-label">Interview</div>
   </div>
-  <div class="pipeline-div"></div>
-  <div class="pipeline-stat">
-    <div class="pipeline-num" style="color:#F5A623">${offerRate}%</div>
-    <div class="pipeline-label">Offer Rate</div>
+  <div class="tstat-box" style="border-left:4px solid #3FB950">
+    <div class="tstat-num" id="stat-offer" style="color:#3FB950">${pipeline.Offer}</div>
+    <div class="tstat-label">Offer</div>
+  </div>
+  <div class="tstat-box" style="border-left:4px solid #DA3633">
+    <div class="tstat-num" id="stat-rejected" style="color:#DA3633">${pipeline.Rejected}</div>
+    <div class="tstat-label">Rejected</div>
   </div>
 </div>
 
@@ -1989,8 +2056,26 @@ function buildTrackerHtml() {
 </div>
 
 <script>
-let allApps = ${appsJson};
+const ALL_APPLICATIONS = ${appsJson};
+let allApps = ALL_APPLICATIONS.slice();
 let currentTrackerCandidate = 'all';
+
+function updateTrackerStats(candidateId) {
+  let apps = ALL_APPLICATIONS;
+  if (candidateId !== 'all') {
+    apps = ALL_APPLICATIONS.filter(a => a.candidateId === candidateId);
+  }
+  const total = apps.length;
+  const applied = apps.filter(a => a.status === 'Applied').length;
+  const interview = apps.filter(a => a.status === 'Interview').length;
+  const offer = apps.filter(a => a.status === 'Offer').length;
+  const rejected = apps.filter(a => a.status === 'Rejected').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-applied').textContent = applied;
+  document.getElementById('stat-interview').textContent = interview;
+  document.getElementById('stat-offer').textContent = offer;
+  document.getElementById('stat-rejected').textContent = rejected;
+}
 
 function getTierColor(tier) {
   if (tier === 1) return '#3FB950';
@@ -2073,7 +2158,11 @@ function filterTrackerByCandidate(selected, btn) {
   });
 
   updateTrackerColCounts();
+  updateTrackerStats(selected);
 }
+
+// Init on load
+updateTrackerStats('all');
 
 function buildKanbanCard(app) {
   if (!app) return '';
@@ -3471,10 +3560,11 @@ if (require.main === module) {
   const profileData = loadSearchProfiles();
   const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
   const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
-  console.log('Dashboard layout v2 complete');
+  console.log('Tier 1 threshold changed to >= 70');
+  console.log('Clickable stats bar: all 6 boxes active');
+  console.log('Jobs re-scored with new thresholds: YES');
   console.log('Stats bar order: Total, Today, Fortune500, T1, T2, Applied');
   console.log('Tracker candidate filter: YES');
-  console.log('Reset+AddJob moved to filter row: YES');
   console.log('Multi-candidate system built');
   console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
   console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);

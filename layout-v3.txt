@@ -1,0 +1,154 @@
+Update the existing file: src/dashboard.js
+
+Read the current src/dashboard.js first before making any changes.
+
+═══════════════════════════════════════════════════════
+FIX 1 — COMPACT ALL FILTERS INTO 2 ROWS
+═══════════════════════════════════════════════════════
+
+Redesign the filter area to use exactly 2 rows:
+
+ROW 1 (filters + action buttons):
+  [Candidate ▼] [Tier ▼] [Company ▼] [Source ▼] 
+  [Location ▼] [Fortune500 toggle] 
+  [Reset Filters] [+ Add Job from URL]
+  
+  All on one line using flexbox, flex-wrap: nowrap
+  Dropdowns should be compact — reduce min-width:
+    Candidate: 180px
+    Tier: 100px
+    Company: 160px
+    Source: 130px
+    Location: 130px
+    Fortune500 toggle: auto
+
+ROW 2 (search + more filters + sort):
+  [Search company or title...........] 
+  [All Roles ▼] [All Levels ▼] [All Dates ▼] 
+  [Highest Score ▼]
+  
+  Search box: flex: 1 (takes remaining space)
+  Other dropdowns: compact, auto width
+
+Layout CSS:
+.filter-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #161B22;
+  border-bottom: 1px solid #30363D;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.filter-row select, .filter-row input {
+  height: 34px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #1F2937;
+  color: white;
+  border: 1px solid #484F58;
+  border-radius: 6px;
+}
+
+.filter-row .search-box {
+  flex: 1;
+  min-width: 200px;
+}
+
+Reset Filters button: height 34px, compact
+Add Job button: height 34px, compact
+
+Remove all old separate rows for search and sort.
+Replace with the new 2-row layout above.
+
+═══════════════════════════════════════════════════════
+FIX 2 — TRACKER PAGE STATS UPDATE WITH CANDIDATE FILTER
+═══════════════════════════════════════════════════════
+
+In the GET /tracker route HTML:
+
+The tracker page has stat counters at the top
+(same stats bar as the main jobs page).
+
+When the candidate filter pill is changed on the
+tracker page, update ALL stat counters to show
+only values for the selected candidate.
+
+STEP 1 — Pass applications data to tracker page:
+In the server route for GET /tracker:
+  Read data/applications.json
+  Pass applications array to the HTML template
+  Inject as JS variable: const ALL_APPLICATIONS = [...]
+
+STEP 2 — Add updateTrackerStats(candidateId) function:
+  function updateTrackerStats(candidateId) {
+    let apps = ALL_APPLICATIONS
+    if (candidateId !== 'all') {
+      apps = ALL_APPLICATIONS.filter(a => 
+        a.candidateId === candidateId)
+    }
+    
+    // Count by status
+    const applied = apps.filter(a => 
+      a.status === 'Applied').length
+    const interview = apps.filter(a => 
+      a.status === 'Interview').length
+    const offer = apps.filter(a => 
+      a.status === 'Offer').length
+    const rejected = apps.filter(a => 
+      a.status === 'Rejected').length
+    const total = apps.length
+    
+    // Update stat boxes
+    document.getElementById('stat-total').textContent = total
+    document.getElementById('stat-applied').textContent = applied
+    document.getElementById('stat-interview').textContent = interview
+    document.getElementById('stat-offer').textContent = offer
+    document.getElementById('stat-rejected').textContent = rejected
+  }
+
+STEP 3 — Tracker stats bar should show:
+  Total Applications | Applied | Interview | Offer | Rejected
+  (different from jobs page which shows job counts)
+
+  Each with matching colored border:
+    Total: grey
+    Applied: blue
+    Interview: amber
+    Offer: green
+    Rejected: red
+
+STEP 4 — Call updateTrackerStats() when:
+  1. Tracker page loads (with 'all')
+  2. Candidate filter pill is clicked
+
+STEP 5 — Also update Kanban column counts when
+candidate filter changes:
+  Each column header shows count of VISIBLE cards
+  Update after filtering:
+  document.querySelectorAll('.kanban-col').forEach(col => {
+    const visible = col.querySelectorAll(
+      '.kanban-card:not([style*="display: none"])').length
+    col.querySelector('.col-count').textContent = visible
+  })
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+
+After all changes:
+  node src/dashboard.js
+
+Confirm:
+  GET / → 200, all filters in 2 rows only
+  GET /tracker → 200, stats update when candidate changes
+
+Print: "2-row filter layout complete"
+Print: "Tracker stats update with candidate filter: YES"

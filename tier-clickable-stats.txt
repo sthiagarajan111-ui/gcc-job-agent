@@ -1,0 +1,149 @@
+Update these files: src/jobPrioritizer.js, src/dashboard.js
+
+Read both files first before making any changes.
+
+═══════════════════════════════════════════════════════
+FIX 1 — CHANGE TIER 1 THRESHOLD TO >= 70
+═══════════════════════════════════════════════════════
+
+In src/jobPrioritizer.js:
+
+Find the tier scoring thresholds.
+Currently:
+  Tier 1: totalScore >= 80
+  Tier 2: totalScore >= 60
+  Tier 3: totalScore >= 40
+  Tier 4: totalScore < 40
+
+Change to:
+  Tier 1: totalScore >= 70
+  Tier 2: totalScore >= 50
+  Tier 3: totalScore >= 30
+  Tier 4: totalScore < 30
+
+Also update tierLabel accordingly:
+  Tier 1: "APPLY TODAY"
+  Tier 2: "STRONG MATCH"
+  Tier 3: "CONSIDER"
+  Tier 4: "WEAK MATCH"
+
+After changing thresholds, the existing jobs in
+data/report-*.json files will not be re-scored.
+But new jobs scraped from tomorrow will use new thresholds.
+
+To re-score existing jobs, add a one-time migration:
+In src/dashboard.js loadAllJobs() function,
+after loading all jobs, re-run prioritizeJob() on
+each job to update their tier with new thresholds:
+
+jobs = jobs.map(job => {
+  const rescored = prioritizeJob(job)
+  return rescored
+})
+
+This ensures all existing 400+ jobs get re-tiered
+with the new >= 70 threshold immediately.
+
+═══════════════════════════════════════════════════════
+FIX 2 — CLICKABLE STATS BAR COUNTERS
+═══════════════════════════════════════════════════════
+
+In src/dashboard.js client-side JavaScript:
+
+Make each stat box in the stats bar clickable.
+When clicked, apply the relevant filter to show
+only that category of jobs.
+
+Add to each stat box:
+  cursor: pointer
+  hover effect: brightness(1.2) or subtle border glow
+
+Click behavior for each stat box:
+
+1. Total Jobs box clicked:
+   → Reset ALL filters to default (show everything)
+   → Same as clicking Reset Filters button
+
+2. Today's New Jobs box clicked:
+   → Set date filter to "Today" (filter-date = "today")
+   → Apply filters
+   → Scroll to job grid
+
+3. Fortune 500 box clicked:
+   → Toggle Fortune 500 filter ON
+   → If already on → toggle OFF (reset to all)
+   → Apply filters
+   → Scroll to job grid
+
+4. Tier 1 box clicked:
+   → Set Tier filter to "Tier 1" (filter-tier = "1")
+   → Apply filters
+   → Scroll to job grid
+
+5. Tier 2 box clicked:
+   → Set Tier filter to "Tier 2" (filter-tier = "2")
+   → Apply filters
+   → Scroll to job grid
+
+6. Applied box clicked:
+   → This is a tracker stat — clicking it should
+     navigate to the Tracker page:
+     window.location.href = '/tracker'
+
+Implementation:
+Add onclick handlers to each stat box div:
+
+stat-total onclick: resetFilters()
+stat-today onclick: 
+  document.getElementById('filter-date').value = 'today'
+  applyFilters()
+  document.getElementById('jobs-grid').scrollIntoView()
+stat-fortune500 onclick:
+  const btn = document.getElementById('filter-fortune500')
+  btn.classList.toggle('active')
+  applyFilters()
+  document.getElementById('jobs-grid').scrollIntoView()
+stat-tier1 onclick:
+  document.getElementById('filter-tier').value = '1'
+  applyFilters()
+  document.getElementById('jobs-grid').scrollIntoView()
+stat-tier2 onclick:
+  document.getElementById('filter-tier').value = '2'
+  applyFilters()
+  document.getElementById('jobs-grid').scrollIntoView()
+stat-applied onclick:
+  window.location.href = '/tracker'
+
+VISUAL FEEDBACK:
+When a stat box is "active" (its filter is applied),
+add a glowing border effect:
+  box-shadow: 0 0 0 2px [box color]
+  
+When the corresponding filter is reset,
+remove the glow effect.
+
+Add a small tooltip on each stat box:
+  Total Jobs: "Click to reset all filters"
+  Today's New: "Click to show today's jobs"
+  Fortune 500: "Click to filter Fortune 500 only"
+  Tier 1: "Click to show Tier 1 jobs"
+  Tier 2: "Click to show Tier 2 jobs"
+  Applied: "Click to open Tracker"
+
+═══════════════════════════════════════════════════════
+TEST AND CONFIRM
+═══════════════════════════════════════════════════════
+
+After all changes:
+  node src/dashboard.js
+
+Confirm:
+  Tier 1 threshold is now >= 70 in jobPrioritizer.js
+  Existing jobs re-scored with new threshold
+  Clicking Tier 1 stat box filters to Tier 1 jobs
+  Clicking Total stat box resets all filters
+  Clicking Applied navigates to /tracker
+
+Print: "Tier 1 threshold changed to >= 70"
+Print: "Clickable stats bar: all 6 boxes active"
+Print: "Jobs re-scored with new thresholds: YES"
