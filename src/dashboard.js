@@ -16,6 +16,9 @@ const { loadNetworkingPlans } = require('./networkingEngine');
 const Anthropic = require('@anthropic-ai/sdk');
 const { scrapeAllSites } = require('./scrapeAll');
 
+const dataDir = './data';
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+
 const prepCache = {};
 
 // ═══════════════════════════════════════════════════════
@@ -3585,8 +3588,7 @@ function startDashboard() {
   const PORT = process.env.PORT || 3000;
   server = app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
-    console.log('Delete button added to ALL card locations');
-    console.log('Number of card generation locations fixed: 2');
+    console.log('Render deployment fixes applied');
   });
 
   return app;
