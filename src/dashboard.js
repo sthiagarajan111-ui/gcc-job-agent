@@ -3083,6 +3083,7 @@ function startDashboard() {
   server = app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
     console.log('Fast startup fix applied for Render');
+    console.log('Scraper disabled on cloud startup');
   });
 
   // ── Health check — responds instantly before any data loads ──
@@ -3127,8 +3128,10 @@ function startDashboard() {
     data.profiles.push(profile);
     saveSearchProfiles(data);
     res.json({ success: true, profile });
-    // Trigger immediate background scrape for this new profile
-    triggerImmediateScrape(profile);
+    // Trigger immediate background scrape for this new profile (local only)
+    if (process.env.NODE_ENV !== 'production') {
+      triggerImmediateScrape(profile);
+    }
   });
 
   // ── PUT /api/search-profiles/:id ──────────────────
