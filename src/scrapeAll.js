@@ -7,6 +7,8 @@ const {
   scrapeDubizzle, scrapeJobsAe, scrapeGulfRecruiter, scrapeKhaleejTimes, scrapeCvLibrary,
 } = require('./scrapers/extra')
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+
 function loadBlockedJobs() {
   const filePath = path.join(__dirname, '../data/blocked-jobs.json')
   if (!fs.existsSync(filePath)) return []
@@ -19,6 +21,10 @@ function loadBlockedJobs() {
 }
 
 async function scrapeAllSites(role, location) {
+  if (IS_PRODUCTION) {
+    console.log('[Scraper] Production mode - scraping disabled')
+    return []
+  }
   const scraperNames = [
     'LinkedIn', 'GulfTalent', 'NaukriGulf', 'Bayt',
     'IndeedGulf', 'MichaelPage', 'MonsterGulf',

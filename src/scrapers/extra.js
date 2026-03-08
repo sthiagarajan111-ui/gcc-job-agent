@@ -40,6 +40,7 @@ async function fetchWithRetry(url, retries = 1) {
 }
 
 async function scrapeIndeedGulf(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   try {
     const url = `https://www.indeed.com/jobs?q=${encodeURIComponent(role)}&l=${encodeURIComponent(location || 'United Arab Emirates')}&fromage=1`;
@@ -99,6 +100,7 @@ function getMichaelPageCategory(role) {
 }
 
 async function scrapeMichaelPage(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   let browser;
   try {
@@ -145,6 +147,7 @@ async function scrapeMichaelPage(role, location) {
 }
 
 async function scrapeMonsterGulf(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   try {
     const rolePath = role.toLowerCase().replace(/\s+/g, '-');
@@ -189,6 +192,7 @@ async function scrapeMonsterGulf(role, location) {
 }
 
 async function scrapeDubizzle() {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(1000);
   try {
     const url = 'https://uae.dubizzle.com/jobs/';
@@ -231,6 +235,7 @@ async function scrapeKhaleejTimes() {
 }
 
 async function scrapeCvLibrary() {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(1000);
   try {
     const url = 'https://www.cv-library.co.uk/jobs/in-united-arab-emirates';

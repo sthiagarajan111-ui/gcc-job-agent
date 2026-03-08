@@ -27,6 +27,7 @@ function buildJob(title, company, location, applyUrl, source) {
 }
 
 async function scrapeGulfTalent(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   try {
     const url = `https://www.gulftalent.com/jobs?search=${encodeURIComponent(role)}&country=${encodeURIComponent(location)}`;
@@ -54,6 +55,7 @@ async function scrapeGulfTalent(role, location) {
 }
 
 async function scrapeNaukriGulf(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   let browser;
   try {
@@ -100,6 +102,7 @@ async function scrapeNaukriGulf(role, location) {
 }
 
 async function scrapeBayt(role, location) {
+  if (process.env.NODE_ENV === 'production') return [];
   await delay(3000);
   try {
     const rolePath = role.toLowerCase().replace(/\s+/g, '-');

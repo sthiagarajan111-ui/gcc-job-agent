@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 
 async function scrapeLinkedIn(role, location, daysBack = 1) {
+  if (process.env.NODE_ENV === 'production') { console.log('[LinkedIn] Skipped - production mode'); return []; }
   let browser;
   try {
     await new Promise(r => setTimeout(r, 2000));
