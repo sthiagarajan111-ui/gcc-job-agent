@@ -3082,9 +3082,10 @@ function startDashboard() {
   const PORT = process.env.PORT || 3000;
   server = app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
-    console.log('Fast startup fix applied for Render');
-    console.log('Scraper disabled on cloud startup');
   });
+
+  // ── Warm job cache in background after port is bound ──
+  setImmediate(() => { loadAllJobs(); });
 
   // ── Health check — responds instantly before any data loads ──
   app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
@@ -3128,10 +3129,6 @@ function startDashboard() {
     data.profiles.push(profile);
     saveSearchProfiles(data);
     res.json({ success: true, profile });
-    // Trigger immediate background scrape for this new profile (local only)
-    if (process.env.NODE_ENV !== 'production') {
-      triggerImmediateScrape(profile);
-    }
   });
 
   // ── PUT /api/search-profiles/:id ──────────────────
@@ -3631,33 +3628,4 @@ function stopDashboard() {
 
 module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 
-// ═══════════════════════════════════════════════════════
-// TEST BLOCK
-// ═══════════════════════════════════════════════════════
-
-if (require.main === module) {
-  // Start server FIRST so Render health check passes immediately
-  startDashboard();
-
-  // Load data in background after port is already bound
-  setImmediate(() => {
-    loadPrepCache();
-    loadSearchProfiles(); // ensure defaults created
-    loadCandidates();
-  });
-
-  const profileData = loadSearchProfiles();
-  const dheerajProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'dheeraj' || !p.candidateId);
-  const thiagarajanProfiles = (profileData.profiles || []).filter(p => p.candidateId === 'thiagarajan');
-  console.log('Tier 1 threshold changed to >= 70');
-  console.log('Clickable stats bar: all 6 boxes active');
-  console.log('Jobs re-scored with new thresholds: YES');
-  console.log('Stats bar order: Total, Today, Fortune500, T1, T2, Applied');
-  console.log('Tracker candidate filter: YES');
-  console.log('Multi-candidate system built');
-  console.log('Candidates: Dheeraj Thiagarajan + Thiagarajan Shanthakumar');
-  console.log(`Search profiles: ${dheerajProfiles.length} for Dheeraj, ${thiagarajanProfiles.length} for Thiagarajan`);
-  console.log('Routes: /roles, /api/search-profiles (GET/POST/PUT/DELETE)');
-  console.log('Dashboard started — open http://localhost:3000');
-  console.log('Press Ctrl+C to stop');
-}
+startDashboard();
