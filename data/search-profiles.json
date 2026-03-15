@@ -418,18 +418,28 @@
       "createdDate": "2026-03-08",
       "color": "#F0E68C",
       "id": "profile_1772988472895"
-    }
-    ,
+    },
     {
       "id": "dheeraj-uk-1",
       "candidateId": "dheeraj",
       "region": "uk",
       "role": "Business Development Manager",
-      "locations": ["London", "Manchester"],
+      "locations": [
+        "London",
+        "Manchester"
+      ],
       "experienceMin": 3,
       "experienceMax": 8,
-      "includeKeywords": ["BD", "partnerships", "strategy", "finance"],
-      "excludeKeywords": ["senior director", "VP"],
+      "includeKeywords": [
+        "BD",
+        "partnerships",
+        "strategy",
+        "finance"
+      ],
+      "excludeKeywords": [
+        "senior director",
+        "VP"
+      ],
       "active": true,
       "createdDate": "2026-03-15",
       "color": "#F0E68C"
@@ -439,10 +449,17 @@
       "candidateId": "dheeraj",
       "region": "uk",
       "role": "Investment Analyst",
-      "locations": ["London"],
+      "locations": [
+        "London"
+      ],
       "experienceMin": 2,
       "experienceMax": 6,
-      "includeKeywords": ["investment", "private equity", "VC", "fund"],
+      "includeKeywords": [
+        "investment",
+        "private equity",
+        "VC",
+        "fund"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
@@ -453,10 +470,18 @@
       "candidateId": "dheeraj",
       "region": "uk",
       "role": "Strategy Consultant",
-      "locations": ["London", "Edinburgh"],
+      "locations": [
+        "London",
+        "Edinburgh"
+      ],
       "experienceMin": 2,
       "experienceMax": 6,
-      "includeKeywords": ["strategy", "consulting", "McKinsey", "BCG"],
+      "includeKeywords": [
+        "strategy",
+        "consulting",
+        "McKinsey",
+        "BCG"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
@@ -467,10 +492,19 @@
       "candidateId": "dheeraj",
       "region": "ireland",
       "role": "Business Development Manager",
-      "locations": ["Dublin", "Cork"],
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
       "experienceMin": 3,
       "experienceMax": 8,
-      "includeKeywords": ["BD", "partnerships", "fintech", "strategy", "tech"],
+      "includeKeywords": [
+        "BD",
+        "partnerships",
+        "fintech",
+        "strategy",
+        "tech"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
@@ -481,10 +515,17 @@
       "candidateId": "dheeraj",
       "region": "ireland",
       "role": "Investment Analyst",
-      "locations": ["Dublin"],
+      "locations": [
+        "Dublin"
+      ],
       "experienceMin": 2,
       "experienceMax": 6,
-      "includeKeywords": ["investment", "finance", "fund", "asset management"],
+      "includeKeywords": [
+        "investment",
+        "finance",
+        "fund",
+        "asset management"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
@@ -495,10 +536,19 @@
       "candidateId": "dheeraj",
       "region": "europe",
       "role": "Business Development Manager",
-      "locations": ["Amsterdam", "Frankfurt", "Paris"],
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
       "experienceMin": 3,
       "experienceMax": 8,
-      "includeKeywords": ["BD", "partnerships", "fintech", "strategy"],
+      "includeKeywords": [
+        "BD",
+        "partnerships",
+        "fintech",
+        "strategy"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
@@ -509,14 +559,630 @@
       "candidateId": "dheeraj",
       "region": "europe",
       "role": "Investment Analyst",
-      "locations": ["Zurich", "Frankfurt", "Amsterdam"],
+      "locations": [
+        "Zurich",
+        "Frankfurt",
+        "Amsterdam"
+      ],
       "experienceMin": 2,
       "experienceMax": 6,
-      "includeKeywords": ["investment", "asset management", "private equity"],
+      "includeKeywords": [
+        "investment",
+        "asset management",
+        "private equity"
+      ],
       "excludeKeywords": [],
       "active": true,
       "createdDate": "2026-03-15",
       "color": "#F0E68C"
+    },
+    {
+      "id": "profile_1-uk",
+      "candidateId": "dheeraj",
+      "role": "Business Development Manager",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [
+        "B2B",
+        "partnerships",
+        "revenue"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "uk"
+    },
+    {
+      "id": "profile_1-ireland",
+      "candidateId": "dheeraj",
+      "role": "Business Development Manager",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [
+        "B2B",
+        "partnerships",
+        "revenue"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "ireland"
+    },
+    {
+      "id": "profile_1-europe",
+      "candidateId": "dheeraj",
+      "role": "Business Development Manager",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [
+        "B2B",
+        "partnerships",
+        "revenue"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "europe"
+    },
+    {
+      "id": "profile_2-uk",
+      "candidateId": "dheeraj",
+      "role": "Investment Analyst",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [
+        "finance",
+        "valuation",
+        "portfolio"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "uk"
+    },
+    {
+      "id": "profile_2-ireland",
+      "candidateId": "dheeraj",
+      "role": "Investment Analyst",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [
+        "finance",
+        "valuation",
+        "portfolio"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "ireland"
+    },
+    {
+      "id": "profile_2-europe",
+      "candidateId": "dheeraj",
+      "role": "Investment Analyst",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [
+        "finance",
+        "valuation",
+        "portfolio"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "europe"
+    },
+    {
+      "id": "profile_3-uk",
+      "candidateId": "dheeraj",
+      "role": "Strategy Consultant",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [
+        "strategy",
+        "consulting",
+        "analysis"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "uk"
+    },
+    {
+      "id": "profile_3-ireland",
+      "candidateId": "dheeraj",
+      "role": "Strategy Consultant",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [
+        "strategy",
+        "consulting",
+        "analysis"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "ireland"
+    },
+    {
+      "id": "profile_3-europe",
+      "candidateId": "dheeraj",
+      "role": "Strategy Consultant",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [
+        "strategy",
+        "consulting",
+        "analysis"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "region": "europe"
+    },
+    {
+      "role": "Sales Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888556975-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Sales Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888556975-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Sales Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888556975-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Business Development Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888589553-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Business Development Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888589553-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Business Development Executive",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888589553-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Strategy Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888752334-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Strategy Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888752334-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Strategy Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888752334-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Business Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888787293-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Business Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888787293-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Business Analyst",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888787293-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Associate",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888810645-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Associate",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888810645-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Associate",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888810645-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Client Relationship Manager",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888836671-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Client Relationship Manager",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888836671-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Client Relationship Manager",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888836671-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Commercial Partnerships",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888929943-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Commercial Partnerships",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888929943-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Commercial Partnerships",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#58A6FF",
+      "id": "profile_1772888929943-europe",
+      "region": "europe"
+    },
+    {
+      "role": "Business Consultant",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "London",
+        "Manchester"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F0E68C",
+      "id": "profile_1772907805999-uk",
+      "region": "uk"
+    },
+    {
+      "role": "Business Consultant",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Dublin",
+        "Cork"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F0E68C",
+      "id": "profile_1772907805999-ireland",
+      "region": "ireland"
+    },
+    {
+      "role": "Business Consultant",
+      "candidateId": "dheeraj",
+      "experienceMin": 1,
+      "experienceMax": 3,
+      "locations": [
+        "Amsterdam",
+        "Frankfurt",
+        "Paris"
+      ],
+      "includeKeywords": [],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-07",
+      "color": "#F0E68C",
+      "id": "profile_1772907805999-europe",
+      "region": "europe"
     }
   ],
   "lastUpdated": "2026-03-15"
