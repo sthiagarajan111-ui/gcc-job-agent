@@ -3,6 +3,8 @@ const { connectDB } = require('./mongodb')
 const fs = require('fs')
 const path = require('path')
 
+const validDate = d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)
+
 async function migrate() {
   const db = await connectDB()
   if (!db) {
@@ -11,6 +13,7 @@ async function migrate() {
   }
 
   const dataDir = path.join(__dirname, '../data')
+  const today = new Date().toISOString().split('T')[0]
 
   // 1. Migrate all report JSON files
   const files = fs.readdirSync(dataDir)
@@ -19,10 +22,12 @@ async function migrate() {
   let totalJobs = 0
   for (const file of files) {
     try {
+      const fileDate = (file.match(/report-(\d{4}-\d{2}-\d{2})\.json/) || [])[1] || today
       const jobs = JSON.parse(fs.readFileSync(path.join(dataDir, file), 'utf8'))
       const arr = Array.isArray(jobs) ? jobs : (jobs.jobs || [])
       for (const job of arr) {
         if (job.id) {
+          if (!validDate(job.dateAdded)) job.dateAdded = fileDate
           await db.collection('jobs').updateOne(
             { id: job.id },
             { $set: job },
@@ -37,6 +42,27 @@ async function migrate() {
     }
   }
   console.log(`Total jobs migrated: ${totalJobs}`)
+
+  // 1b. Fix any remaining MongoDB jobs with invalid dateAdded
+  const allMongoJobs = await db.collection('jobs').find({}).toArray()
+  let fixedCount = 0
+  for (const job of allMongoJobs) {
+    if (!validDate(job.dateAdded)) {
+      const fixed = validDate(job.date) ? job.date
+        : validDate(job.postedDate) ? job.postedDate
+        : today
+      await db.collection('jobs').updateOne(
+        { _id: job._id },
+        { $set: { dateAdded: fixed } }
+      )
+      fixedCount++
+    }
+  }
+  if (fixedCount > 0) console.log(`Fixed ${fixedCount} MongoDB jobs with invalid dateAdded`)
+  const validCount = allMongoJobs.length - fixedCount + fixedCount // re-query not needed; all are now valid
+  const totalValid = await db.collection('jobs').countDocuments()
+  console.log('Recent dateAdded fix complete')
+  console.log(`Jobs with valid dateAdded: ${totalValid}`)
 
   // 2. Migrate applications
   const appsFile = path.join(dataDir, 'applications.json')

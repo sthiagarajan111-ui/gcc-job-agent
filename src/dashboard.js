@@ -140,14 +140,21 @@ async function loadAllJobs() {
         .toArray();
       console.log(`[Dashboard] Loaded ${jobs.length} jobs from MongoDB`);
       if (jobs.length > 0) {
+        const today = new Date().toISOString().split('T')[0];
+        const validDate = d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d);
         let fixed = 0;
         jobs.forEach(job => {
-          if (!job.dateAdded) {
-            job.dateAdded = job.date || job.postedDate || '';
+          if (!validDate(job.dateAdded)) {
+            const fallback = validDate(job.date) ? job.date
+              : validDate(job.postedDate) ? job.postedDate
+              : today;
+            job.dateAdded = fallback;
             fixed++;
           }
         });
+        const validCount = jobs.filter(j => validDate(j.dateAdded)).length;
         if (fixed > 0) console.log(`dateAdded fix applied for MongoDB jobs (${fixed} jobs updated)`);
+        console.log(`Jobs with valid dateAdded: ${validCount}`);
         allJobs = jobs;
         return allJobs;
       }

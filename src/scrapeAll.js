@@ -75,7 +75,7 @@ async function scrapeAllSites(role, location) {
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, ''),
-    dateAdded: job.dateAdded || today,
+    dateAdded: /^\d{4}-\d{2}-\d{2}$/.test(job.dateAdded) ? job.dateAdded : today,
   }))
 
   // Filter out blocked jobs
