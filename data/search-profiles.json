@@ -243,15 +243,15 @@
         "All GCC"
       ],
       "includeKeywords": [
-        "after sales",
-        "service",
-        "warranty",
-        "automotive"
+        "automotive",
+        "car",
+        "truck",
+        "automobile"
       ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
-      "createdDate": "2026-03-07"
+      "createdDate": "2026-03-08"
     },
     {
       "id": "profile_ts_2",
@@ -265,14 +265,15 @@
         "All GCC"
       ],
       "includeKeywords": [
-        "after sales",
-        "director",
-        "service operations"
+        "automotive",
+        "automobile",
+        "car",
+        "truck"
       ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
-      "createdDate": "2026-03-07"
+      "createdDate": "2026-03-08"
     },
     {
       "id": "profile_ts_3",
@@ -286,14 +287,15 @@
         "All GCC"
       ],
       "includeKeywords": [
-        "after sales",
-        "general manager",
-        "service"
+        "automotive",
+        "automobile",
+        "car",
+        "truck"
       ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
-      "createdDate": "2026-03-07"
+      "createdDate": "2026-03-08"
     },
     {
       "id": "profile_ts_4",
@@ -306,15 +308,15 @@
         "All GCC"
       ],
       "includeKeywords": [
-        "service",
-        "director",
         "automotive",
-        "operations"
+        "automobile",
+        "car",
+        "truck"
       ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
-      "createdDate": "2026-03-07"
+      "createdDate": "2026-03-08"
     },
     {
       "id": "profile_ts_5",
@@ -328,15 +330,15 @@
         "All GCC"
       ],
       "includeKeywords": [
-        "operations",
-        "P&L",
-        "leadership",
-        "automotive"
+        "automotive",
+        "car",
+        "truck",
+        "automobile"
       ],
       "excludeKeywords": [],
       "color": "#3FB950",
       "active": true,
-      "createdDate": "2026-03-07"
+      "createdDate": "2026-03-08"
     },
     {
       "role": "Financial Analyst",
@@ -370,7 +372,152 @@
       "createdDate": "2026-03-07",
       "color": "#F0E68C",
       "id": "profile_1772907805999"
+    },
+    {
+      "role": "General Manager- Service",
+      "candidateId": "thiagarajan",
+      "experienceMin": 10,
+      "experienceMax": 35,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "car",
+        "truck",
+        "automotive",
+        "automobile"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-08",
+      "color": "#F0E68C",
+      "id": "profile_1772988403761"
+    },
+    {
+      "role": "Head of Service",
+      "candidateId": "thiagarajan",
+      "experienceMin": 2,
+      "experienceMax": 4,
+      "locations": [
+        "Dubai",
+        "Abu Dhabi",
+        "All UAE",
+        "All GCC"
+      ],
+      "includeKeywords": [
+        "automotive",
+        "automobile",
+        "car",
+        "truck"
+      ],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-08",
+      "color": "#F0E68C",
+      "id": "profile_1772988472895"
+    }
+    ,
+    {
+      "id": "dheeraj-uk-1",
+      "candidateId": "dheeraj",
+      "region": "uk",
+      "role": "Business Development Manager",
+      "locations": ["London", "Manchester"],
+      "experienceMin": 3,
+      "experienceMax": 8,
+      "includeKeywords": ["BD", "partnerships", "strategy", "finance"],
+      "excludeKeywords": ["senior director", "VP"],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-uk-2",
+      "candidateId": "dheeraj",
+      "region": "uk",
+      "role": "Investment Analyst",
+      "locations": ["London"],
+      "experienceMin": 2,
+      "experienceMax": 6,
+      "includeKeywords": ["investment", "private equity", "VC", "fund"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-uk-3",
+      "candidateId": "dheeraj",
+      "region": "uk",
+      "role": "Strategy Consultant",
+      "locations": ["London", "Edinburgh"],
+      "experienceMin": 2,
+      "experienceMax": 6,
+      "includeKeywords": ["strategy", "consulting", "McKinsey", "BCG"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-ireland-1",
+      "candidateId": "dheeraj",
+      "region": "ireland",
+      "role": "Business Development Manager",
+      "locations": ["Dublin", "Cork"],
+      "experienceMin": 3,
+      "experienceMax": 8,
+      "includeKeywords": ["BD", "partnerships", "fintech", "strategy", "tech"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-ireland-2",
+      "candidateId": "dheeraj",
+      "region": "ireland",
+      "role": "Investment Analyst",
+      "locations": ["Dublin"],
+      "experienceMin": 2,
+      "experienceMax": 6,
+      "includeKeywords": ["investment", "finance", "fund", "asset management"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-europe-1",
+      "candidateId": "dheeraj",
+      "region": "europe",
+      "role": "Business Development Manager",
+      "locations": ["Amsterdam", "Frankfurt", "Paris"],
+      "experienceMin": 3,
+      "experienceMax": 8,
+      "includeKeywords": ["BD", "partnerships", "fintech", "strategy"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
+    },
+    {
+      "id": "dheeraj-europe-2",
+      "candidateId": "dheeraj",
+      "region": "europe",
+      "role": "Investment Analyst",
+      "locations": ["Zurich", "Frankfurt", "Amsterdam"],
+      "experienceMin": 2,
+      "experienceMax": 6,
+      "includeKeywords": ["investment", "asset management", "private equity"],
+      "excludeKeywords": [],
+      "active": true,
+      "createdDate": "2026-03-15",
+      "color": "#F0E68C"
     }
   ],
-  "lastUpdated": "2026-03-07"
+  "lastUpdated": "2026-03-15"
 }

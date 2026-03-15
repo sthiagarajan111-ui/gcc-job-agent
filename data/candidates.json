@@ -61,7 +61,13 @@
       "skills": ["Python", "Advanced Excel", "PowerBI", "SQL", "Tableau", "Financial Modelling"],
       "languages": ["English (Native)", "Tamil (Native)", "Hindi (Native)", "French (Beginner)", "Arabic (Beginner)"],
       "targetRoles": ["Business Development Manager", "Investment Analyst", "Strategy Consultant", "Partnerships Manager", "Financial Analyst"],
-      "targetLocations": ["Dubai", "Abu Dhabi", "Sharjah"],
+      "regions": ["gcc", "uk", "ireland", "europe"],
+      "targetLocations": {
+        "gcc": ["Dubai", "Abu Dhabi", "Riyadh", "Doha", "Kuwait", "Muscat", "Bahrain"],
+        "uk": ["London", "Manchester", "Edinburgh", "Birmingham", "Leeds"],
+        "ireland": ["Dublin", "Cork", "Galway"],
+        "europe": ["Amsterdam", "Frankfurt", "Paris", "Zurich", "Barcelona", "Madrid", "Berlin"]
+      },
       "experienceYears": 4,
       "active": true
     },
@@ -231,7 +237,10 @@
         "Chief Operating Officer",
         "Aftersales Manager"
       ],
-      "targetLocations": ["Dubai", "Abu Dhabi", "Sharjah", "Riyadh", "Doha", "Kuwait", "Muscat", "Bahrain"],
+      "regions": ["gcc"],
+      "targetLocations": {
+        "gcc": ["Dubai", "Abu Dhabi", "Riyadh", "Doha", "Kuwait", "Muscat", "Bahrain", "Jeddah"]
+      },
       "active": true
     }
   ]

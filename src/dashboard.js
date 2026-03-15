@@ -765,10 +765,17 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
 <div class="filter-area">
   <!-- Row 1: main filters + action buttons -->
   <div class="filter-row">
-    <select id="filter-candidate" onchange="applyFilters()" style="min-width:180px">
+    <select id="filter-candidate" onchange="onCandidateChange()" style="min-width:180px">
       <option value="">All Candidates</option>
       <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
       <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
+    </select>
+    <select id="filter-region" onchange="applyFilters()" style="min-width:130px">
+      <option value="all">All Regions</option>
+      <option value="gcc">🌍 GCC</option>
+      <option value="uk">🇬🇧 UK</option>
+      <option value="ireland">🇮🇪 Ireland</option>
+      <option value="europe">🇪🇺 Europe</option>
     </select>
     <select id="filter-tier" onchange="onTierChange()" style="min-width:100px">
       <option value="">All Tiers</option>
@@ -785,13 +792,36 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     </select>
     <select id="filter-location" onchange="applyFilters()" style="min-width:130px">
       <option value="">All Locations</option>
-      <option value="Dubai">Dubai</option>
-      <option value="Abu Dhabi">Abu Dhabi</option>
-      <option value="Qatar">Qatar</option>
-      <option value="Saudi Arabia">Saudi Arabia</option>
-      <option value="Kuwait">Kuwait</option>
-      <option value="Bahrain">Bahrain</option>
-      <option value="Oman">Oman</option>
+      <optgroup label="🌍 GCC">
+        <option value="Dubai">Dubai</option>
+        <option value="Abu Dhabi">Abu Dhabi</option>
+        <option value="Qatar">Qatar</option>
+        <option value="Saudi Arabia">Saudi Arabia</option>
+        <option value="Kuwait">Kuwait</option>
+        <option value="Bahrain">Bahrain</option>
+        <option value="Oman">Oman</option>
+      </optgroup>
+      <optgroup label="🇬🇧 UK">
+        <option value="London">London</option>
+        <option value="Manchester">Manchester</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="Birmingham">Birmingham</option>
+        <option value="Leeds">Leeds</option>
+      </optgroup>
+      <optgroup label="🇮🇪 Ireland">
+        <option value="Dublin">Dublin</option>
+        <option value="Cork">Cork</option>
+        <option value="Galway">Galway</option>
+      </optgroup>
+      <optgroup label="🇪🇺 Europe">
+        <option value="Amsterdam">Amsterdam</option>
+        <option value="Frankfurt">Frankfurt</option>
+        <option value="Paris">Paris</option>
+        <option value="Zurich">Zurich</option>
+        <option value="Barcelona">Barcelona</option>
+        <option value="Madrid">Madrid</option>
+        <option value="Berlin">Berlin</option>
+      </optgroup>
     </select>
     <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Fortune 500</button>
     <button class="btn-reset" onclick="resetFilters()" style="margin-left:auto">Reset Filters</button>
@@ -955,8 +985,20 @@ function onTierChange() {
   applyFilters()
 }
 
+function onCandidateChange() {
+  const candidate = document.getElementById('filter-candidate').value;
+  const regionSelect = document.getElementById('filter-region');
+  if (candidate === 'thiagarajan') {
+    regionSelect.value = 'gcc';
+  } else if (candidate === 'dheeraj') {
+    regionSelect.value = 'all';
+  }
+  applyFilters();
+}
+
 function applyFilters() {
   const candidate = document.getElementById('filter-candidate').value;
+  const filterRegion = document.getElementById('filter-region').value;
   const tier = document.getElementById('filter-tier').value;
   const company = document.getElementById('filter-company').value;
   const source = document.getElementById('filter-source').value;
@@ -970,6 +1012,7 @@ function applyFilters() {
 
   filteredJobs = ALL_JOBS.filter(job => {
     if (candidate && (job.candidateId || 'dheeraj') !== candidate) return false;
+    if (filterRegion && filterRegion !== 'all' && (job.region || 'gcc') !== filterRegion) return false;
     if (tier && String(job.tier) !== tier) return false;
     if (company && company !== 'All Companies' && (job.company || '') !== company) return false;
     if (source && source !== 'All Sources' && (job.source || job.platform || job.board || job.origin || job.website || 'Unknown') !== source) return false;
@@ -1033,6 +1076,7 @@ function toggleFortune() {
 
 function resetFilters() {
   document.getElementById('filter-candidate').value = '';
+  document.getElementById('filter-region').value = 'all';
   document.getElementById('filter-tier').value = '';
   updateCompanyDropdown(ALL_JOBS, '');
   updateSourceDropdown(ALL_JOBS, '');
@@ -1198,6 +1242,8 @@ function buildCard(job, idx) {
             \${(job.experienceLevel || '') === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
             \${(job.experienceLevel || '') === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
             \${(job.experienceLevel || '') === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
+            \${(() => { const r = job.region || 'gcc'; const regionMap = { gcc: { label: '🌍 GCC', bg: '#484F58', tc: '#E6EDF3' }, uk: { label: '🇬🇧 UK', bg: '#1D6FA4', tc: '#fff' }, ireland: { label: '🇮🇪 IRL', bg: '#169B62', tc: '#fff' }, europe: { label: '🇪🇺 EU', bg: '#003399', tc: '#fff' } }; const rm = regionMap[r] || regionMap.gcc; return \`<span style="display:inline-block;background:\${rm.bg};color:\${rm.tc};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">\${rm.label}</span>\`; })()}
+            \${(() => { const vs = job.visaSponsorship; if (vs === 'yes') return '<span style="display:inline-block;background:#169B62;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">✅ Sponsors Visa</span>'; if (vs === 'unknown' && ['uk','ireland','europe'].includes(job.region || '')) return '<span style="display:inline-block;background:#D29922;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">⚠️ Visa Unknown</span>'; return ''; })()}
           </div>
         </div>
         <div class="score-circle" style="background:\${scoreColor}">\${job.totalScore || 0}</div>
@@ -2606,7 +2652,14 @@ function buildSearchProfilesHtml() {
   const minExp = profiles.length ? Math.min(...profiles.map(p => p.experienceMin)) : 0;
   const maxExp = profiles.length ? Math.max(...profiles.map(p => p.experienceMax)) : 0;
 
-  const profileCardsHtml = profiles.map(p => {
+  const regionMeta = {
+    gcc:     { label: '🌍 GCC',     color: '#484F58', title: '🌍 GCC Profiles' },
+    uk:      { label: '🇬🇧 UK',     color: '#1D6FA4', title: '🇬🇧 UK Profiles' },
+    ireland: { label: '🇮🇪 Ireland', color: '#169B62', title: '🇮🇪 Ireland Profiles' },
+    europe:  { label: '🇪🇺 Europe',  color: '#003399', title: '🇪🇺 Europe Profiles' },
+  };
+
+  function renderCard(p) {
     const locStr = (p.locations || []).join(', ') || 'Any';
     const incKw = (p.includeKeywords || []);
     const excKw = (p.excludeKeywords || []);
@@ -2617,11 +2670,13 @@ function buildSearchProfilesHtml() {
         ${incKw.length ? `<span class="kw-label">✅ Include:</span> ${incPills}` : ''}
         ${excKw.length ? `<span class="kw-label" style="margin-left:8px">❌ Exclude:</span> ${excPills}` : ''}
       </div>` : '';
+    const rm = regionMeta[p.region || 'gcc'] || regionMeta.gcc;
+    const regionBadge = `<span style="display:inline-block;background:${rm.color};color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-left:8px">${rm.label}</span>`;
     return `
     <div class="profile-card" data-id="${p.id}" style="border-left:4px solid ${p.color}">
       <div class="card-top-row">
         <div>
-          <span class="card-role-name">${p.role}</span>
+          <span class="card-role-name">${p.role}</span>${regionBadge}
           <div style="font-size:12px;margin-top:2px;color:${p.candidateId === 'thiagarajan' ? '#3FB950' : '#F0E68C'}">${p.candidateId === 'thiagarajan' ? '🟢 Thiagarajan Shanthakumar' : '🟡 Dheeraj Thiagarajan'}</div>
         </div>
         <div class="card-actions">
@@ -2643,6 +2698,23 @@ function buildSearchProfilesHtml() {
         <span>Created: ${p.createdDate || 'N/A'}</span>
       </div>
     </div>`;
+  }
+
+  const regionOrder = ['gcc', 'uk', 'ireland', 'europe'];
+  const grouped = {};
+  regionOrder.forEach(r => { grouped[r] = []; });
+  profiles.forEach(p => {
+    const r = p.region || 'gcc';
+    if (!grouped[r]) grouped[r] = [];
+    grouped[r].push(p);
+  });
+
+  const profileCardsHtml = regionOrder.map(r => {
+    const grp = grouped[r] || [];
+    if (!grp.length) return '';
+    const rm = regionMeta[r];
+    return `<h3 style="color:${rm.color};font-size:14px;font-weight:bold;margin:20px 0 8px;padding:6px 12px;background:#161B22;border-radius:6px;border-left:3px solid ${rm.color}">${rm.title}</h3>` +
+      grp.map(renderCard).join('');
   }).join('');
 
   return `<!DOCTYPE html>
@@ -2904,6 +2976,16 @@ function buildSearchProfilesHtml() {
     </div>
 
     <div class="form-group">
+      <label class="form-label">Region</label>
+      <select id="profile-region" class="form-input" style="background:#161B22;color:#E6EDF3">
+        <option value="gcc">🌍 GCC</option>
+        <option value="uk">🇬🇧 UK</option>
+        <option value="ireland">🇮🇪 Ireland</option>
+        <option value="europe">🇪🇺 Europe</option>
+      </select>
+    </div>
+
+    <div class="form-group">
       <label class="form-label">What job role are you looking for? *</label>
       <input type="text" class="form-input" id="field-role" placeholder="e.g. Business Development Manager" oninput="fetchSuggestions(this.value)">
       <div class="suggestions-box" id="suggestions-box"></div>
@@ -2980,6 +3062,7 @@ function openAddModal() {
   });
   const dheerajRadio = document.querySelector('input[name="field-candidate"][value="dheeraj"]');
   if (dheerajRadio) dheerajRadio.checked = true;
+  document.getElementById('profile-region').value = 'gcc';
   selectColor('#F0E68C');
   updateExpLabel();
   document.getElementById('suggestions-box').innerHTML = '';
@@ -3004,6 +3087,7 @@ function openEditModal(id) {
     const cid = p.candidateId || 'dheeraj';
     const radio = document.querySelector('input[name="field-candidate"][value="' + cid + '"]');
     if (radio) radio.checked = true;
+    document.getElementById('profile-region').value = p.region || 'gcc';
     selectColor(p.color || '#F0E68C');
     updateExpLabel();
     document.getElementById('suggestions-box').innerHTML = '';
@@ -3091,6 +3175,7 @@ function saveProfile() {
   const profileData = {
     role,
     candidateId: candidateRadio ? candidateRadio.value : 'dheeraj',
+    region: document.getElementById('profile-region').value || 'gcc',
     experienceMin: parseInt(document.getElementById('field-exp-min').value) || 0,
     experienceMax: parseInt(document.getElementById('field-exp-max').value) || 0,
     locations: getSelectedLocations(),

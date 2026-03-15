@@ -92,3 +92,23 @@ const config = {
 };
 
 module.exports = config;
+
+function detectRegion(location) {
+  const ukCities = ['london', 'manchester', 'edinburgh',
+    'birmingham', 'leeds', 'glasgow', 'bristol',
+    'united kingdom', 'england', 'scotland', 'wales', 'uk']
+  const irelandCities = ['dublin', 'cork', 'galway',
+    'ireland', 'republic of ireland']
+  const europeCities = ['amsterdam', 'frankfurt', 'paris',
+    'zurich', 'barcelona', 'madrid', 'berlin', 'brussels',
+    'vienna', 'milan', 'rome', 'stockholm', 'copenhagen',
+    'oslo', 'netherlands', 'germany', 'france',
+    'switzerland', 'spain']
+  const loc = (location || '').toLowerCase()
+  if (irelandCities.some(c => loc.includes(c))) return 'ireland'
+  if (ukCities.some(c => loc.includes(c))) return 'uk'
+  if (europeCities.some(c => loc.includes(c))) return 'europe'
+  return 'gcc'
+}
+
+module.exports.detectRegion = detectRegion

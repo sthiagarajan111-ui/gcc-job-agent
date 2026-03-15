@@ -219,19 +219,84 @@ function generateEmailHTML(jobs, pipelineSummary) {
   const dheerajJobs = jobs.filter(j => detectCandidateId(j) === 'dheeraj');
   const thiagarajanJobs = jobs.filter(j => detectCandidateId(j) === 'thiagarajan');
 
-  // Dheeraj tier sections
-  const dt1 = dheerajJobs.filter(j => j.tier === 1);
-  const dt2 = dheerajJobs.filter(j => j.tier === 2).slice(0, 30);
-  const dt3 = dheerajJobs.filter(j => j.tier === 3);
+  // Helper to detect region (mirrors src/config.js detectRegion)
+  function getRegion(job) {
+    if (job.region) return job.region;
+    const ukCities = ['london', 'manchester', 'edinburgh', 'birmingham', 'leeds', 'glasgow', 'bristol', 'united kingdom', 'england', 'scotland', 'wales', 'uk'];
+    const irelandCities = ['dublin', 'cork', 'galway', 'ireland', 'republic of ireland'];
+    const europeCities = ['amsterdam', 'frankfurt', 'paris', 'zurich', 'barcelona', 'madrid', 'berlin', 'brussels', 'vienna', 'milan', 'rome', 'stockholm', 'copenhagen', 'oslo', 'netherlands', 'germany', 'france', 'switzerland', 'spain'];
+    const loc = (job.location || '').toLowerCase();
+    if (irelandCities.some(c => loc.includes(c))) return 'ireland';
+    if (ukCities.some(c => loc.includes(c))) return 'uk';
+    if (europeCities.some(c => loc.includes(c))) return 'europe';
+    return 'gcc';
+  }
 
-  const dheerajSection = `
-    <div style="background:#1B2A4A;border-left:4px solid #58A6FF;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
-      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🔵 Dheeraj Thiagarajan — Jobs</h2>
+  // Split Dheeraj by region
+  const dheerajGCC     = dheerajJobs.filter(j => getRegion(j) === 'gcc');
+  const dheerajUK      = dheerajJobs.filter(j => getRegion(j) === 'uk');
+  const dheerajIreland = dheerajJobs.filter(j => getRegion(j) === 'ireland');
+  const dheerajEurope  = dheerajJobs.filter(j => getRegion(j) === 'europe');
+
+  function renderRegionSection(regionJobs, headerHtml) {
+    const r1 = regionJobs.filter(j => j.tier === 1);
+    const r2 = regionJobs.filter(j => j.tier === 2).slice(0, 30);
+    const r3 = regionJobs.filter(j => j.tier === 3);
+    if (!r1.length && !r2.length && !r3.length) return '<p style="color:#888;padding:12px">No jobs found.</p>';
+    return `
+      ${r1.length ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${r1.length} jobs)`) + r1.map(renderJobCard).join('') : ''}
+      ${r2.length ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${r2.length} jobs)`) + r2.map(renderJobCard).join('') : ''}
+      ${r3.length ? sectionHeader(`📌 TIER 3 — APPLY IF TIME (${r3.length} jobs)`) + renderTier3Table(r3) : ''}
+    `;
+  }
+
+  // Summary counts helper
+  function t1t2Count(regionJobs) {
+    return { t1: regionJobs.filter(j => j.tier === 1).length, t2: regionJobs.filter(j => j.tier === 2).length, total: regionJobs.length };
+  }
+  const sumGCC     = t1t2Count(dheerajGCC);
+  const sumUK      = t1t2Count(dheerajUK);
+  const sumIRL     = t1t2Count(dheerajIreland);
+  const sumEU      = t1t2Count(dheerajEurope);
+  const sumTS      = t1t2Count(thiagarajanJobs);
+
+  const summaryBox = `
+    <div style="background:#F8F9FA;border:1px solid #ddd;border-radius:6px;padding:16px 20px;margin-bottom:20px">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:bold;color:#1B2A4A">📊 TODAY'S SUMMARY</h3>
+      <p style="margin:2px 0;font-size:13px;color:#333">🟡 Dheeraj GCC: <strong>${sumGCC.total} jobs</strong> (T1: ${sumGCC.t1}, T2: ${sumGCC.t2})</p>
+      <p style="margin:2px 0;font-size:13px;color:#1D6FA4">🟡 Dheeraj 🇬🇧 UK: <strong>${sumUK.total} jobs</strong> (T1: ${sumUK.t1}, T2: ${sumUK.t2})</p>
+      <p style="margin:2px 0;font-size:13px;color:#169B62">🟡 Dheeraj 🇮🇪 Ireland: <strong>${sumIRL.total} jobs</strong> (T1: ${sumIRL.t1}, T2: ${sumIRL.t2})</p>
+      <p style="margin:2px 0;font-size:13px;color:#003399">🟡 Dheeraj 🇪🇺 Europe: <strong>${sumEU.total} jobs</strong> (T1: ${sumEU.t1}, T2: ${sumEU.t2})</p>
+      <p style="margin:2px 0;font-size:13px;color:#27AE60">🟢 Thiagarajan GCC: <strong>${sumTS.total} jobs</strong> (T1: ${sumTS.t1}, T2: ${sumTS.t2})</p>
+    </div>`;
+
+  // Build the 5 sections
+  const section1 = `
+    <div style="background:#1B2A4A;border-left:4px solid #F0E68C;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟡 Dheeraj — GCC Jobs</h2>
     </div>
-    ${dt1.length ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${dt1.length} jobs)`) + dt1.map(renderJobCard).join('') : ''}
-    ${dt2.length ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${dt2.length} jobs)`) + dt2.map(renderJobCard).join('') : ''}
-    ${dt3.length ? sectionHeader(`📌 TIER 3 — APPLY IF TIME (${dt3.length} jobs)`) + renderTier3Table(dt3) : ''}
-    ${!dt1.length && !dt2.length && !dt3.length ? '<p style="color:#888;padding:12px">No jobs found for Dheeraj today.</p>' : ''}
+    ${renderRegionSection(dheerajGCC)}
+  `;
+
+  const section2 = `
+    <div style="background:#1B2A4A;border-left:4px solid #1D6FA4;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟡 Dheeraj — 🇬🇧 UK Jobs</h2>
+    </div>
+    ${renderRegionSection(dheerajUK)}
+  `;
+
+  const section3 = `
+    <div style="background:#1B2A4A;border-left:4px solid #169B62;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟡 Dheeraj — 🇮🇪 Ireland Jobs</h2>
+    </div>
+    ${renderRegionSection(dheerajIreland)}
+  `;
+
+  const section4 = `
+    <div style="background:#1B2A4A;border-left:4px solid #003399;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟡 Dheeraj — 🇪🇺 Europe Jobs</h2>
+    </div>
+    ${renderRegionSection(dheerajEurope)}
   `;
 
   // Thiagarajan tier sections
@@ -241,7 +306,7 @@ function generateEmailHTML(jobs, pipelineSummary) {
 
   const thiagarajanSection = `
     <div style="background:#1A2E1A;border-left:4px solid #3FB950;padding:12px 20px;margin:24px 0 12px;border-radius:4px">
-      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟢 Thiagarajan Shanthakumar — Jobs</h2>
+      <h2 style="margin:0;font-size:16px;font-weight:bold;color:#fff">🟢 Thiagarajan Shanthakumar — GCC Jobs</h2>
     </div>
     ${ts1.length ? sectionHeader(`🔥 TIER 1 — APPLY TODAY (${ts1.length} jobs)`) + ts1.map(renderJobCard).join('') : ''}
     ${ts2.length ? sectionHeader(`📋 TIER 2 — APPLY THIS WEEK (${ts2.length} jobs)`) + ts2.map(renderJobCard).join('') : ''}
@@ -276,9 +341,13 @@ function generateEmailHTML(jobs, pipelineSummary) {
     <table width="100%" cellpadding="0" cellspacing="0"><tr>${pipelineBoxes}</tr></table>
   </div>
 
-  <!-- SECTIONS 3 / 4 / 5 -->
+  <!-- SECTIONS 3–7: CANDIDATE + REGION SPLITS -->
   <div style="padding:16px 28px 24px">
-    ${dheerajSection}
+    ${summaryBox}
+    ${section1}
+    ${section2}
+    ${section3}
+    ${section4}
     ${thiagarajanSection}
 
     <!-- SECTION 6: SALARY INTELLIGENCE -->
@@ -330,12 +399,16 @@ async function sendReportEmail(jobs, pipelineSummary) {
   const tier1Count = jobs.filter(j => j.tier === 1).length;
   const tier2Count = jobs.filter(j => j.tier === 2).length;
   const dateLabel = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const subject = `GCC Job Agent — ${dateLabel} — ${tier1Count} Tier 1 + ${tier2Count} Tier 2 Jobs Found`;
+  const isFullReport = jobs.length > 0 && tier1Count + tier2Count < jobs.length * 0.5;
+  const subject = isFullReport
+    ? `GCC Job Agent — Full Report (${jobs.length} jobs) — ${dateLabel}`
+    : `GCC Job Agent — ${dateLabel} — ${tier1Count} Tier 1 + ${tier2Count} Tier 2 Jobs Found`;
 
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '465'),
+    host: 'smtp.gmail.com',
+    port: 465,
     secure: true,
+    family: 4,
     auth: {
       user: process.env.EMAIL_FROM,
       pass: process.env.EMAIL_PASSWORD,

@@ -1,5 +1,35 @@
 const puppeteer = require('puppeteer');
 
+const LOCATION_GEOIDS = {
+  // GCC (existing)
+  'Dubai': '106204383',
+  'Abu Dhabi': '102611383',
+  'Riyadh': '105149290',
+  'Doha': '106048158',
+  'Kuwait': '101355337',
+  'Muscat': '106048158',
+  'Bahrain': '96570',
+  'Jeddah': '105043218',
+  // UK
+  'London': '90009496',
+  'Manchester': '103502874',
+  'Edinburgh': '104063',
+  'Birmingham': '107505',
+  'Leeds': '108057',
+  // Ireland
+  'Dublin': '106278171',
+  'Cork': '104738515',
+  'Galway': '106680244',
+  // Europe
+  'Amsterdam': '102011674',
+  'Frankfurt': '100476452',
+  'Paris': '105015875',
+  'Zurich': '106693272',
+  'Barcelona': '103035651',
+  'Madrid': '100994331',
+  'Berlin': '106967730',
+};
+
 async function scrapeLinkedIn(role, location, daysBack = 1) {
   if (process.env.NODE_ENV === 'production') { console.log('[LinkedIn] Skipped - production mode'); return []; }
   let browser;

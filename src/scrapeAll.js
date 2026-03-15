@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs-extra')
+const { detectRegion } = require('./config')
 const { scrapeLinkedIn } = require('./scrapers/linkedin')
 const { scrapeGulfTalent, scrapeNaukriGulf, scrapeBayt } = require('./scrapers/gulf')
 const {
@@ -76,6 +77,7 @@ async function scrapeAllSites(role, location) {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, ''),
     dateAdded: /^\d{4}-\d{2}-\d{2}$/.test(job.dateAdded) ? job.dateAdded : today,
+    region: job.region || detectRegion(job.location),
   }))
 
   // Filter out blocked jobs

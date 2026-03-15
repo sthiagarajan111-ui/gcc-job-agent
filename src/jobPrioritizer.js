@@ -212,8 +212,39 @@ function prioritizeJob(job) {
   };
 }
 
+const SPONSORSHIP_POSITIVE = [
+  'visa sponsorship', 'sponsor visa', 'sponsorship provided',
+  'skilled worker visa', 'tier 2 visa', 'work permit',
+  'sponsorship available', 'visa support', 'relocation support',
+  'relocation assistance', 'we sponsor', 'sponsorship considered',
+  'international candidates', 'global mobility',
+]
+
+const SPONSORSHIP_NEGATIVE = [
+  'no sponsorship', 'not able to sponsor', 'unable to sponsor',
+  'right to work required', 'must have right to work',
+  'no visa sponsorship', 'must be eligible to work',
+  'sponsorship not available', 'cannot sponsor',
+]
+
+function checkVisaSponsorship(job) {
+  if (!['uk', 'europe', 'ireland'].includes(job.region)) return 'na'
+  const text = [job.title, job.description, job.snippet]
+    .join(' ').toLowerCase()
+  if (SPONSORSHIP_NEGATIVE.some(n => text.includes(n))) return 'no'
+  if (SPONSORSHIP_POSITIVE.some(p => text.includes(p))) return 'yes'
+  return 'unknown'
+}
+
 function prioritizeAllJobs(jobsArray) {
-  return jobsArray.map(prioritizeJob).sort((a, b) => b.totalScore - a.totalScore);
+  return jobsArray.map(job => {
+    const prioritized = prioritizeJob(job)
+    const visaSponsorship = checkVisaSponsorship(prioritized)
+    let adjustedScore = prioritized.totalScore
+    if (visaSponsorship === 'no') adjustedScore = 0
+    if (visaSponsorship === 'yes') adjustedScore += 20
+    return { ...prioritized, visaSponsorship, totalScore: adjustedScore }
+  }).sort((a, b) => b.totalScore - a.totalScore);
 }
 
 module.exports = {
@@ -224,6 +255,7 @@ module.exports = {
   scoreSalary,
   scoreProfileMatch,
   detectExperienceLevel,
+  checkVisaSponsorship,
   prioritizeJob,
   prioritizeAllJobs,
 };
