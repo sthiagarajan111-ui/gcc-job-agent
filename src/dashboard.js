@@ -140,6 +140,14 @@ async function loadAllJobs() {
         .toArray();
       console.log(`[Dashboard] Loaded ${jobs.length} jobs from MongoDB`);
       if (jobs.length > 0) {
+        let fixed = 0;
+        jobs.forEach(job => {
+          if (!job.dateAdded) {
+            job.dateAdded = job.date || job.postedDate || '';
+            fixed++;
+          }
+        });
+        if (fixed > 0) console.log(`dateAdded fix applied for MongoDB jobs (${fixed} jobs updated)`);
         allJobs = jobs;
         return allJobs;
       }
@@ -990,7 +998,10 @@ function applyFilters() {
 function updateStatsBar(jobs) {
   const candidate = document.getElementById('filter-candidate').value;
   const total = jobs.length;
-  const todaysNew = jobs.filter(j => j.dateAdded === TODAY_ISO).length;
+  const todaysNew = jobs.filter(j =>
+    j.dateAdded === TODAY_ISO ||
+    j.scrapedDate === TODAY_ISO ||
+    j.firstSeen === TODAY_ISO).length;
   const fortune500 = jobs.filter(j => j.isFortuneCompany).length;
   const tier1 = jobs.filter(j => j.tier === 1).length;
   const tier2 = jobs.filter(j => j.tier === 2).length;

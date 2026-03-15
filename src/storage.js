@@ -85,7 +85,7 @@ async function saveDailyReport(dateString, jobsArray) {
         if (job.id) {
           await db.collection('jobs').updateOne(
             { id: job.id },
-            { $set: { ...job, date: dateString } },
+            { $set: { ...job, date: dateString, dateAdded: job.dateAdded || dateString } },
             { upsert: true }
           );
         }
