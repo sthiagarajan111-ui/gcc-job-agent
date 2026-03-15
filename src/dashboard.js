@@ -15,6 +15,7 @@ const { loadContacts } = require('./contactFinder');
 const { loadNetworkingPlans } = require('./networkingEngine');
 const Anthropic = require('@anthropic-ai/sdk');
 const { scrapeAllSites } = require('./scrapeAll');
+const { getDB } = require('./mongodb');
 
 const dataDir = './data';
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
@@ -125,9 +126,27 @@ function loadTodaysJobs() {
 // LOAD ALL JOBS (all historic reports)
 // ═══════════════════════════════════════════════════════
 
-function loadAllJobs() {
+async function loadAllJobs() {
   try {
   if (allJobs !== null) return allJobs;
+
+  // Try MongoDB first
+  try {
+    const db = await getDB();
+    if (db) {
+      const jobs = await db.collection('jobs')
+        .find({})
+        .sort({ score: -1 })
+        .toArray();
+      console.log(`[Dashboard] Loaded ${jobs.length} jobs from MongoDB`);
+      if (jobs.length > 0) {
+        allJobs = jobs;
+        return allJobs;
+      }
+    }
+  } catch (mongoErr) {
+    console.log('[Dashboard] MongoDB load failed, using local files');
+  }
 
   const dataDir = path.join(__dirname, '../data');
   if (!fs.existsSync(dataDir)) { allJobs = []; return allJobs; }
@@ -139,8 +158,10 @@ function loadAllJobs() {
 
   for (const file of files) {
     try {
+      const fileDate = (file.match(/report-(\d{4}-\d{2}-\d{2})\.json/) || [])[1] || '';
       const raw = fs.readJsonSync(path.join(dataDir, file));
       const jobs = Array.isArray(raw) ? raw : (raw.jobs || []);
+      if (fileDate) jobs.forEach(job => { if (!job.dateAdded) job.dateAdded = fileDate; });
       combined = combined.concat(jobs);
     } catch (err) {
       console.error(`[dashboard] Error loading ${file}:`, err.message);
@@ -264,7 +285,7 @@ function saveJobToTodaysReport(job) {
   fs.writeJsonSync(filePath, existing, { spaces: 2 });
 }
 
-function saveJobToManualFile(job) {
+async function saveJobToManualFile(job) {
   const filePath = path.join(__dirname, '../data/manual-jobs.json');
   fs.ensureDirSync(path.dirname(filePath));
   let existing = [];
@@ -280,6 +301,24 @@ function saveJobToManualFile(job) {
   if (!alreadyExists) {
     existing.unshift(job);
     fs.writeJsonSync(filePath, existing, { spaces: 2 });
+    try {
+      const db = await getDB();
+      if (db && job.id) {
+        await db.collection('manual_jobs').updateOne(
+          { id: job.id },
+          { $set: job },
+          { upsert: true }
+        );
+        // Also upsert into jobs collection so it appears in loadAllJobs
+        await db.collection('jobs').updateOne(
+          { id: job.id },
+          { $set: job },
+          { upsert: true }
+        );
+      }
+    } catch (err) {
+      console.log('[Dashboard] MongoDB saveJobToManualFile failed:', err.message);
+    }
   }
 }
 
@@ -331,10 +370,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   const fortune500 = jobs.filter(j => j.isFortuneCompany).length;
   const applications = loadApplications();
   const applied = applications.length;
-  const todaysNew = jobs.filter(j => {
-    const d = (j.postedDate || j.addedDate || '');
-    return d.startsWith(todayIso);
-  }).length;
+  const todaysNew = jobs.filter(j => j.dateAdded === todayIso).length;
 
   // Pre-compute contact/networking fields per job
   const HR_TITLE_KW = ['hiring manager', 'talent acquisition', 'recruiter', 'hr manager', 'hr director'];
@@ -769,6 +805,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
       <option value="60">Last 60 Days</option>
       <option value="90">Last 90 Days</option>
     </select>
+    <input type="date" id="filter-date-picker" onchange="applyFilters()" title="Filter by exact date added" style="background:#1F2937;color:white;border:1px solid #484F58;border-radius:6px;height:34px;padding:4px 8px;font-size:12px;">
     <select id="filter-sort" onchange="applyFilters()">
       <option value="high">Highest Score</option>
       <option value="low">Lowest Score</option>
@@ -912,6 +949,7 @@ function applyFilters() {
   const role = document.getElementById('filter-role').value;
   const experience = document.getElementById('filter-experience').value;
   const dateFilter = document.getElementById('filter-date').value;
+  const pickerDate = document.getElementById('filter-date-picker').value;
   const sort = document.getElementById('filter-sort').value;
   const search = document.getElementById('filter-search').value.toLowerCase();
 
@@ -925,12 +963,14 @@ function applyFilters() {
     if (fortuneActive && !job.isFortuneCompany) return false;
     if (experience && (job.experienceLevel || 'unknown') !== experience) return false;
     if (search && !(job.company || '').toLowerCase().includes(search) && !(job.title || '').toLowerCase().includes(search)) return false;
-    if (dateFilter && dateFilter !== 'All Dates') {
-      const dateStr = job.postedDate || job.datePosted || job.date || job.addedDate || job.createdAt || '';
-      if (dateStr) {
-        const posted = new Date(dateStr);
-        if (!isNaN(posted.getTime())) {
-          const daysAgo = (new Date() - posted) / (1000 * 60 * 60 * 24);
+    if (pickerDate) {
+      if ((job.dateAdded || '') !== pickerDate) return false;
+    } else if (dateFilter && dateFilter !== 'All Dates') {
+      const dateAdded = job.dateAdded || '';
+      if (dateAdded) {
+        const added = new Date(dateAdded);
+        if (!isNaN(added.getTime())) {
+          const daysAgo = (new Date() - added) / (1000 * 60 * 60 * 24);
           if (daysAgo > parseInt(dateFilter)) return false;
         }
       }
@@ -950,10 +990,7 @@ function applyFilters() {
 function updateStatsBar(jobs) {
   const candidate = document.getElementById('filter-candidate').value;
   const total = jobs.length;
-  const todaysNew = jobs.filter(j => {
-    const d = j.postedDate || j.addedDate || '';
-    return d.startsWith(TODAY_ISO);
-  }).length;
+  const todaysNew = jobs.filter(j => j.dateAdded === TODAY_ISO).length;
   const fortune500 = jobs.filter(j => j.isFortuneCompany).length;
   const tier1 = jobs.filter(j => j.tier === 1).length;
   const tier2 = jobs.filter(j => j.tier === 2).length;
@@ -986,6 +1023,7 @@ function resetFilters() {
   document.getElementById('filter-location').value = '';
   document.getElementById('filter-experience').value = '';
   document.getElementById('filter-date').value = 'All Dates';
+  document.getElementById('filter-date-picker').value = '';
   document.getElementById('filter-sort').value = 'high';
   document.getElementById('filter-search').value = '';
   fortuneActive = false;
@@ -1015,6 +1053,7 @@ function statTotalClick() {
 }
 
 function statTodayClick() {
+  document.getElementById('filter-date-picker').value = '';
   document.getElementById('filter-date').value = '1';
   setStatActive('stat-today', '#00D4FF');
   applyFilters();
@@ -2369,6 +2408,7 @@ function handleExtractedJob(extracted, url, res) {
   });
   job.manuallyAdded = true;
   job.addedDate = new Date().toISOString();
+  job.dateAdded = new Date().toISOString().split('T')[0];
   console.log(`[add-job] allJobs array length before add: ${allJobs !== null ? allJobs.length : 'null (not loaded)'}`);
   saveJobToTodaysReport(job);
   saveJobToManualFile(job);
@@ -2396,6 +2436,7 @@ function handleManualData(manualData, url, res) {
   });
   job.manuallyAdded = true;
   job.addedDate = new Date().toISOString();
+  job.dateAdded = new Date().toISOString().split('T')[0];
   const clientId = (job.title + job.company).toLowerCase().replace(/[^a-z0-9]/g, '');
   job.id = clientId;
   console.log('Manual job id set to:', job.id);
@@ -2414,24 +2455,24 @@ function handleManualData(manualData, url, res) {
 // ═══════════════════════════════════════════════════════
 
 function findJobById(jobId) {
-  const allJobs = loadAllJobs();
+  const jobs = Array.isArray(allJobs) ? allJobs : [];
 
   // 1. Exact id match
-  let job = allJobs.find(j => j.id === jobId);
+  let job = jobs.find(j => j.id === jobId);
   if (job) return job;
 
   // 2. _id match
-  job = allJobs.find(j => String(j._id) === jobId);
+  job = jobs.find(j => String(j._id) === jobId);
   if (job) return job;
 
   // 3. Index match
   const idx = parseInt(jobId);
-  if (!isNaN(idx) && allJobs[idx]) return allJobs[idx];
+  if (!isNaN(idx) && jobs[idx]) return jobs[idx];
 
   // 4. title+company from jobId string
   const parts = jobId.split('_');
   if (parts.length >= 2) {
-    job = allJobs.find(j =>
+    job = jobs.find(j =>
       j.company && j.title &&
       jobId.toLowerCase().includes(
         j.company.toLowerCase().replace(/\s+/g, ''))
@@ -3097,10 +3138,11 @@ function startDashboard() {
   // ── GET / ──────────────────────────────────────────
   app.get('/', async (req, res) => {
     try {
-      const jobs = loadAllJobs();
+      const jobs = await loadAllJobs();
+      const safeJobs = Array.isArray(jobs) ? jobs : [];
       const contactsData = await loadContacts().catch(() => []);
       const networkingData = (() => { try { return loadNetworkingPlans(); } catch(e) { return []; } })();
-      res.send(buildDashboardHtml(jobs, contactsData, networkingData));
+      res.send(buildDashboardHtml(safeJobs, contactsData, networkingData));
     } catch (err) {
       console.error('[GET /] Error:', err.message);
       res.send('<h2 style="font-family:sans-serif;color:#E6EDF3;background:#0D1117;padding:40px">Dashboard loading...</h2>');
@@ -3170,8 +3212,9 @@ function startDashboard() {
   });
 
   // ── GET /api/jobs ──────────────────────────────────
-  app.get('/api/jobs', (req, res) => {
-    let jobs = loadAllJobs();
+  app.get('/api/jobs', async (req, res) => {
+    const loaded = await loadAllJobs();
+    let jobs = Array.isArray(loaded) ? loaded : [];
     const { tier, location, role, fortune500 } = req.query;
     if (tier) jobs = jobs.filter(j => String(j.tier) === tier);
     if (location) jobs = jobs.filter(j => (j.location || '').includes(location));
@@ -3190,7 +3233,7 @@ function startDashboard() {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
       console.log('Cover letter requested for:', jobId);
-      console.log('All job IDs in memory:', loadAllJobs().slice(0,5).map(j => j.id));
+      console.log('All job IDs in memory:', (Array.isArray(allJobs) ? allJobs : []).slice(0,5).map(j => j.id));
       console.log('Looking for jobId:', jobId);
       const foundJob = findJobById(jobId);
       console.log('Job found:', foundJob ? foundJob.title : 'NOT FOUND');
@@ -3254,12 +3297,24 @@ function startDashboard() {
   });
 
   // ── POST /api/add-application ──────────────────────
-  app.post('/api/add-application', (req, res) => {
+  app.post('/api/add-application', async (req, res) => {
     const job = req.body;
     if (!job || !job.title || !job.company) {
       return res.json({ success: false, message: 'Job title and company required' });
     }
     const application = addApplication(job);
+    try {
+      const db = await getDB();
+      if (db && application && application.id) {
+        await db.collection('applications').updateOne(
+          { id: application.id },
+          { $set: application },
+          { upsert: true }
+        );
+      }
+    } catch (err) {
+      console.log('[Dashboard] MongoDB save application failed:', err.message);
+    }
     res.json({ success: true, application });
   });
 
@@ -3380,6 +3435,7 @@ function startDashboard() {
             source: detectPortalName(extracted.applyUrl || url),
             applyUrl: extracted.applyUrl || url,
             postedDate: new Date().toISOString().split('T')[0],
+            dateAdded: new Date().toISOString().split('T')[0],
           });
           saveJobToTodaysReport(job);
           if (allJobs !== null) allJobs.unshift(job);
@@ -3513,7 +3569,7 @@ function startDashboard() {
   });
 
   // ── DELETE /api/remove-job/:jobId ─────────────────
-  app.delete('/api/remove-job/:jobId', (req, res) => {
+  app.delete('/api/remove-job/:jobId', async (req, res) => {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
       const job = findJobById(jobId);
@@ -3572,13 +3628,30 @@ function startDashboard() {
         (b.title && b.company && b.title.toLowerCase() === (job.title || '').toLowerCase() &&
           b.company.toLowerCase() === (job.company || '').toLowerCase()));
       if (!alreadyBlocked) {
-        blockedJobs.push({
+        const blockedEntry = {
           id: job.id,
           title: job.title || '',
           company: job.company || '',
           blockedDate: new Date().toISOString(),
-        });
+        };
+        blockedJobs.push(blockedEntry);
         fs.writeJsonSync(blockedFilePath, blockedJobs, { spaces: 2 });
+        try {
+          const db = await getDB();
+          if (db) {
+            await db.collection('blocked_jobs').updateOne(
+              { _id: 'blocked' },
+              { $set: { ids: blockedJobs } },
+              { upsert: true }
+            );
+            // Also remove from jobs collection
+            if (job.id) {
+              await db.collection('jobs').deleteOne({ id: job.id });
+            }
+          }
+        } catch (mongoErr) {
+          console.log('[Dashboard] MongoDB block-job failed:', mongoErr.message);
+        }
       }
 
       res.json({ success: true });
@@ -3589,7 +3662,7 @@ function startDashboard() {
   });
 
   // ── DELETE /api/tracker/:applicationId ─────────────
-  app.delete('/api/tracker/:applicationId', (req, res) => {
+  app.delete('/api/tracker/:applicationId', async (req, res) => {
     try {
       const applicationId = decodeURIComponent(req.params.applicationId);
       const applications = loadApplications();
@@ -3599,6 +3672,14 @@ function startDashboard() {
       }
       applications.splice(idx, 1);
       saveApplications(applications);
+      try {
+        const db = await getDB();
+        if (db) {
+          await db.collection('applications').deleteOne({ id: applicationId });
+        }
+      } catch (err) {
+        console.log('[Dashboard] MongoDB delete application failed:', err.message);
+      }
       res.json({ success: true });
     } catch (err) {
       console.error('[delete-tracker] Error:', err.message);

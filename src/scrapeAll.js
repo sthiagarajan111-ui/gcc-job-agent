@@ -67,13 +67,15 @@ async function scrapeAllSites(role, location) {
     return true
   })
 
+  const today = new Date().toISOString().split('T')[0]
   const withIds = deduplicated.map(job => ({
     ...job,
     id: (job.title + job.company + job.location)
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
+      .replace(/^-|-$/g, ''),
+    dateAdded: job.dateAdded || today,
   }))
 
   // Filter out blocked jobs
