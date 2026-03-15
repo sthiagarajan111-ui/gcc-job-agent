@@ -44,6 +44,7 @@ function addApplication(job) {
     totalScore: job.totalScore,
     salaryAED: job.salaryAED !== undefined ? job.salaryAED : null,
     candidateId: job.candidateId || 'dheeraj',
+    region: job.region || 'gcc',
     appliedDate: today,
     status: 'Applied',
     lastUpdated: today,

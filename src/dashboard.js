@@ -1979,8 +1979,9 @@ function buildTrackerHtml() {
       const cid = app.candidateId || 'dheeraj';
       const dotColor = cid === 'thiagarajan' ? '#3FB950' : '#D29922';
       const dotTitle = cid === 'thiagarajan' ? 'Thiagarajan Shanthakumar' : 'Dheeraj Thiagarajan';
+      const appRegion = app.region || 'gcc';
       return `
-      <div class="kanban-card" id="kcard-${app.id}" data-candidate-id="${cid}">
+      <div class="kanban-card" id="kcard-${app.id}" data-candidate-id="${cid}" data-region="${appRegion}">
         <div style="text-align:right;margin-top:6px;">
           <button onclick="deleteTrackerCard('${app.id}','${app.status || 'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
         </div>
@@ -2162,6 +2163,12 @@ function buildTrackerHtml() {
   <button class="cand-filter-btn active" id="cand-btn-all" onclick="filterTrackerByCandidate('all', this)">All Candidates</button>
   <button class="cand-filter-btn" id="cand-btn-dheeraj" onclick="filterTrackerByCandidate('dheeraj', this)">🟡 Dheeraj Thiagarajan</button>
   <button class="cand-filter-btn" id="cand-btn-thiagarajan" onclick="filterTrackerByCandidate('thiagarajan', this)">🟢 Thiagarajan Shanthakumar</button>
+  <span class="cand-filter-label" style="margin-left:16px">Region:</span>
+  <button class="cand-filter-btn active" id="region-btn-all" onclick="filterTrackerByRegion('all', this)">All Regions</button>
+  <button class="cand-filter-btn" id="region-btn-gcc" onclick="filterTrackerByRegion('gcc', this)">🌍 GCC</button>
+  <button class="cand-filter-btn" id="region-btn-uk" onclick="filterTrackerByRegion('uk', this)">🇬🇧 UK</button>
+  <button class="cand-filter-btn" id="region-btn-ireland" onclick="filterTrackerByRegion('ireland', this)">🇮🇪 Ireland</button>
+  <button class="cand-filter-btn" id="region-btn-europe" onclick="filterTrackerByRegion('europe', this)">🇪🇺 Europe</button>
 </div>
 
 <div class="kanban-wrapper">
@@ -2174,12 +2181,18 @@ function buildTrackerHtml() {
 const ALL_APPLICATIONS = ${appsJson};
 let allApps = ALL_APPLICATIONS.slice();
 let currentTrackerCandidate = 'all';
+let currentTrackerRegion = 'all';
 
-function updateTrackerStats(candidateId) {
-  let apps = ALL_APPLICATIONS;
-  if (candidateId !== 'all') {
-    apps = ALL_APPLICATIONS.filter(a => a.candidateId === candidateId);
-  }
+function getVisibleApps() {
+  return ALL_APPLICATIONS.filter(a => {
+    if (currentTrackerCandidate !== 'all' && (a.candidateId || 'dheeraj') !== currentTrackerCandidate) return false;
+    if (currentTrackerRegion !== 'all' && (a.region || 'gcc') !== currentTrackerRegion) return false;
+    return true;
+  });
+}
+
+function updateTrackerStats() {
+  const apps = getVisibleApps();
   const total = apps.length;
   const applied = apps.filter(a => a.status === 'Applied').length;
   const interview = apps.filter(a => a.status === 'Interview').length;
@@ -2257,36 +2270,47 @@ function updateTrackerColCounts() {
   });
 }
 
-function filterTrackerByCandidate(selected, btn) {
-  currentTrackerCandidate = selected;
-  document.querySelectorAll('.cand-filter-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-
+function applyTrackerFilters() {
   const cards = document.querySelectorAll('.kanban-card');
   cards.forEach(card => {
-    const cardCandidate = card.dataset.candidateId;
-    if (selected === 'all' || cardCandidate === selected) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
+    const cardCandidate = card.dataset.candidateId || 'dheeraj';
+    const cardRegion = card.dataset.region || 'gcc';
+    const candMatch = currentTrackerCandidate === 'all' || cardCandidate === currentTrackerCandidate;
+    const regionMatch = currentTrackerRegion === 'all' || cardRegion === currentTrackerRegion;
+    card.style.display = (candMatch && regionMatch) ? 'block' : 'none';
   });
-
   updateTrackerColCounts();
-  updateTrackerStats(selected);
+  updateTrackerStats();
+}
+
+function filterTrackerByCandidate(selected, btn) {
+  currentTrackerCandidate = selected;
+  document.querySelectorAll('#cand-btn-all,#cand-btn-dheeraj,#cand-btn-thiagarajan').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyTrackerFilters();
+}
+
+function filterTrackerByRegion(selected, btn) {
+  currentTrackerRegion = selected;
+  document.querySelectorAll('#region-btn-all,#region-btn-gcc,#region-btn-uk,#region-btn-ireland,#region-btn-europe').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyTrackerFilters();
 }
 
 // Init on load
-updateTrackerStats('all');
+updateTrackerStats();
 
 function buildKanbanCard(app) {
   if (!app) return '';
   const cid = app.candidateId || 'dheeraj';
+  const appRegion = app.region || 'gcc';
   const dotColor = cid === 'thiagarajan' ? '#3FB950' : '#D29922';
   const dotTitle = cid === 'thiagarajan' ? 'Thiagarajan Shanthakumar' : 'Dheeraj Thiagarajan';
-  const hidden = (currentTrackerCandidate !== 'all' && cid !== currentTrackerCandidate) ? 'style="display:none"' : '';
+  const candMatch = currentTrackerCandidate === 'all' || cid === currentTrackerCandidate;
+  const regionMatch = currentTrackerRegion === 'all' || appRegion === currentTrackerRegion;
+  const hidden = (candMatch && regionMatch) ? '' : 'style="display:none"';
   return \`
-    <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" \${hidden}>
+    <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" data-region="\${appRegion}" \${hidden}>
       <div style="text-align:right;margin-top:6px;">
         <button onclick="deleteTrackerCard('\${app.id}','\${app.status||'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
       </div>
