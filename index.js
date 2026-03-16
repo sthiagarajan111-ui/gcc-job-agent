@@ -49,15 +49,67 @@ async function runJobAgent() {
       console.log('No cache - starting fresh scrape...')
       allScrapedJobs = []
 
-      for (const role of config.TARGET_ROLES) {
-        for (const location of config.TARGET_LOCATIONS) {
-          const jobs = await scrapeAllSites(
-            role.title, location)
-          allScrapedJobs.push(...jobs)
-          console.log('Scraped', role.title,
-            'in', location, '-', jobs.length, 'jobs')
-          await new Promise(r => setTimeout(r, 2000))
+      const fse0 = require('fs-extra')
+      const path0 = require('path')
+
+      // Load all active search profiles (GCC + UK + Ireland + Europe)
+      const profilesData = fse0.readJsonSync(
+        path0.join(__dirname, 'data', 'search-profiles.json'))
+      const activeProfiles = profilesData.profiles.filter(p => p.active !== false)
+
+      // Count profiles by region
+      let ukProfiles = 0, irelandProfiles = 0, europeProfiles = 0
+      for (const p of activeProfiles) {
+        if (p.region === 'uk') ukProfiles++
+        else if (p.region === 'ireland') irelandProfiles++
+        else if (p.region === 'europe') europeProfiles++
+      }
+      console.log('UK/Ireland/Europe scraping fix applied')
+      console.log(`Total profiles being scraped: ${activeProfiles.length}`)
+      console.log(`UK profiles: ${ukProfiles} | Ireland: ${irelandProfiles} | Europe: ${europeProfiles}`)
+
+      // Detect which regions have been seen before (to set daysBack)
+      const seenJobsPath = path0.join(__dirname, 'data', 'seen_jobs.json')
+      const seenIds = fse0.existsSync(seenJobsPath) ? fse0.readJsonSync(seenJobsPath) : []
+      const seenIdStr = seenIds.join(' ')
+      const seenRegions = new Set()
+      if (/london|manchester|edinburgh|birmingham/.test(seenIdStr)) seenRegions.add('uk')
+      if (/dublin|cork|galway/.test(seenIdStr)) seenRegions.add('ireland')
+      if (/amsterdam|frankfurt|paris|zurich|berlin/.test(seenIdStr)) seenRegions.add('europe')
+      if (/dubai|abu-dhabi|riyadh|doha|kuwait|muscat|bahrain|jeddah/.test(seenIdStr)) seenRegions.add('gcc')
+
+      // Inline region detector (avoids re-require of config)
+      function getLocRegion(location) {
+        const loc = location.toLowerCase()
+        if (['london','manchester','edinburgh','birmingham','leeds'].some(c => loc.includes(c))) return 'uk'
+        if (['dublin','cork','galway'].some(c => loc.includes(c))) return 'ireland'
+        if (['amsterdam','frankfurt','paris','zurich','barcelona','madrid','berlin'].some(c => loc.includes(c))) return 'europe'
+        return 'gcc'
+      }
+
+      // Build deduplicated role+location pairs from ALL active profiles
+      const pairsSeen = new Set()
+      const scrapePairs = []
+      for (const p of activeProfiles) {
+        for (const loc of p.locations) {
+          const key = `${p.role}|${loc}`
+          if (!pairsSeen.has(key)) {
+            pairsSeen.add(key)
+            scrapePairs.push({ role: p.role, location: loc })
+          }
         }
+      }
+
+      for (const { role, location } of scrapePairs) {
+        const region = getLocRegion(location)
+        const daysBack = seenRegions.has(region) ? 1 : 30
+        if (daysBack === 30) {
+          console.log(`[First run] ${role} in ${location} — scraping last 30 days`)
+        }
+        const jobs = await scrapeAllSites(role, location, daysBack)
+        allScrapedJobs.push(...jobs)
+        console.log('Scraped', role, 'in', location, '-', jobs.length, 'jobs')
+        await new Promise(r => setTimeout(r, 2000))
       }
 
       await saveRawJobs(allScrapedJobs, today)
@@ -76,15 +128,18 @@ async function runJobAgent() {
       console.log('No new jobs today')
       console.log('All jobs seen in previous days')
 
-      // Still save all cached jobs to dashboard report so UI is populated
       const fse = require('fs-extra')
       const path = require('path')
-      const allPrioritized = prioritizeAllJobs(allScrapedJobs)
       const dashPath = path.join(__dirname, 'data', `report-${today}.json`)
-      await fse.outputJson(dashPath, allPrioritized, { spaces: 2 })
-      console.log(`Dashboard report saved: ${allPrioritized.length} jobs`)
 
-      await sendJobReport([], today)
+      // Save prioritized report if not already done
+      let allPrioritized = prioritizeAllJobs(allScrapedJobs)
+      await fse.outputJson(dashPath, allPrioritized, { spaces: 2 })
+
+      // Load full report and send with all jobs
+      const allReportJobs = await fse.readJson(dashPath)
+      console.log(`Sending full report with ${allReportJobs.length} jobs`)
+      await runDailyReport(allReportJobs)
       console.log('=== GCC Job Agent Finished:',
         today, '===')
       return
@@ -216,7 +271,7 @@ cron.schedule('0 4 * * *', () => {
   runJobAgent()
 })
 
-runJobAgent()
+runJobAgent().then(() => process.exit(0))
 
 console.log('=== Scheduler active. 8AM Gulf Time daily ===')
 console.log('=== Running now... ===')

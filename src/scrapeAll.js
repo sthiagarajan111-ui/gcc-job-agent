@@ -21,7 +21,7 @@ function loadBlockedJobs() {
   }
 }
 
-async function scrapeAllSites(role, location) {
+async function scrapeAllSites(role, location, daysBack = 1) {
   if (IS_PRODUCTION) {
     console.log('[Scraper] Production mode - scraping disabled')
     return []
@@ -33,7 +33,7 @@ async function scrapeAllSites(role, location) {
   ]
 
   const results = await Promise.allSettled([
-    scrapeLinkedIn(role, location),
+    scrapeLinkedIn(role, location, daysBack),
     scrapeGulfTalent(role, location),
     scrapeNaukriGulf(role, location),
     scrapeBayt(role, location),
