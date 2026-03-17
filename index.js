@@ -22,8 +22,19 @@ const { buildNetworkingPlansForTier1And2 } = require('./src/networkingEngine')
 
 async function runJobAgent() {
   const startTime = Date.now()
+  const MAX_RUNTIME = 90 * 60 * 1000 // 90 minutes
+
+  function checkTimeout() {
+    if (Date.now() - startTime > MAX_RUNTIME) {
+      console.log('Max runtime reached - sending report and exiting')
+      return true
+    }
+    return false
+  }
+
   const today = new Date().toISOString().split('T')[0]
   console.log('=== GCC Job Agent Starting:', today, '===')
+  console.log('90 minute timeout safety added')
 
   let totalScraped = 0
   let newJobs = 0
@@ -189,45 +200,61 @@ async function runJobAgent() {
     await runDailyReport(prioritizedJobs)
     console.log('Upgraded email report sent via reporterV2')
 
-    // STEP D — Generate cover letters (Tier 1 and 2 only)
-    try {
-      await generateForTierOneAndTwo(prioritizedJobs)
-      coverLetterCount = prioritizedJobs.filter(
-        j => j.tier === 1 || j.tier === 2).length
-      console.log('Cover letters generated for Tier 1 and 2 jobs')
-    } catch (err) {
-      console.log('Cover letter generation skipped:', err.message)
+    // STEP D — Generate cover letters (Tier 1 and 2 only, max 50)
+    if (!checkTimeout()) {
+      const coverLetterJobs = prioritizedJobs
+        .filter(j => j.tier <= 2 || j.priority === 'HIGH')
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 50)
+      console.log('Cover letters limited to Tier 1+2 only (max 50)')
+      try {
+        await generateForTierOneAndTwo(coverLetterJobs)
+        coverLetterCount = coverLetterJobs.length
+        console.log('Cover letters generated for Tier 1 and 2 jobs')
+      } catch (err) {
+        console.log('Cover letter generation skipped:', err.message)
+      }
     }
 
-    // STEP E — Find HR contacts (Tier 1 and 2 only)
-    try {
-      await findContactsForTier1And2(prioritizedJobs)
-      contactCount = prioritizedJobs.filter(
-        j => j.tier === 1 || j.tier === 2).length
-      console.log('HR contacts search complete')
-    } catch (err) {
-      console.log('Contact finder skipped:', err.message)
+    // STEP E — Find HR contacts (Tier 1 and 2 only, max 50)
+    if (!checkTimeout()) {
+      const contactJobs = prioritizedJobs
+        .filter(j => j.tier <= 2 || j.priority === 'HIGH')
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 50)
+      console.log('HR contacts limited to Tier 1+2 only (max 50)')
+      try {
+        await findContactsForTier1And2(contactJobs)
+        contactCount = contactJobs.length
+        console.log('HR contacts search complete')
+      } catch (err) {
+        console.log('Contact finder skipped:', err.message)
+      }
     }
 
     // STEP F — Build networking plans (Tier 1 and 2 only)
-    try {
-      await buildNetworkingPlansForTier1And2(prioritizedJobs)
-      console.log('Networking plans built for Tier 1 and 2 jobs')
-    } catch (err) {
-      console.log('Networking engine skipped:', err.message)
+    if (!checkTimeout()) {
+      try {
+        await buildNetworkingPlansForTier1And2(prioritizedJobs)
+        console.log('Networking plans built for Tier 1 and 2 jobs')
+      } catch (err) {
+        console.log('Networking engine skipped:', err.message)
+      }
     }
 
     // STEP G — Check follow-up reminders
-    try {
-      const followUps = await checkFollowUps()
-      followUpCount = followUps.length
-      if (followUps.length > 0) {
-        console.log(`Follow-up reminders sent for ${followUps.length} applications`)
-      } else {
-        console.log('No follow-up reminders due today')
+    if (!checkTimeout()) {
+      try {
+        const followUps = await checkFollowUps()
+        followUpCount = followUps.length
+        if (followUps.length > 0) {
+          console.log(`Follow-up reminders sent for ${followUps.length} applications`)
+        } else {
+          console.log('No follow-up reminders due today')
+        }
+      } catch (err) {
+        console.log('Follow-up check skipped:', err.message)
       }
-    } catch (err) {
-      console.log('Follow-up check skipped:', err.message)
     }
 
   } catch (err) {
