@@ -57,7 +57,7 @@ COVER LETTER WRITING RULES:
 5. Closing paragraph: Express enthusiasm for the GCC market, mention availability to relocate immediately, notice period of 1 month, and a clear call to action.
 6. Never mention visa status or nationality.
 7. Never use clichés like "I am writing to apply" or "Please find attached my CV"
-8. Sign off as: Dheeraj Thiagarajan
+8. Do not include any sign-off, name, or closing signature — the document template handles that.
 
 Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
 
@@ -134,7 +134,12 @@ async function saveCoverLetterDocx(job, coverLetterText, candidateId) {
   const fileName = `CoverLetter_${companyClean}_${titleClean}_${getTodayISO()}.docx`;
   const filePath = path.join(folder, fileName);
 
-  const paragraphs = coverLetterText.split(/\n\n+/).filter(p => p.trim().length > 0);
+  // Strip any trailing sign-off name the AI may include despite instructions
+  const signoffNames = ['Dheeraj Thiagarajan', 'DHEERAJ THIAGARAJAN', 'Thiagarajan Shanthakumar', 'THIAGARAJAN SHANTHAKUMAR'];
+  const paragraphs = coverLetterText
+    .split(/\n\n+/)
+    .filter(p => p.trim().length > 0)
+    .filter(p => !signoffNames.includes(p.trim()));
   const candInfo = getCandidateHeaderInfo(candidateId);
 
   const children = [];
@@ -227,12 +232,6 @@ async function saveCoverLetterDocx(job, coverLetterText, candidateId) {
 
   children.push(new Paragraph({
     children: [new TextRun({ text: candInfo.signoffName, bold: true, size: 22, font: 'Calibri' })],
-  }));
-  children.push(new Paragraph({
-    children: [new TextRun({ text: candInfo.titleLine, size: 22, font: 'Calibri' })],
-  }));
-  children.push(new Paragraph({
-    children: [new TextRun({ text: candInfo.contactLine, size: 22, font: 'Calibri' })],
   }));
 
   const doc = new Document({
