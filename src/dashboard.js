@@ -236,6 +236,8 @@ async function loadAllJobs() {
   });
 
   // Auto-delete jobs older than 90 days
+  // NOTE: Only removes from allJobs array and report files
+  // NEVER removes from applications.json (tracker data)
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
   const blockedFilePath = path.join(__dirname, '../data/blocked-jobs.json');
@@ -275,6 +277,12 @@ async function loadAllJobs() {
     if (!job.candidateId) {
       job.candidateId = detectCandidate(job);
     }
+  }
+
+  // Mark favorites
+  const favoriteIds = new Set(loadFavorites().map(f => f.id).filter(Boolean));
+  for (const job of allJobs) {
+    job.isFavorite = favoriteIds.has(job.id);
   }
 
   return allJobs;
@@ -346,6 +354,55 @@ function loadBlockedJobs() {
   } catch (e) {
     return [];
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// FAVORITES HELPERS
+// ═══════════════════════════════════════════════════════
+
+const FAVORITES_PATH = path.join(__dirname, '../data/favorites.json');
+
+function loadFavorites() {
+  if (!fs.existsSync(FAVORITES_PATH)) return [];
+  try {
+    const data = fs.readJsonSync(FAVORITES_PATH);
+    return Array.isArray(data) ? data : [];
+  } catch (e) { return []; }
+}
+
+function saveFavorites(favorites) {
+  fs.ensureDirSync(path.dirname(FAVORITES_PATH));
+  fs.writeJsonSync(FAVORITES_PATH, favorites, { spaces: 2 });
+}
+
+// ═══════════════════════════════════════════════════════
+// EXTRACT EXPERIENCE FROM JOB TEXT
+// ═══════════════════════════════════════════════════════
+
+function extractExperience(job) {
+  const text = [
+    job.title || '',
+    job.description || '',
+    job.snippet || '',
+    job.requirements || '',
+  ].join(' ').toLowerCase();
+
+  const patterns = [
+    /(\d+)\s*[-–to]+\s*(\d+)\s*years?/i,
+    /(\d+)\+\s*years?/i,
+    /minimum\s*(\d+)\s*years?/i,
+    /at least\s*(\d+)\s*years?/i,
+    /(\d+)\s*years?\s*(?:of\s*)?experience/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) {
+      if (match[2]) return `${match[1]}-${match[2]} yrs`;
+      return `${match[1]}+ yrs`;
+    }
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -724,6 +781,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <a href="/" class="active">Jobs</a>
     <a href="/tracker">Tracker</a>
     <a href="/roles">Roles</a>
+    <a href="/favorites">⭐ Favorites</a>
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
@@ -1182,6 +1240,11 @@ function buildCard(job, idx) {
   console.log('job.manuallyAdded:', job.manuallyAdded);
   const jobId = getJobId(job);
   const tierColor = getTierColor(job.tier);
+  const expBadge = (() => {
+    const exp = extractExperience(job);
+    if (!exp) return '';
+    return '<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:#8B949E;padding:2px 8px;border-radius:4px;font-size:11px">👔 ' + exp + '</span>';
+  })();
   const scoreColor = getScoreColor(job.totalScore || 0);
   const verdict = getSalaryVerdict(job);
   const isApplied = appliedSet.has(jobId);
@@ -1244,6 +1307,7 @@ function buildCard(job, idx) {
             \${(job.experienceLevel || '') === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
             \${(() => { const r = job.region || 'gcc'; const regionMap = { gcc: { label: '🌍 GCC', bg: '#484F58', tc: '#E6EDF3' }, uk: { label: '🇬🇧 UK', bg: '#1D6FA4', tc: '#fff' }, ireland: { label: '🇮🇪 IRL', bg: '#169B62', tc: '#fff' }, europe: { label: '🇪🇺 EU', bg: '#003399', tc: '#fff' } }; const rm = regionMap[r] || regionMap.gcc; return \`<span style="display:inline-block;background:\${rm.bg};color:\${rm.tc};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">\${rm.label}</span>\`; })()}
             \${(() => { const vs = job.visaSponsorship; if (vs === 'yes') return '<span style="display:inline-block;background:#169B62;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">✅ Sponsors Visa</span>'; if (vs === 'unknown' && ['uk','ireland','europe'].includes(job.region || '')) return '<span style="display:inline-block;background:#D29922;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">⚠️ Visa Unknown</span>'; return ''; })()}
+            \${expBadge}
           </div>
         </div>
         <div class="score-circle" style="background:\${scoreColor}">\${job.totalScore || 0}</div>
@@ -1281,6 +1345,11 @@ function buildCard(job, idx) {
 
       <div class="btn-row">
         <a href="\${escapeHtml(job.applyUrl || '#')}" target="_blank" class="btn btn-view">VIEW JOB</a>
+        <button class="btn" id="btn-fav-\${escapeHtml(jobId)}"
+          style="\${job.isFavorite ? 'background:#2D2D2D;color:#D29922' : 'background:#D29922;color:white'};border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;"
+          onclick="handleFavorite(this, '\${escapeHtml(jobId)}', \${JSON.stringify(job).replace(/"/g, '&quot;')})">
+          \${job.isFavorite ? '★ Saved' : '⭐ Save'}
+        </button>
         <button class="btn btn-apply \${isApplied ? 'applied' : ''}"
           id="btn-apply-\${escapeHtml(jobId)}"
           onclick="handleApply(this, \${JSON.stringify(job).replace(/"/g, '&quot;')})"
@@ -1429,6 +1498,33 @@ async function handleRemoveJob(btn, jobId) {
     btn.disabled = false;
     alert('Error removing job: ' + e.message);
   }
+}
+
+async function handleFavorite(btn, jobId, job) {
+  const isSaved = btn.textContent.trim().startsWith('★');
+  btn.disabled = true;
+  try {
+    if (isSaved) {
+      await fetch('/api/favorites/' + encodeURIComponent(jobId), { method: 'DELETE' });
+      btn.textContent = '⭐ Save';
+      btn.style.background = '#D29922';
+      btn.style.color = 'white';
+      showToast('Removed from Favorites');
+    } else {
+      await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId }),
+      });
+      btn.textContent = '★ Saved';
+      btn.style.background = '#2D2D2D';
+      btn.style.color = '#D29922';
+      showToast('Added to Favorites');
+    }
+  } catch (e) {
+    showToast('Error updating favorites');
+  }
+  btn.disabled = false;
 }
 
 // ── INTERVIEW PREP ─────────────────────────────────────
@@ -1945,6 +2041,120 @@ async function saveJobToDashboard(job) {
 }
 
 // ═══════════════════════════════════════════════════════
+// FAVORITES PAGE HTML
+// ═══════════════════════════════════════════════════════
+
+function buildFavoritesHtml() {
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const favorites = loadFavorites();
+  const applications = loadApplications();
+  const appliedIds = new Set(applications.map(a => a.id));
+
+  const tier1 = favorites.filter(j => j.tier === 1).length;
+  const tier2 = favorites.filter(j => j.tier === 2).length;
+  const applied = favorites.filter(j => appliedIds.has(j.id)).length;
+
+  const cardsHtml = favorites.length === 0
+    ? '<div style="text-align:center;padding:60px;color:#6E7681;font-size:14px">No saved jobs yet. Click ⭐ Save on any job card to save it here.</div>'
+    : favorites.map((job, idx) => {
+        job.isFavorite = true;
+        const isApplied = appliedIds.has(job.id);
+        const tierColor = (t => { if (t===1) return '#3FB950'; if (t===2) return '#58A6FF'; if (t===3) return '#D29922'; return '#6E7681'; })(job.tier);
+        const jobId = job.id || (job.title + '_' + job.company).replace(/[^a-zA-Z0-9]/g,'_');
+        const expText = extractExperience(job);
+        const expBadge = expText ? `<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:#8B949E;padding:2px 8px;border-radius:4px;font-size:11px">👔 ${expText}</span>` : '';
+        const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `
+        <div class="job-card" style="border-left:4px solid ${tierColor};margin-bottom:12px;padding:16px;background:#161B22;border-radius:8px;border:1px solid #30363D">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div>
+              <div style="font-size:15px;font-weight:bold;color:#E6EDF3;margin-bottom:2px">${esc(job.title)}</div>
+              <div style="color:#8B949E;font-size:13px">${esc(job.company)}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <span style="color:#8B949E;font-size:12px">${esc(job.location)}</span>
+                <span style="background:${tierColor};color:white;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">TIER ${job.tier}</span>
+                ${expBadge}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+              <a href="${esc(job.applyUrl||'#')}" target="_blank" style="background:#238636;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;text-decoration:none">VIEW JOB</a>
+              <button onclick="removeFavorite('${esc(jobId)}', this)"
+                style="background:#DA3633;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer">🗑 Remove</button>
+            </div>
+          </div>
+          <div style="color:#6E7681;font-size:11px">Score: ${job.totalScore||0} | ${job.candidateId==='thiagarajan'?'TS':'DT'} | ${esc(job.source||'')}</div>
+        </div>`;
+      }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCC Job Agent — Favorites</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#0D1117; color:#E6EDF3; font-family:'Segoe UI',Arial,sans-serif; }
+  .navbar { background:#161B22; border-bottom:1px solid #30363D; padding:12px 24px; display:flex; align-items:center; gap:16px; }
+  .navbar-logo { color:white; font-weight:bold; font-size:18px; letter-spacing:1px; }
+  .navbar-links { display:flex; gap:8px; }
+  .navbar-links a { color:#8B949E; text-decoration:none; padding:6px 12px; border-radius:6px; font-size:13px; border:1px solid transparent; }
+  .navbar-links a:hover, .navbar-links a.active { background:#30363D; border:1px solid #58A6FF; }
+  .navbar-right { color:#8B949E; font-size:13px; margin-left:auto; }
+  .container { max-width:960px; margin:0 auto; padding:24px 16px; }
+  .stats-bar { display:flex; gap:12px; margin-bottom:24px; }
+  .stat-box { background:#161B22; border:1px solid #30363D; border-radius:8px; padding:14px 20px; flex:1; text-align:center; }
+  .stat-label { color:#8B949E; font-size:11px; text-transform:uppercase; margin-bottom:4px; }
+  .stat-value { font-size:24px; font-weight:bold; color:#E6EDF3; }
+  .job-card { background:#161B22; border:1px solid #30363D; border-radius:8px; }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-logo">GCC JOB AGENT</div>
+  <div class="navbar-links">
+    <a href="/">Jobs</a>
+    <a href="/tracker">Tracker</a>
+    <a href="/roles">Roles</a>
+    <a href="/favorites" class="active">⭐ Favorites</a>
+  </div>
+  <div class="navbar-right">${today}</div>
+</nav>
+<div class="container">
+  <h2 style="margin-bottom:16px;color:#E6EDF3">⭐ Saved Jobs</h2>
+  <div class="stats-bar">
+    <div class="stat-box"><div class="stat-label">Total Favorites</div><div class="stat-value">${favorites.length}</div></div>
+    <div class="stat-box" style="border-left:4px solid #3FB950"><div class="stat-label">Tier 1</div><div class="stat-value" style="color:#3FB950">${tier1}</div></div>
+    <div class="stat-box" style="border-left:4px solid #58A6FF"><div class="stat-label">Tier 2</div><div class="stat-value" style="color:#58A6FF">${tier2}</div></div>
+    <div class="stat-box" style="border-left:4px solid #8957E5"><div class="stat-label">Applied</div><div class="stat-value" style="color:#8957E5">${applied}</div></div>
+  </div>
+  <div id="favorites-list">${cardsHtml}</div>
+</div>
+<script>
+async function removeFavorite(jobId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Removing...';
+  try {
+    const res = await fetch('/api/favorites/' + encodeURIComponent(jobId), { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      const card = btn.closest('.job-card');
+      if (card) { card.style.transition='opacity 0.3s'; card.style.opacity='0'; setTimeout(()=>card.remove(),300); }
+    } else {
+      btn.textContent = '🗑 Remove';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = '🗑 Remove';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>`;
+}
+
+// ═══════════════════════════════════════════════════════
 // TRACKER PAGE HTML
 // ═══════════════════════════════════════════════════════
 
@@ -2124,6 +2334,7 @@ function buildTrackerHtml() {
     <a href="/">Jobs</a>
     <a href="/tracker" class="active">Tracker</a>
     <a href="/roles">Roles</a>
+    <a href="/favorites">⭐ Favorites</a>
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
@@ -2920,6 +3131,7 @@ function buildSearchProfilesHtml() {
     <a href="/">Jobs</a>
     <a href="/tracker">Tracker</a>
     <a href="/roles" class="active">Roles</a>
+    <a href="/favorites">⭐ Favorites</a>
   </div>
   <div class="navbar-right">
     <strong>Search Profile Manager</strong>
@@ -3784,6 +3996,47 @@ function startDashboard() {
       res.json({ success: true });
     } catch (err) {
       console.error('[remove-job] Error:', err.message);
+      res.json({ success: false, message: err.message });
+    }
+  });
+
+  // ── GET /favorites ──────────────────────────────────
+  app.get('/favorites', (req, res) => {
+    res.send(buildFavoritesHtml());
+  });
+
+  // ── GET /api/favorites ──────────────────────────────
+  app.get('/api/favorites', (req, res) => {
+    res.json(loadFavorites());
+  });
+
+  // ── POST /api/favorites ─────────────────────────────
+  app.post('/api/favorites', async (req, res) => {
+    try {
+      const { jobId } = req.body;
+      const jobs = await loadAllJobs();
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return res.json({ success: false, message: 'Job not found' });
+      const favorites = loadFavorites();
+      const alreadyIn = favorites.some(f => f.id === jobId);
+      if (!alreadyIn) {
+        favorites.push(job);
+        saveFavorites(favorites);
+      }
+      res.json({ success: true });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
+  });
+
+  // ── DELETE /api/favorites/:jobId ────────────────────
+  app.delete('/api/favorites/:jobId', (req, res) => {
+    try {
+      const jobId = decodeURIComponent(req.params.jobId);
+      const favorites = loadFavorites().filter(f => f.id !== jobId);
+      saveFavorites(favorites);
+      res.json({ success: true });
+    } catch (err) {
       res.json({ success: false, message: err.message });
     }
   });
