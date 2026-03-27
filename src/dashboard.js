@@ -402,7 +402,7 @@ function extractExperience(job) {
       return `${match[1]}+ yrs`;
     }
   }
-  return null;
+  return 'N/A';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -956,7 +956,7 @@ function extractExperience(job) {
     const m = text.match(p);
     if (m) return m[2] ? m[1] + '-' + m[2] + ' yrs' : m[1] + '+ yrs';
   }
-  return null;
+  return 'N/A';
 }
 
 function getTierColor(tier) {
@@ -1255,8 +1255,8 @@ function buildCard(job, idx) {
   const tierColor = getTierColor(job.tier);
   const expBadge = (() => {
     const exp = extractExperience(job);
-    if (!exp) return '';
-    return '<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:#8B949E;padding:2px 8px;border-radius:4px;font-size:11px">👔 ' + exp + '</span>';
+    const color = exp === 'N/A' ? '#6E7681' : '#8B949E';
+    return '<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:11px">👔 ' + exp + '</span>';
   })();
   const scoreColor = getScoreColor(job.totalScore || 0);
   const verdict = getSalaryVerdict(job);
