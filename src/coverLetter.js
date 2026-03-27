@@ -3,14 +3,14 @@
 require('dotenv').config();
 
 const Anthropic = require('@anthropic-ai/sdk');
-const { Document, Packer, Paragraph, TextRun, BorderStyle } = require('docx');
+const { Document, Packer, Paragraph, TextRun, BorderStyle, AlignmentType } = require('docx');
 const fs = require('fs');
 const path = require('path');
 
 // ═══════════════════════════════════════════════════════
 // SYSTEM PROMPTS (one per candidate)
 // ═══════════════════════════════════════════════════════
-const SYSTEM_PROMPT = `You are writing a professional cover letter for Dheeraj Thiagarajan. Follow these rules exactly:
+const SYSTEM_PROMPT = `You are writing a cover letter for Dheeraj Thiagarajan. Write it like a real human wrote it — direct, confident, and specific. No AI-sounding language.
 
 CANDIDATE PROFILE:
 Name: Dheeraj Thiagarajan
@@ -41,25 +41,20 @@ Extracurricular:
 - JPMorgan Chase Finance Virtual Experience (2022)
 - Common Purpose Leadership Award (2020)
 
-Key Strengths:
-- LSE and Chicago Booth dual postgraduate credentials
-- Proven B2B sales with 65%+ conversion rate
-- Financial modelling and valuation experience
-- C-suite stakeholder engagement
-- Sports finance and commercial partnerships
-- Strategy consulting experience
+WRITING RULES:
+1. Sound like a real human wrote this — conversational, confident, genuine
+2. BANNED phrases — never use: "I am excited to", "I am passionate about", "leverage", "utilize", "synergy", "dynamic", "innovative", "thrilled", "delighted", "I would be remiss", "I am writing to express", "I am writing to apply", "Please find attached"
+3. Use natural contractions: I've, I'm, I'd, it's, that's
+4. Show personality — be direct and confident
+5. Maximum 3 paragraphs. Each paragraph max 4 sentences.
+6. Total length: 250-320 words
+7. First paragraph: specific hook about the company or role — no generic openers
+8. Second paragraph: 2-3 specific achievements with numbers that match the job
+9. Third paragraph: brief closing, mention GCC market, availability to relocate immediately, 1 month notice, clear CTA
+10. Never mention visa status or nationality
+11. Do not include any sign-off, name, or closing signature — the document template handles that
 
-COVER LETTER WRITING RULES:
-1. Length: 3 paragraphs, maximum 350 words total
-2. Tone: Confident, commercial, results-focused — not generic
-3. Opening paragraph: Show genuine knowledge of the company and role, reference specific things about the company if known
-4. Middle paragraph: Pick the 2-3 most relevant experiences from Dheeraj's background that match this specific job. Always include specific numbers and achievements.
-5. Closing paragraph: Express enthusiasm for the GCC market, mention availability to relocate immediately, notice period of 1 month, and a clear call to action.
-6. Never mention visa status or nationality.
-7. Never use clichés like "I am writing to apply" or "Please find attached my CV"
-8. Do not include any sign-off, name, or closing signature — the document template handles that.
-
-Write ONLY the body of the cover letter (3 paragraphs), starting directly with the first paragraph. Do not include headers, date, recipient address, subject line, or signature — just the 3 paragraphs of body text separated by blank lines.`;
+Write ONLY the letter body — no subject line, no date, no address blocks. 3 paragraphs separated by blank lines.`;
 
 const THIAGARAJAN_SYSTEM_PROMPT = `You are an expert executive career consultant writing senior-level cover letters for C-suite and Director-level positions in the automotive industry.`;
 
@@ -218,6 +213,7 @@ async function saveCoverLetterDocx(job, coverLetterText, candidateId) {
   // Body paragraphs
   for (const para of paragraphs) {
     children.push(new Paragraph({
+      alignment: AlignmentType.JUSTIFIED,
       children: [new TextRun({ text: para.trim(), size: 22, font: 'Calibri' })],
     }));
     children.push(blankLine());
@@ -317,11 +313,15 @@ WRITING GUIDELINES:
 - End with strong call to action for interview`;
   } else {
     systemPrompt = SYSTEM_PROMPT;
-    userMessage = `Write a cover letter for this job:
+    userMessage = `Write a cover letter for Dheeraj Thiagarajan applying for ${job.title} at ${job.company}.
+
+Candidate profile: Dheeraj Thiagarajan — LSE MSc Finance (Merit), Chicago Booth MBA Exchange (Merit), Investment & Partnerships Analyst at Lovemore Sports (£1m+ Premier League partnerships, six-figure brand deals), former BD Associate at G.Network (65%+ conversion rate, top 3 by revenue), Strategy Consultant at Castore Consulting (20%+ revenue upside). Based in London, 1 month notice, available to relocate immediately.
+
+Job details:
 Title: ${job.title}
 Company: ${job.company}
 Location: ${job.location}
-Job Description: ${job.description}`;
+Description: ${job.description}`;
   }
 
   let coverLetterText;
