@@ -943,6 +943,22 @@ let filteredJobs = [...ALL_JOBS];
 let fortuneActive = false;
 const appliedSet = new Set();
 
+function extractExperience(job) {
+  const text = [job.title||'', job.description||'', job.snippet||'', job.requirements||''].join(' ').toLowerCase();
+  const patterns = [
+    /(\d+)\s*[-\u2013to]+\s*(\d+)\s*years?/i,
+    /(\d+)\+\s*years?/i,
+    /minimum\s*(\d+)\s*years?/i,
+    /at least\s*(\d+)\s*years?/i,
+    /(\d+)\s*years?\s*(?:of\s*)?experience/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) return m[2] ? m[1] + '-' + m[2] + ' yrs' : m[1] + '+ yrs';
+  }
+  return null;
+}
+
 function getTierColor(tier) {
   if (tier === 1) return '#3FB950';
   if (tier === 2) return '#58A6FF';
@@ -1206,12 +1222,11 @@ function statTier2Click() {
 
 function renderPage() {
   const grid = document.getElementById('jobs-grid');
-  console.log('Grid element:', grid);
   if (!grid) return;
   const start = (currentPage - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
   const pageJobs = filteredJobs.slice(start, end);
-  console.log('Jobs received:', filteredJobs.length);
+  console.log('Rendering jobs:', filteredJobs.length, '| First job:', filteredJobs[0] ? filteredJobs[0].title : 'none', '| Grid:', grid ? 'found' : 'missing');
 
   grid.innerHTML = '';
   pageJobs.forEach((job, idx) => {
@@ -1236,8 +1251,6 @@ function renderPage() {
 }
 
 function buildCard(job, idx) {
-  console.log('Building card for:', job.title);
-  console.log('job.manuallyAdded:', job.manuallyAdded);
   const jobId = getJobId(job);
   const tierColor = getTierColor(job.tier);
   const expBadge = (() => {
