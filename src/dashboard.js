@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const express = require('express');
 const path = require('path');
@@ -22,9 +22,9 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 
 const prepCache = {};
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MULTI-CANDIDATE SUPPORT
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const CANDIDATES_PATH = path.join(__dirname, '../data/candidates.json');
 
@@ -104,9 +104,9 @@ let app = null;
 let browserExtractionResult = null;
 let allJobs = null;
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LOAD TODAY'S JOBS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function loadTodaysJobs() {
   const today = new Date().toISOString().split('T')[0];
@@ -122,9 +122,9 @@ function loadTodaysJobs() {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LOAD ALL JOBS (all historic reports)
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 async function loadAllJobs() {
   try {
@@ -356,9 +356,9 @@ function loadBlockedJobs() {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FAVORITES HELPERS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const FAVORITES_PATH = path.join(__dirname, '../data/favorites.json');
 
@@ -375,9 +375,9 @@ function saveFavorites(favorites) {
   fs.writeJsonSync(FAVORITES_PATH, favorites, { spaces: 2 });
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EXTRACT EXPERIENCE FROM JOB TEXT
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function extractExperience(job) {
   const text = [
@@ -388,7 +388,7 @@ function extractExperience(job) {
   ].join(' ').toLowerCase();
 
   const patterns = [
-    /(\d+)\s*[-–to]+\s*(\d+)\s*years?/i,
+    /(\d+)\s*[-â€“to]+\s*(\d+)\s*years?/i,
     /(\d+)\+\s*years?/i,
     /minimum\s*(\d+)\s*years?/i,
     /at least\s*(\d+)\s*years?/i,
@@ -405,9 +405,9 @@ function extractExperience(job) {
   return 'N/A';
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // HTML HELPERS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function getTierColor(tier) {
   if (tier === 1) return '#3FB950';
@@ -430,9 +430,9 @@ function getSalaryVerdict(job) {
   return { label: 'BELOW FLOOR', color: '#DA3633' };
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN DASHBOARD HTML
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   const todayIso = new Date().toISOString().split('T')[0];
@@ -781,7 +781,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     <a href="/" class="active">Jobs</a>
     <a href="/tracker">Tracker</a>
     <a href="/roles">Roles</a>
-    <a href="/favorites">⭐ Favorites</a>
+    <a href="/favorites">â­ Favorites</a>
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
@@ -825,15 +825,15 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
   <div class="filter-row">
     <select id="filter-candidate" onchange="onCandidateChange()" style="min-width:180px">
       <option value="">All Candidates</option>
-      <option value="dheeraj">🟡 Dheeraj Thiagarajan</option>
-      <option value="thiagarajan">🟢 Thiagarajan Shanthakumar</option>
+      <option value="dheeraj">ðŸŸ¡ Dheeraj Thiagarajan</option>
+      <option value="thiagarajan">ðŸŸ¢ Thiagarajan Shanthakumar</option>
     </select>
     <select id="filter-region" onchange="applyFilters()" style="min-width:130px">
       <option value="all">All Regions</option>
-      <option value="gcc">🌍 GCC</option>
-      <option value="uk">🇬🇧 UK</option>
-      <option value="ireland">🇮🇪 Ireland</option>
-      <option value="europe">🇪🇺 Europe</option>
+      <option value="gcc">ðŸŒ GCC</option>
+      <option value="uk">ðŸ‡¬ðŸ‡§ UK</option>
+      <option value="ireland">ðŸ‡®ðŸ‡ª Ireland</option>
+      <option value="europe">ðŸ‡ªðŸ‡º Europe</option>
     </select>
     <select id="filter-tier" onchange="onTierChange()" style="min-width:100px">
       <option value="">All Tiers</option>
@@ -850,7 +850,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     </select>
     <select id="filter-location" onchange="applyFilters()" style="min-width:130px">
       <option value="">All Locations</option>
-      <optgroup label="🌍 GCC">
+      <optgroup label="ðŸŒ GCC">
         <option value="Dubai">Dubai</option>
         <option value="Abu Dhabi">Abu Dhabi</option>
         <option value="Qatar">Qatar</option>
@@ -859,19 +859,19 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
         <option value="Bahrain">Bahrain</option>
         <option value="Oman">Oman</option>
       </optgroup>
-      <optgroup label="🇬🇧 UK">
+      <optgroup label="ðŸ‡¬ðŸ‡§ UK">
         <option value="London">London</option>
         <option value="Manchester">Manchester</option>
         <option value="Edinburgh">Edinburgh</option>
         <option value="Birmingham">Birmingham</option>
         <option value="Leeds">Leeds</option>
       </optgroup>
-      <optgroup label="🇮🇪 Ireland">
+      <optgroup label="ðŸ‡®ðŸ‡ª Ireland">
         <option value="Dublin">Dublin</option>
         <option value="Cork">Cork</option>
         <option value="Galway">Galway</option>
       </optgroup>
-      <optgroup label="🇪🇺 Europe">
+      <optgroup label="ðŸ‡ªðŸ‡º Europe">
         <option value="Amsterdam">Amsterdam</option>
         <option value="Frankfurt">Frankfurt</option>
         <option value="Paris">Paris</option>
@@ -883,7 +883,7 @@ function buildDashboardHtml(jobs, contactsData = [], networkingData = []) {
     </select>
     <button class="btn-fortune" id="btn-fortune" onclick="toggleFortune()">Fortune 500</button>
     <button class="btn-reset" onclick="resetFilters()" style="margin-left:auto">Reset Filters</button>
-    <button class="btn-add-job" onclick="openAddJobModal()">➕ Add Job from URL</button>
+    <button class="btn-add-job" onclick="openAddJobModal()">âž• Add Job from URL</button>
   </div>
   <!-- Row 2: search + secondary filters -->
   <div class="filter-row">
@@ -1168,7 +1168,7 @@ function resetFilters() {
   applyFilters();
 }
 
-// ── CLICKABLE STATS BAR ───────────────────────────────
+// â”€â”€ CLICKABLE STATS BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function clearStatActive() {
   ['stat-total','stat-today','stat-fortune500','stat-tier1','stat-tier2'].forEach(id => {
@@ -1256,7 +1256,7 @@ function buildCard(job, idx) {
   const expBadge = (() => {
     const exp = extractExperience(job);
     const color = exp === 'N/A' ? '#6E7681' : '#8B949E';
-    return '<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:11px">👔 ' + exp + '</span>';
+    return '<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:11px">ðŸ‘” ' + exp + '</span>';
   })();
   const scoreColor = getScoreColor(job.totalScore || 0);
   const verdict = getSalaryVerdict(job);
@@ -1318,8 +1318,8 @@ function buildCard(job, idx) {
             \${(job.experienceLevel || '') === 'entry' ? '<span class="exp-badge" style="background:#3FB950">Entry Level</span>' : ''}
             \${(job.experienceLevel || '') === 'mid' ? '<span class="exp-badge" style="background:#58A6FF">Mid Level</span>' : ''}
             \${(job.experienceLevel || '') === 'senior' ? '<span class="exp-badge" style="background:#D29922">Senior</span>' : ''}
-            \${(() => { const r = job.region || 'gcc'; const regionMap = { gcc: { label: '🌍 GCC', bg: '#484F58', tc: '#E6EDF3' }, uk: { label: '🇬🇧 UK', bg: '#1D6FA4', tc: '#fff' }, ireland: { label: '🇮🇪 IRL', bg: '#169B62', tc: '#fff' }, europe: { label: '🇪🇺 EU', bg: '#003399', tc: '#fff' } }; const rm = regionMap[r] || regionMap.gcc; return \`<span style="display:inline-block;background:\${rm.bg};color:\${rm.tc};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">\${rm.label}</span>\`; })()}
-            \${(() => { const vs = job.visaSponsorship; if (vs === 'yes') return '<span style="display:inline-block;background:#169B62;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">✅ Sponsors Visa</span>'; if (vs === 'unknown' && ['uk','ireland','europe'].includes(job.region || '')) return '<span style="display:inline-block;background:#D29922;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">⚠️ Visa Unknown</span>'; return ''; })()}
+            \${(() => { const r = job.region || 'gcc'; const regionMap = { gcc: { label: 'ðŸŒ GCC', bg: '#484F58', tc: '#E6EDF3' }, uk: { label: 'ðŸ‡¬ðŸ‡§ UK', bg: '#1D6FA4', tc: '#fff' }, ireland: { label: 'ðŸ‡®ðŸ‡ª IRL', bg: '#169B62', tc: '#fff' }, europe: { label: 'ðŸ‡ªðŸ‡º EU', bg: '#003399', tc: '#fff' } }; const rm = regionMap[r] || regionMap.gcc; return \`<span style="display:inline-block;background:\${rm.bg};color:\${rm.tc};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">\${rm.label}</span>\`; })()}
+            \${(() => { const vs = job.visaSponsorship; if (vs === 'yes') return '<span style="display:inline-block;background:#169B62;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">âœ… Sponsors Visa</span>'; if (vs === 'unknown' && ['uk','ireland','europe'].includes(job.region || '')) return '<span style="display:inline-block;background:#D29922;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold">âš ï¸ Visa Unknown</span>'; return ''; })()}
             \${expBadge}
           </div>
         </div>
@@ -1328,14 +1328,14 @@ function buildCard(job, idx) {
 
       <div style="background:#161B22;border-radius:6px;padding:8px 12px;border:1px solid #30363D;font-size:11px">
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:4px">
-          <span><span style="color:#8B949E">🌐 Source: </span><span style="color:#E6EDF3">\${_source}</span></span>
-          <span><span style="color:#8B949E">📅 Posted: </span><span style="color:\${_dateAgeColor}">\${_datePosted}</span></span>
-          <span><span style="color:#8B949E">💰 Salary: </span>\${_salaryHtml}</span>
+          <span><span style="color:#8B949E">ðŸŒ Source: </span><span style="color:#E6EDF3">\${_source}</span></span>
+          <span><span style="color:#8B949E">ðŸ“… Posted: </span><span style="color:\${_dateAgeColor}">\${_datePosted}</span></span>
+          <span><span style="color:#8B949E">ðŸ’° Salary: </span>\${_salaryHtml}</span>
         </div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
-          <span><span style="color:#8B949E">👤 Hiring Mgr: </span>\${_hiringMgrHtml}</span>
-          <span><span style="color:#8B949E">👔 Func. Mgr: </span>\${_funcMgrHtml}</span>
-          <span><span style="color:#8B949E">🎓 Alumni: </span>\${_alumniBadge}<span style="color:\${_alumniBadgeColor}">\${_alumniText}</span></span>
+          <span><span style="color:#8B949E">ðŸ‘¤ Hiring Mgr: </span>\${_hiringMgrHtml}</span>
+          <span><span style="color:#8B949E">ðŸ‘” Func. Mgr: </span>\${_funcMgrHtml}</span>
+          <span><span style="color:#8B949E">ðŸŽ“ Alumni: </span>\${_alumniBadge}<span style="color:\${_alumniBadgeColor}">\${_alumniText}</span></span>
         </div>
       </div>
 
@@ -1361,13 +1361,13 @@ function buildCard(job, idx) {
         <button class="btn" id="btn-fav-\${escapeHtml(jobId)}"
           style="\${job.isFavorite ? 'background:#2D2D2D;color:#D29922' : 'background:#D29922;color:white'};border-radius:6px;padding:8px 16px;font-size:12px;font-weight:bold;"
           onclick="handleFavorite(this, '\${escapeHtml(jobId)}', \${JSON.stringify(job).replace(/"/g, '&quot;')})">
-          \${job.isFavorite ? '★ Saved' : '⭐ Save'}
+          \${job.isFavorite ? 'â˜… Saved' : 'â­ Save'}
         </button>
         <button class="btn btn-apply \${isApplied ? 'applied' : ''}"
           id="btn-apply-\${escapeHtml(jobId)}"
           onclick="handleApply(this, \${JSON.stringify(job).replace(/"/g, '&quot;')})"
           \${isApplied ? 'disabled' : ''}>
-          \${isApplied ? '✅ Applied' : 'APPLY & TRACK'}
+          \${isApplied ? 'âœ… Applied' : 'APPLY & TRACK'}
         </button>
         <button class="btn btn-cover" id="btn-cover-\${escapeHtml(jobId)}"
           onclick="handleCoverLetter(this, '\${escapeHtml(jobId)}', \${JSON.stringify(job).replace(/"/g, '&quot;')})">
@@ -1386,15 +1386,15 @@ function buildCard(job, idx) {
           style="background:#DA3633;color:white;font-size:11px;padding:5px 10px;border-radius:6px;margin-left:auto;"
           title="Remove this job permanently"
           onclick="handleRemoveJob(this, '\${escapeHtml(jobId)}')">
-          🗑
+          ðŸ—‘
         </button>
       </div>
     </div>
     <div class="prep-panel" id="prep-panel-\${escapeHtml(jobId)}">
       <div id="prep-loading-\${escapeHtml(jobId)}" style="display:none;text-align:center;padding:20px">
-        <div style="font-size:14px;color:#8957E5;font-weight:bold;margin-bottom:8px">🤖 Claude AI is preparing your interview brief...</div>
+        <div style="font-size:14px;color:#8957E5;font-weight:bold;margin-bottom:8px">ðŸ¤– Claude AI is preparing your interview brief...</div>
         <div style="font-size:12px;color:#8B949E;margin-bottom:12px">Analysing <strong style="color:#E6EDF3">\${escapeHtml(job.company || '')}</strong> and the <strong style="color:#E6EDF3">\${escapeHtml(job.title || '')}</strong> role...</div>
-        <div class="prep-loading-dots" style="color:#8957E5"><span>●</span><span> ●</span><span> ●</span></div>
+        <div class="prep-loading-dots" style="color:#8957E5"><span>â—</span><span> â—</span><span> â—</span></div>
       </div>
       <div id="prep-content-\${escapeHtml(jobId)}" style="display:none"></div>
     </div>
@@ -1424,7 +1424,7 @@ async function handleApply(btn, job) {
     });
     const data = await res.json();
     if (data.success) {
-      btn.textContent = '✅ Applied';
+      btn.textContent = 'âœ… Applied';
       btn.classList.add('applied');
       const jobId = getJobId(job);
       appliedSet.add(jobId);
@@ -1502,24 +1502,24 @@ async function handleRemoveJob(btn, jobId) {
       if (statTotal) statTotal.textContent = Math.max(0, parseInt(statTotal.textContent || '1') - 1);
       showToast('Job permanently removed');
     } else {
-      btn.textContent = '🗑 Remove';
+      btn.textContent = 'ðŸ—‘ Remove';
       btn.disabled = false;
       alert(data.message || 'Failed to remove job');
     }
   } catch (e) {
-    btn.textContent = '🗑 Remove';
+    btn.textContent = 'ðŸ—‘ Remove';
     btn.disabled = false;
     alert('Error removing job: ' + e.message);
   }
 }
 
 async function handleFavorite(btn, jobId, job) {
-  const isSaved = btn.textContent.trim().startsWith('★');
+  const isSaved = btn.textContent.trim().startsWith('â˜…');
   btn.disabled = true;
   try {
     if (isSaved) {
       await fetch('/api/favorites/' + encodeURIComponent(jobId), { method: 'DELETE' });
-      btn.textContent = '⭐ Save';
+      btn.textContent = 'â­ Save';
       btn.style.background = '#D29922';
       btn.style.color = 'white';
       showToast('Removed from Favorites');
@@ -1529,7 +1529,7 @@ async function handleFavorite(btn, jobId, job) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobId }),
       });
-      btn.textContent = '★ Saved';
+      btn.textContent = 'â˜… Saved';
       btn.style.background = '#2D2D2D';
       btn.style.color = '#D29922';
       showToast('Added to Favorites');
@@ -1540,7 +1540,7 @@ async function handleFavorite(btn, jobId, job) {
   btn.disabled = false;
 }
 
-// ── INTERVIEW PREP ─────────────────────────────────────
+// â”€â”€ INTERVIEW PREP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const _prepState = {};
 
 async function handleInterviewPrep(btn, jobId, job) {
@@ -1552,7 +1552,7 @@ async function handleInterviewPrep(btn, jobId, job) {
       btn.textContent = 'INTERVIEW PREP';
     } else {
       panel.classList.add('open');
-      btn.innerHTML = '📚 INTERVIEW PREP ▲';
+      btn.innerHTML = 'ðŸ“š INTERVIEW PREP â–²';
     }
     return;
   }
@@ -1572,14 +1572,14 @@ async function handleInterviewPrep(btn, jobId, job) {
       _prepState[jobId] = 'loaded';
       if (loading) loading.style.display = 'none';
       if (content) { content.innerHTML = buildPrepHtml(jobId, data.prep, job); content.style.display = 'block'; }
-      btn.innerHTML = '📚 INTERVIEW PREP ▲';
+      btn.innerHTML = 'ðŸ“š INTERVIEW PREP â–²';
       btn.disabled = false;
       loadChecklistState(jobId, (data.prep.preparationChecklist || []));
     } else if (data.message === 'no_credits') {
       _prepState[jobId] = 'error';
       if (loading) loading.style.display = 'none';
       if (content) { content.innerHTML = buildNoCreditsFallback(job); content.style.display = 'block'; }
-      btn.innerHTML = '📚 INTERVIEW PREP ▲';
+      btn.innerHTML = 'ðŸ“š INTERVIEW PREP â–²';
       btn.disabled = false;
     } else {
       _prepState[jobId] = 'error';
@@ -1601,16 +1601,16 @@ async function handleInterviewPrep(btn, jobId, job) {
 function buildNoCreditsFallback(job) {
   const company = escapeHtml((job && job.company) ? job.company : 'the company');
   return '<div style="padding:12px;background:#1F2937;border-radius:6px;border:1px solid #D29922">' +
-    '<div style="color:#D29922;font-weight:bold;margin-bottom:8px">⚠️ Interview prep requires Anthropic API credits.</div>' +
+    '<div style="color:#D29922;font-weight:bold;margin-bottom:8px">âš ï¸ Interview prep requires Anthropic API credits.</div>' +
     '<div style="color:#8B949E;font-size:12px;margin-bottom:12px">Add credits at <strong style="color:#E6EDF3">console.anthropic.com</strong> then try again.</div>' +
     '<div style="font-size:12px;font-weight:bold;color:#8B949E;margin-bottom:6px">BASIC PREP CHECKLIST:</div>' +
     '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#E6EDF3">' +
-    '<div>✅ Research ' + company + ' on LinkedIn and website</div>' +
-    '<div>✅ Review the job description thoroughly</div>' +
-    '<div>✅ Prepare 3 STAR examples from your experience</div>' +
-    '<div>✅ Research GCC market for this industry</div>' +
-    '<div>✅ Prepare 5 questions to ask the interviewer</div>' +
-    '<div>✅ Review your CV and be ready to discuss each role</div>' +
+    '<div>âœ… Research ' + company + ' on LinkedIn and website</div>' +
+    '<div>âœ… Review the job description thoroughly</div>' +
+    '<div>âœ… Prepare 3 STAR examples from your experience</div>' +
+    '<div>âœ… Research GCC market for this industry</div>' +
+    '<div>âœ… Prepare 5 questions to ask the interviewer</div>' +
+    '<div>âœ… Review your CV and be ready to discuss each role</div>' +
     '</div></div>';
 }
 
@@ -1623,15 +1623,15 @@ function buildPrepHtml(jobId, prep, job) {
   const companyName = escapeHtml((job && job.company) ? job.company : 'Company');
 
   let html = '<div class="prep-tabs">' +
-    '<button class="prep-tab active" id="tab-btn-' + jobId + '-company" onclick="switchPrepTab(\\'' + jobId + '\\',\\'company\\')">🏢 Company</button>' +
-    '<button class="prep-tab" id="tab-btn-' + jobId + '-industry" onclick="switchPrepTab(\\'' + jobId + '\\',\\'industry\\')">📊 Industry</button>' +
-    '<button class="prep-tab" id="tab-btn-' + jobId + '-role" onclick="switchPrepTab(\\'' + jobId + '\\',\\'role\\')">🎯 Role</button>' +
-    '<button class="prep-tab" id="tab-btn-' + jobId + '-questions" onclick="switchPrepTab(\\'' + jobId + '\\',\\'questions\\')">❓ Questions</button>' +
-    '<button class="prep-tab" id="tab-btn-' + jobId + '-answers" onclick="switchPrepTab(\\'' + jobId + '\\',\\'answers\\')">💡 Your Answers</button>' +
-    '<button class="prep-tab" id="tab-btn-' + jobId + '-checklist" onclick="switchPrepTab(\\'' + jobId + '\\',\\'checklist\\')">✅ Checklist</button>' +
+    '<button class="prep-tab active" id="tab-btn-' + jobId + '-company" onclick="switchPrepTab(\\'' + jobId + '\\',\\'company\\')">ðŸ¢ Company</button>' +
+    '<button class="prep-tab" id="tab-btn-' + jobId + '-industry" onclick="switchPrepTab(\\'' + jobId + '\\',\\'industry\\')">ðŸ“Š Industry</button>' +
+    '<button class="prep-tab" id="tab-btn-' + jobId + '-role" onclick="switchPrepTab(\\'' + jobId + '\\',\\'role\\')">ðŸŽ¯ Role</button>' +
+    '<button class="prep-tab" id="tab-btn-' + jobId + '-questions" onclick="switchPrepTab(\\'' + jobId + '\\',\\'questions\\')">â“ Questions</button>' +
+    '<button class="prep-tab" id="tab-btn-' + jobId + '-answers" onclick="switchPrepTab(\\'' + jobId + '\\',\\'answers\\')">ðŸ’¡ Your Answers</button>' +
+    '<button class="prep-tab" id="tab-btn-' + jobId + '-checklist" onclick="switchPrepTab(\\'' + jobId + '\\',\\'checklist\\')">âœ… Checklist</button>' +
     '</div>';
 
-  // Tab 1 — Company
+  // Tab 1 â€” Company
   const culturePills = (co.culture || '').split(/[,;]/).map(function(k){ return k.trim(); }).filter(Boolean)
     .map(function(k){ return '<span class="prep-pill">' + escapeHtml(k) + '</span>'; }).join('');
   html += '<div class="prep-tab-pane active" id="tab-' + jobId + '-company">' +
@@ -1644,8 +1644,8 @@ function buildPrepHtml(jobId, prep, job) {
     '<div class="prep-section"><div class="prep-section-title">Recent News</div>' +
     '<div style="color:#8B949E;font-style:italic;font-size:13px">' + escapeHtml(co.recentNews || '') + '</div></div></div>';
 
-  // Tab 2 — Industry
-  const keyTrends = (ind.keyTrends || []).map(function(t){ return '<div style="color:#58A6FF;font-size:13px;padding:4px 0">→ ' + escapeHtml(t) + '</div>'; }).join('');
+  // Tab 2 â€” Industry
+  const keyTrends = (ind.keyTrends || []).map(function(t){ return '<div style="color:#58A6FF;font-size:13px;padding:4px 0">â†’ ' + escapeHtml(t) + '</div>'; }).join('');
   const compBadges = (ind.topCompetitors || []).map(function(c){ return '<span class="prep-pill prep-pill-blue">' + escapeHtml(c) + '</span>'; }).join('');
   html += '<div class="prep-tab-pane" id="tab-' + jobId + '-industry">' +
     '<div class="prep-section"><div style="margin-bottom:10px"><span class="prep-pill prep-pill-purple">' + escapeHtml(ind.sector || '') + '</span></div>' +
@@ -1654,17 +1654,17 @@ function buildPrepHtml(jobId, prep, job) {
     '<div class="prep-section-title">Key Trends</div>' + keyTrends + '</div>' +
     '<div class="prep-section"><div class="prep-section-title">Top Competitors</div><div>' + compBadges + '</div></div></div>';
 
-  // Tab 3 — Role
-  const resps = (role.typicalResponsibilities || []).map(function(r){ return '<div style="font-size:13px;color:#E6EDF3;padding:4px 0 4px 12px;border-left:2px solid #30363D">• ' + escapeHtml(r) + '</div>'; }).join('');
-  const kpis = (role.kpisMeasuredBy || []).map(function(k){ return '<div style="font-size:13px;color:#E6EDF3;padding:4px 0">📏 ' + escapeHtml(k) + '</div>'; }).join('');
+  // Tab 3 â€” Role
+  const resps = (role.typicalResponsibilities || []).map(function(r){ return '<div style="font-size:13px;color:#E6EDF3;padding:4px 0 4px 12px;border-left:2px solid #30363D">â€¢ ' + escapeHtml(r) + '</div>'; }).join('');
+  const kpis = (role.kpisMeasuredBy || []).map(function(k){ return '<div style="font-size:13px;color:#E6EDF3;padding:4px 0">ðŸ“ ' + escapeHtml(k) + '</div>'; }).join('');
   html += '<div class="prep-tab-pane" id="tab-' + jobId + '-role">' +
     '<div class="prep-section"><div class="prep-section-title">Typical Responsibilities</div>' + resps + '</div>' +
     '<div class="prep-section"><div class="prep-section-title">Measured By (KPIs)</div>' + kpis + '</div>' +
     '<div class="prep-section" style="display:flex;gap:24px;flex-wrap:wrap">' +
-    '<div><div style="font-size:11px;color:#8B949E">CAREER PATH</div><div style="font-size:13px;color:#E6EDF3">→ ' + escapeHtml(role.careerProgression || '') + '</div></div>' +
+    '<div><div style="font-size:11px;color:#8B949E">CAREER PATH</div><div style="font-size:13px;color:#E6EDF3">â†’ ' + escapeHtml(role.careerProgression || '') + '</div></div>' +
     '<div><div style="font-size:11px;color:#8B949E">SALARY RANGE</div><div style="font-size:13px;color:#D29922;font-weight:bold">' + escapeHtml(role.salaryRange || '') + '</div></div></div></div>';
 
-  // Tab 4 — Questions
+  // Tab 4 â€” Questions
   function qCards(items, cls) {
     return (items || []).map(function(q) {
       return '<div class="prep-question-card ' + cls + '"><span>' + escapeHtml(q) + '</span>' +
@@ -1677,7 +1677,7 @@ function buildPrepHtml(jobId, prep, job) {
     '<div class="prep-section"><div class="prep-section-title" style="color:#3FB950">Situational</div>' + qCards(qs.situational, 'prep-q-situational') + '</div>' +
     '<div class="prep-section"><div class="prep-section-title" style="color:#8957E5">Company Specific</div>' + qCards(qs.companySpecific, 'prep-q-company') + '</div></div>';
 
-  // Tab 5 — Your Answers
+  // Tab 5 â€” Your Answers
   const starCards = (ans.starExamples || []).map(function(s, i) {
     return '<div style="background:#1F2937;border-radius:6px;padding:12px;margin-bottom:10px">' +
       '<div style="font-size:11px;font-weight:bold;color:#8957E5;margin-bottom:8px">STAR EXAMPLE ' + (i + 1) + '</div>' +
@@ -1695,18 +1695,18 @@ function buildPrepHtml(jobId, prep, job) {
     '<div class="prep-section"><div class="prep-section-title">STAR Examples</div>' + starCards + '</div>' +
     '<div class="prep-section"><div class="prep-section-title">Questions to Ask Interviewer</div><div>' + askQs + '</div></div></div>';
 
-  // Tab 6 — Checklist
+  // Tab 6 â€” Checklist
   const chkItems = (prep.preparationChecklist || []).map(function(item, i) {
     const cid = 'chk-' + jobId + '-' + i;
     return '<div class="prep-checklist-item" id="chk-row-' + cid + '">' +
       '<input type="checkbox" id="' + cid + '" onchange="toggleChecklistItem(\\'' + jobId + '\\',' + i + ',this)">' +
       '<label for="' + cid + '" style="cursor:pointer">' + escapeHtml(item) + '</label></div>';
   }).join('');
-  const redFlags = (prep.redFlags || []).map(function(f){ return '<div style="color:#D29922;font-size:13px;padding:4px 0">⚠️ ' + escapeHtml(f) + '</div>'; }).join('');
+  const redFlags = (prep.redFlags || []).map(function(f){ return '<div style="color:#D29922;font-size:13px;padding:4px 0">âš ï¸ ' + escapeHtml(f) + '</div>'; }).join('');
   html += '<div class="prep-tab-pane" id="tab-' + jobId + '-checklist">' +
     '<div class="prep-section"><div class="prep-section-title">Pre-Interview Checklist</div>' + chkItems + '</div>' +
     '<div class="prep-section"><div class="prep-section-title">Dress Code</div>' +
-    '<div style="font-size:13px;color:#E6EDF3">👔 ' + escapeHtml(prep.dresscode || '') + '</div></div>' +
+    '<div style="font-size:13px;color:#E6EDF3">ðŸ‘” ' + escapeHtml(prep.dresscode || '') + '</div></div>' +
     '<div class="prep-section"><div class="prep-section-title">Red Flags</div>' + redFlags + '</div></div>';
 
   return html;
@@ -1766,7 +1766,7 @@ if (ALL_JOBS.length > 0) {
   updateStatsBar(ALL_JOBS);
 }
 
-// ─── ADD JOB MODAL ───────────────────────────────────────
+// â”€â”€â”€ ADD JOB MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let _addJobUrl = '';
 let _browserPollInterval = null;
 let _manualMode = false;
@@ -1804,9 +1804,9 @@ function setModalSection(section) {
 }
 
 function setProgress(steps) {
-  const icons = { done: '✅', loading: '<span class="spinner" style="width:12px;height:12px;border-width:2px"></span>', wait: '⏳', error: '❌' };
+  const icons = { done: 'âœ…', loading: '<span class="spinner" style="width:12px;height:12px;border-width:2px"></span>', wait: 'â³', error: 'âŒ' };
   document.getElementById('modal-progress-steps').innerHTML = steps.map(s =>
-    \`<div class="step">\${icons[s.state] || '•'} \${s.text}</div>\`
+    \`<div class="step">\${icons[s.state] || 'â€¢'} \${s.text}</div>\`
   ).join('');
 }
 
@@ -1831,7 +1831,7 @@ async function startExtraction() {
       const portalName = data.portalName || detectPortalName(_addJobUrl);
       setProgress([
         { state: 'done', text: 'Direct fetch attempted' },
-        { state: 'loading', text: 'Login required — opening browser...' }
+        { state: 'loading', text: 'Login required â€” opening browser...' }
       ]);
       setModalSection('browser-section');
       document.getElementById('modal-browser-portal').textContent = portalName;
@@ -1841,7 +1841,7 @@ async function startExtraction() {
       setTimeout(() => showManualForm(), 2000);
     }
   } catch (err) {
-    setProgress([{ state: 'error', text: 'Network error — try manual entry' }]);
+    setProgress([{ state: 'error', text: 'Network error â€” try manual entry' }]);
     setTimeout(() => showManualForm(), 1500);
   }
 }
@@ -1957,7 +1957,7 @@ function addJobToGrid(job) {
   if (statTotal) statTotal.textContent = parseInt(statTotal.textContent || '0') + 1;
   const statToday = document.getElementById('stat-today');
   if (statToday) statToday.textContent = parseInt(statToday.textContent || '0') + 1;
-  showToast(\`✅ \${job.title} at \${job.company} added!\`);
+  showToast(\`âœ… \${job.title} at \${job.company} added!\`);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1985,8 +1985,8 @@ async function saveJobToDashboard(job) {
 <div class="modal-overlay" id="add-job-modal" onclick="if(event.target===this)closeAddJobModal()">
   <div class="modal-box">
     <div class="modal-title">
-      <span>➕ Add Job from URL</span>
-      <button class="modal-close" onclick="closeAddJobModal()">×</button>
+      <span>âž• Add Job from URL</span>
+      <button class="modal-close" onclick="closeAddJobModal()">Ã—</button>
     </div>
 
     <!-- URL INPUT -->
@@ -1994,7 +1994,7 @@ async function saveJobToDashboard(job) {
       <div class="modal-field-label">Paste the job listing URL</div>
       <input class="modal-input" id="modal-url-input" type="url" placeholder="https://linkedin.com/jobs/view/...">
       <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="modal-btn" onclick="startExtraction()">🔍 Extract &amp; Add Job</button>
+        <button class="modal-btn" onclick="startExtraction()">ðŸ” Extract &amp; Add Job</button>
         <button class="modal-btn-sec" onclick="showManualForm()">Enter Manually</button>
       </div>
     </div>
@@ -2009,21 +2009,21 @@ async function saveJobToDashboard(job) {
     <!-- BROWSER WAITING -->
     <div id="modal-browser-section" style="display:none">
       <div class="modal-browser-msg">
-        <div style="font-weight:bold;margin-bottom:6px">🖥️ Browser window opened</div>
+        <div style="font-weight:bold;margin-bottom:6px">ðŸ–¥ï¸ Browser window opened</div>
         <div>Please log in to <strong id="modal-browser-portal"></strong> and navigate to the job page.</div>
-        <div style="color:#3FB950;margin-top:6px">✅ Job details will be extracted automatically.</div>
+        <div style="color:#3FB950;margin-top:6px">âœ… Job details will be extracted automatically.</div>
         <div style="color:#8B949E;font-size:11px;margin-top:4px">Do not close the browser window.</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
         <span class="spinner" style="width:14px;height:14px;border-width:2px"></span>
         <span style="font-size:12px;color:#8B949E">Waiting for browser...</span>
-        <button class="modal-btn-sec" onclick="cancelBrowser()" style="margin-left:auto">Cancel — Enter Manually</button>
+        <button class="modal-btn-sec" onclick="cancelBrowser()" style="margin-left:auto">Cancel â€” Enter Manually</button>
       </div>
     </div>
 
     <!-- MANUAL ENTRY -->
     <div id="modal-manual-section" style="display:none">
-      <div style="font-size:12px;color:#8B949E;margin-bottom:10px">Fill in what you know — all fields optional except Title.</div>
+      <div style="font-size:12px;color:#8B949E;margin-bottom:10px">Fill in what you know â€” all fields optional except Title.</div>
       <div class="modal-field-row">
         <div><div class="modal-field-label">Job Title *</div><input class="modal-input" id="manual-title" placeholder="e.g. Sales Manager"></div>
         <div><div class="modal-field-label">Company</div><input class="modal-input" id="manual-company" placeholder="e.g. Emaar Properties"></div>
@@ -2039,7 +2039,7 @@ async function saveJobToDashboard(job) {
       <div><div class="modal-field-label">Description</div><textarea class="modal-input" id="manual-description" rows="3" placeholder="Paste job description..."></textarea></div>
       <div style="display:flex;gap:8px;margin-top:4px">
         <button class="modal-btn" onclick="submitManual()">Add Job Manually</button>
-        <button class="modal-btn-sec" onclick="setModalSection('url-section')">← Back</button>
+        <button class="modal-btn-sec" onclick="setModalSection('url-section')">â† Back</button>
       </div>
     </div>
 
@@ -2053,9 +2053,9 @@ async function saveJobToDashboard(job) {
 </html>`;
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FAVORITES PAGE HTML
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function buildFavoritesHtml() {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -2068,14 +2068,14 @@ function buildFavoritesHtml() {
   const applied = favorites.filter(j => appliedIds.has(j.id)).length;
 
   const cardsHtml = favorites.length === 0
-    ? '<div style="text-align:center;padding:60px;color:#6E7681;font-size:14px">No saved jobs yet. Click ⭐ Save on any job card to save it here.</div>'
+    ? '<div style="text-align:center;padding:60px;color:#6E7681;font-size:14px">No saved jobs yet. Click â­ Save on any job card to save it here.</div>'
     : favorites.map((job, idx) => {
         job.isFavorite = true;
         const isApplied = appliedIds.has(job.id);
         const tierColor = (t => { if (t===1) return '#3FB950'; if (t===2) return '#58A6FF'; if (t===3) return '#D29922'; return '#6E7681'; })(job.tier);
         const jobId = job.id || (job.title + '_' + job.company).replace(/[^a-zA-Z0-9]/g,'_');
         const expText = extractExperience(job);
-        const expBadge = expText ? `<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:#8B949E;padding:2px 8px;border-radius:4px;font-size:11px">👔 ${expText}</span>` : '';
+        const expBadge = expText ? `<span style="display:inline-block;background:#1F2937;border:1px solid #484F58;color:#8B949E;padding:2px 8px;border-radius:4px;font-size:11px">ðŸ‘” ${expText}</span>` : '';
         const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         return `
         <div class="job-card" style="border-left:4px solid ${tierColor};margin-bottom:12px;padding:16px;background:#161B22;border-radius:8px;border:1px solid #30363D">
@@ -2092,7 +2092,7 @@ function buildFavoritesHtml() {
             <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
               <a href="${esc(job.applyUrl||'#')}" target="_blank" style="background:#238636;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;text-decoration:none">VIEW JOB</a>
               <button onclick="removeFavorite('${esc(jobId)}', this)"
-                style="background:#DA3633;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer">🗑 Remove</button>
+                style="background:#DA3633;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer">ðŸ—‘ Remove</button>
             </div>
           </div>
           <div style="color:#6E7681;font-size:11px">Score: ${job.totalScore||0} | ${job.candidateId==='thiagarajan'?'TS':'DT'} | ${esc(job.source||'')}</div>
@@ -2104,7 +2104,7 @@ function buildFavoritesHtml() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GCC Job Agent — Favorites</title>
+<title>GCC Job Agent â€” Favorites</title>
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   body { background:#0D1117; color:#E6EDF3; font-family:'Segoe UI',Arial,sans-serif; }
@@ -2129,12 +2129,12 @@ function buildFavoritesHtml() {
     <a href="/">Jobs</a>
     <a href="/tracker">Tracker</a>
     <a href="/roles">Roles</a>
-    <a href="/favorites" class="active">⭐ Favorites</a>
+    <a href="/favorites" class="active">â­ Favorites</a>
   </div>
   <div class="navbar-right">${today}</div>
 </nav>
 <div class="container">
-  <h2 style="margin-bottom:16px;color:#E6EDF3">⭐ Saved Jobs</h2>
+  <h2 style="margin-bottom:16px;color:#E6EDF3">â­ Saved Jobs</h2>
   <div class="stats-bar">
     <div class="stat-box"><div class="stat-label">Total Favorites</div><div class="stat-value">${favorites.length}</div></div>
     <div class="stat-box" style="border-left:4px solid #3FB950"><div class="stat-label">Tier 1</div><div class="stat-value" style="color:#3FB950">${tier1}</div></div>
@@ -2154,11 +2154,11 @@ async function removeFavorite(jobId, btn) {
       const card = btn.closest('.job-card');
       if (card) { card.style.transition='opacity 0.3s'; card.style.opacity='0'; setTimeout(()=>card.remove(),300); }
     } else {
-      btn.textContent = '🗑 Remove';
+      btn.textContent = 'ðŸ—‘ Remove';
       btn.disabled = false;
     }
   } catch(e) {
-    btn.textContent = '🗑 Remove';
+    btn.textContent = 'ðŸ—‘ Remove';
     btn.disabled = false;
   }
 }
@@ -2167,9 +2167,9 @@ async function removeFavorite(jobId, btn) {
 </html>`;
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TRACKER PAGE HTML
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function buildTrackerHtml() {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -2206,7 +2206,7 @@ function buildTrackerHtml() {
       return `
       <div class="kanban-card" id="kcard-${app.id}" data-candidate-id="${cid}" data-region="${appRegion}">
         <div style="text-align:right;margin-top:6px;">
-          <button onclick="deleteTrackerCard('${app.id}','${app.status || 'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
+          <button onclick="deleteTrackerCard('${app.id}','${app.status || 'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">ðŸ—‘ Remove</button>
         </div>
         <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
           <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0" title="${dotTitle}"></span>
@@ -2247,7 +2247,7 @@ function buildTrackerHtml() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GCC Job Agent — Tracker</title>
+<title>GCC Job Agent â€” Tracker</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #0D1117; color: #E6EDF3; color-scheme: dark; }
@@ -2347,7 +2347,7 @@ function buildTrackerHtml() {
     <a href="/">Jobs</a>
     <a href="/tracker" class="active">Tracker</a>
     <a href="/roles">Roles</a>
-    <a href="/favorites">⭐ Favorites</a>
+    <a href="/favorites">â­ Favorites</a>
   </div>
   <div class="navbar-right">
     <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:2px">
@@ -2385,14 +2385,14 @@ function buildTrackerHtml() {
 <div class="cand-filter-bar">
   <span class="cand-filter-label">Candidate:</span>
   <button class="cand-filter-btn active" id="cand-btn-all" onclick="filterTrackerByCandidate('all', this)">All Candidates</button>
-  <button class="cand-filter-btn" id="cand-btn-dheeraj" onclick="filterTrackerByCandidate('dheeraj', this)">🟡 Dheeraj Thiagarajan</button>
-  <button class="cand-filter-btn" id="cand-btn-thiagarajan" onclick="filterTrackerByCandidate('thiagarajan', this)">🟢 Thiagarajan Shanthakumar</button>
+  <button class="cand-filter-btn" id="cand-btn-dheeraj" onclick="filterTrackerByCandidate('dheeraj', this)">ðŸŸ¡ Dheeraj Thiagarajan</button>
+  <button class="cand-filter-btn" id="cand-btn-thiagarajan" onclick="filterTrackerByCandidate('thiagarajan', this)">ðŸŸ¢ Thiagarajan Shanthakumar</button>
   <span class="cand-filter-label" style="margin-left:16px">Region:</span>
   <button class="cand-filter-btn active" id="region-btn-all" onclick="filterTrackerByRegion('all', this)">All Regions</button>
-  <button class="cand-filter-btn" id="region-btn-gcc" onclick="filterTrackerByRegion('gcc', this)">🌍 GCC</button>
-  <button class="cand-filter-btn" id="region-btn-uk" onclick="filterTrackerByRegion('uk', this)">🇬🇧 UK</button>
-  <button class="cand-filter-btn" id="region-btn-ireland" onclick="filterTrackerByRegion('ireland', this)">🇮🇪 Ireland</button>
-  <button class="cand-filter-btn" id="region-btn-europe" onclick="filterTrackerByRegion('europe', this)">🇪🇺 Europe</button>
+  <button class="cand-filter-btn" id="region-btn-gcc" onclick="filterTrackerByRegion('gcc', this)">ðŸŒ GCC</button>
+  <button class="cand-filter-btn" id="region-btn-uk" onclick="filterTrackerByRegion('uk', this)">ðŸ‡¬ðŸ‡§ UK</button>
+  <button class="cand-filter-btn" id="region-btn-ireland" onclick="filterTrackerByRegion('ireland', this)">ðŸ‡®ðŸ‡ª Ireland</button>
+  <button class="cand-filter-btn" id="region-btn-europe" onclick="filterTrackerByRegion('europe', this)">ðŸ‡ªðŸ‡º Europe</button>
 </div>
 
 <div class="kanban-wrapper">
@@ -2536,7 +2536,7 @@ function buildKanbanCard(app) {
   return \`
     <div class="kanban-card" id="kcard-\${app.id}" data-candidate-id="\${cid}" data-region="\${appRegion}" \${hidden}>
       <div style="text-align:right;margin-top:6px;">
-        <button onclick="deleteTrackerCard('\${app.id}','\${app.status||'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">🗑 Remove</button>
+        <button onclick="deleteTrackerCard('\${app.id}','\${app.status||'Applied'}',this.closest('.kanban-card'))" style="background:#DA3633;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;" title="Remove">ðŸ—‘ Remove</button>
       </div>
       <div class="kcard-title" style="display:flex;align-items:center;gap:5px">
         <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:\${dotColor};flex-shrink:0" title="\${dotTitle}"></span>
@@ -2617,7 +2617,7 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ─── INTERVIEW PREP CACHE ────────────────────────────
+// â”€â”€â”€ INTERVIEW PREP CACHE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getPrepCacheFilePath() {
   const today = new Date().toISOString().split('T')[0];
   return path.join(__dirname, '../data/interview-prep-' + today + '.json');
@@ -2648,9 +2648,9 @@ function getTierColor(tier) {
   return '#6E7681';
 }
 
-// ═══════════════════════════════════════════════════════
-// JOB URL EXTRACTION — HELPERS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// JOB URL EXTRACTION â€” HELPERS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function isLoginPage(html, url) {
   const u = (url || '').toLowerCase();
@@ -2762,9 +2762,9 @@ function handleManualData(manualData, url, res) {
   return res.json({ success: true, job });
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // START DASHBOARD
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function findJobById(jobId) {
   const jobs = Array.isArray(allJobs) ? allJobs : [];
@@ -2795,9 +2795,9 @@ function findJobById(jobId) {
   return null;
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SEARCH PROFILES HELPERS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const SEARCH_PROFILES_PATH = path.join(__dirname, '../data/search-profiles.json');
 
@@ -2886,9 +2886,9 @@ function getExperienceLabel(min, max) {
   return 'Leadership';
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SEARCH PROFILES PAGE HTML
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function buildSearchProfilesHtml() {
   const data = loadSearchProfiles();
@@ -2901,10 +2901,10 @@ function buildSearchProfilesHtml() {
   const maxExp = profiles.length ? Math.max(...profiles.map(p => p.experienceMax)) : 0;
 
   const regionMeta = {
-    gcc:     { label: '🌍 GCC',     color: '#484F58', title: '🌍 GCC Profiles' },
-    uk:      { label: '🇬🇧 UK',     color: '#1D6FA4', title: '🇬🇧 UK Profiles' },
-    ireland: { label: '🇮🇪 Ireland', color: '#169B62', title: '🇮🇪 Ireland Profiles' },
-    europe:  { label: '🇪🇺 Europe',  color: '#003399', title: '🇪🇺 Europe Profiles' },
+    gcc:     { label: 'ðŸŒ GCC',     color: '#484F58', title: 'ðŸŒ GCC Profiles' },
+    uk:      { label: 'ðŸ‡¬ðŸ‡§ UK',     color: '#1D6FA4', title: 'ðŸ‡¬ðŸ‡§ UK Profiles' },
+    ireland: { label: 'ðŸ‡®ðŸ‡ª Ireland', color: '#169B62', title: 'ðŸ‡®ðŸ‡ª Ireland Profiles' },
+    europe:  { label: 'ðŸ‡ªðŸ‡º Europe',  color: '#003399', title: 'ðŸ‡ªðŸ‡º Europe Profiles' },
   };
 
   function renderCard(p) {
@@ -2915,8 +2915,8 @@ function buildSearchProfilesHtml() {
     const excPills = excKw.map(k => `<span class="kw-pill kw-exc">${k}</span>`).join('');
     const kwRow = (incKw.length || excKw.length) ? `
       <div class="card-kw-row">
-        ${incKw.length ? `<span class="kw-label">✅ Include:</span> ${incPills}` : ''}
-        ${excKw.length ? `<span class="kw-label" style="margin-left:8px">❌ Exclude:</span> ${excPills}` : ''}
+        ${incKw.length ? `<span class="kw-label">âœ… Include:</span> ${incPills}` : ''}
+        ${excKw.length ? `<span class="kw-label" style="margin-left:8px">âŒ Exclude:</span> ${excPills}` : ''}
       </div>` : '';
     const rm = regionMeta[p.region || 'gcc'] || regionMeta.gcc;
     const regionBadge = `<span style="display:inline-block;background:${rm.color};color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-left:8px">${rm.label}</span>`;
@@ -2925,20 +2925,20 @@ function buildSearchProfilesHtml() {
       <div class="card-top-row">
         <div>
           <span class="card-role-name">${p.role}</span>${regionBadge}
-          <div style="font-size:12px;margin-top:2px;color:${p.candidateId === 'thiagarajan' ? '#3FB950' : '#F0E68C'}">${p.candidateId === 'thiagarajan' ? '🟢 Thiagarajan Shanthakumar' : '🟡 Dheeraj Thiagarajan'}</div>
+          <div style="font-size:12px;margin-top:2px;color:${p.candidateId === 'thiagarajan' ? '#3FB950' : '#F0E68C'}">${p.candidateId === 'thiagarajan' ? 'ðŸŸ¢ Thiagarajan Shanthakumar' : 'ðŸŸ¡ Dheeraj Thiagarajan'}</div>
         </div>
         <div class="card-actions">
           <label class="toggle-switch" title="Toggle active">
             <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleProfile('${p.id}', this.checked)">
             <span class="toggle-slider"></span>
           </label>
-          <button class="btn-edit" onclick="openEditModal('${p.id}')">✏️ Edit</button>
-          <button class="btn-delete" onclick="deleteProfile('${p.id}')">🗑 Delete</button>
+          <button class="btn-edit" onclick="openEditModal('${p.id}')">âœï¸ Edit</button>
+          <button class="btn-delete" onclick="deleteProfile('${p.id}')">ðŸ—‘ Delete</button>
         </div>
       </div>
       <div class="card-details-row">
-        <span class="detail-pill">📅 ${p.experienceMin} - ${p.experienceMax} years exp</span>
-        <span class="detail-pill">📍 ${locStr}</span>
+        <span class="detail-pill">ðŸ“… ${p.experienceMin} - ${p.experienceMax} years exp</span>
+        <span class="detail-pill">ðŸ“ ${locStr}</span>
       </div>
       ${kwRow}
       <div class="card-footer">
@@ -2970,7 +2970,7 @@ function buildSearchProfilesHtml() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Search Profile Manager — GCC Job Agent</title>
+<title>Search Profile Manager â€” GCC Job Agent</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #0D1117; color: #E6EDF3; }
@@ -3144,7 +3144,7 @@ function buildSearchProfilesHtml() {
     <a href="/">Jobs</a>
     <a href="/tracker">Tracker</a>
     <a href="/roles" class="active">Roles</a>
-    <a href="/favorites">⭐ Favorites</a>
+    <a href="/favorites">â­ Favorites</a>
   </div>
   <div class="navbar-right">
     <strong>Search Profile Manager</strong>
@@ -3153,7 +3153,7 @@ function buildSearchProfilesHtml() {
 </div>
 
 <div class="page-header">
-  <div class="page-title">🎯 Search Profile Manager</div>
+  <div class="page-title">ðŸŽ¯ Search Profile Manager</div>
   <div class="page-subtitle">Configure exactly what jobs the agent searches for every morning at 8:10 AM</div>
 </div>
 
@@ -3172,11 +3172,11 @@ function buildSearchProfilesHtml() {
       <span class="summary-val" id="sum-active">${activeProfiles.length}</span>
     </div>
     <div class="summary-row">
-      <span class="summary-key">🟡 Dheeraj active profiles</span>
+      <span class="summary-key">ðŸŸ¡ Dheeraj active profiles</span>
       <span class="summary-val">${dheerajActive.length}</span>
     </div>
     <div class="summary-row">
-      <span class="summary-key">🟢 Thiagarajan active profiles</span>
+      <span class="summary-key">ðŸŸ¢ Thiagarajan active profiles</span>
       <span class="summary-val">${thiagarajanActive.length}</span>
     </div>
     <div class="summary-row">
@@ -3197,7 +3197,7 @@ function buildSearchProfilesHtml() {
     </div>
     <div class="summary-row">
       <span class="summary-key">Estimated jobs per day</span>
-      <span class="summary-val">${activeProfiles.length} profiles × ~50 jobs each = ~${activeProfiles.length * 50} jobs</span>
+      <span class="summary-val">${activeProfiles.length} profiles Ã— ~50 jobs each = ~${activeProfiles.length * 50} jobs</span>
     </div>
   </div>
 
@@ -3206,7 +3206,7 @@ function buildSearchProfilesHtml() {
 <!-- ADD / EDIT MODAL -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
-    <div class="modal-title" id="modal-title">🎯 Add Search Profile</div>
+    <div class="modal-title" id="modal-title">ðŸŽ¯ Add Search Profile</div>
 
     <input type="hidden" id="edit-profile-id" value="">
 
@@ -3215,11 +3215,11 @@ function buildSearchProfilesHtml() {
       <div style="display:flex;gap:20px;margin-top:6px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
           <input type="radio" name="field-candidate" value="dheeraj" checked style="accent-color:#F0E68C">
-          <span style="color:#F0E68C;font-weight:bold">🟡 Dheeraj Thiagarajan</span>
+          <span style="color:#F0E68C;font-weight:bold">ðŸŸ¡ Dheeraj Thiagarajan</span>
         </label>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
           <input type="radio" name="field-candidate" value="thiagarajan" style="accent-color:#3FB950">
-          <span style="color:#3FB950;font-weight:bold">🟢 Thiagarajan Shanthakumar</span>
+          <span style="color:#3FB950;font-weight:bold">ðŸŸ¢ Thiagarajan Shanthakumar</span>
         </label>
       </div>
     </div>
@@ -3227,10 +3227,10 @@ function buildSearchProfilesHtml() {
     <div class="form-group">
       <label class="form-label">Region</label>
       <select id="profile-region" class="form-input" style="background:#161B22;color:#E6EDF3">
-        <option value="gcc">🌍 GCC</option>
-        <option value="uk">🇬🇧 UK</option>
-        <option value="ireland">🇮🇪 Ireland</option>
-        <option value="europe">🇪🇺 Europe</option>
+        <option value="gcc">ðŸŒ GCC</option>
+        <option value="uk">ðŸ‡¬ðŸ‡§ UK</option>
+        <option value="ireland">ðŸ‡®ðŸ‡ª Ireland</option>
+        <option value="europe">ðŸ‡ªðŸ‡º Europe</option>
       </select>
     </div>
 
@@ -3299,7 +3299,7 @@ let incKeywords = [];
 let excKeywords = [];
 
 function openAddModal() {
-  document.getElementById('modal-title').textContent = '🎯 Add Search Profile';
+  document.getElementById('modal-title').textContent = 'ðŸŽ¯ Add Search Profile';
   document.getElementById('edit-profile-id').value = '';
   document.getElementById('field-role').value = '';
   document.getElementById('field-exp-min').value = '2';
@@ -3322,7 +3322,7 @@ function openEditModal(id) {
   fetch('/api/search-profiles').then(r=>r.json()).then(data => {
     const p = (data.profiles || []).find(x => x.id === id);
     if (!p) return;
-    document.getElementById('modal-title').textContent = '✏️ Edit Profile';
+    document.getElementById('modal-title').textContent = 'âœï¸ Edit Profile';
     document.getElementById('edit-profile-id').value = p.id;
     document.getElementById('field-role').value = p.role || '';
     document.getElementById('field-exp-min').value = p.experienceMin || 0;
@@ -3403,7 +3403,7 @@ function renderTags(type) {
   keywords.forEach((kw, i) => {
     const pill = document.createElement('span');
     pill.className = 'kw-pill ' + cls;
-    pill.textContent = kw + ' ×';
+    pill.textContent = kw + ' Ã—';
     pill.style.cursor = 'pointer';
     pill.onclick = () => {
       if (type === 'inc') incKeywords.splice(i, 1); else excKeywords.splice(i, 1);
@@ -3471,23 +3471,25 @@ function startDashboard() {
   app = express();
   app.use(express.json());
 
-  // ── Bind port IMMEDIATELY so Render health check passes ──
+  // â”€â”€ Bind port IMMEDIATELY so Render health check passes â”€â”€
   const PORT = process.env.PORT || 3000;
-  server = app.listen(PORT, () => {
+  app.use('/api/property', require('./propertyIntel'));
+  server = app.listen(PORT,
+app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
   });
 
-  // ── Warm job cache in background after port is bound ──
+  // â”€â”€ Warm job cache in background after port is bound â”€â”€
   setImmediate(() => { loadAllJobs(); });
 
-  // ── Health check — responds instantly before any data loads ──
+  // â”€â”€ Health check â€” responds instantly before any data loads â”€â”€
   app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
 
   // Serve cover letter files
   const coverLetterDir = path.join(__dirname, '../data/cover-letters');
   app.use('/cover-letter', express.static(coverLetterDir));
 
-  // ── GET / ──────────────────────────────────────────
+  // â”€â”€ GET / â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/', async (req, res) => {
     try {
       const jobs = await loadAllJobs();
@@ -3501,22 +3503,22 @@ function startDashboard() {
     }
   });
 
-  // ── GET /tracker ───────────────────────────────────
+  // â”€â”€ GET /tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/tracker', (req, res) => {
     res.send(buildTrackerHtml());
   });
 
-  // ── GET /roles ─────────────────────────────────────
+  // â”€â”€ GET /roles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/roles', (req, res) => {
     res.send(buildSearchProfilesHtml());
   });
 
-  // ── GET /api/search-profiles ───────────────────────
+  // â”€â”€ GET /api/search-profiles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/search-profiles', (req, res) => {
     res.json(loadSearchProfiles());
   });
 
-  // ── POST /api/search-profiles ──────────────────────
+  // â”€â”€ POST /api/search-profiles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/search-profiles', (req, res) => {
     const data = loadSearchProfiles();
     const profile = { ...req.body, id: 'profile_' + Date.now() };
@@ -3525,7 +3527,7 @@ function startDashboard() {
     res.json({ success: true, profile });
   });
 
-  // ── PUT /api/search-profiles/:id ──────────────────
+  // â”€â”€ PUT /api/search-profiles/:id â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.put('/api/search-profiles/:id', (req, res) => {
     const data = loadSearchProfiles();
     const idx = data.profiles.findIndex(p => p.id === req.params.id);
@@ -3535,7 +3537,7 @@ function startDashboard() {
     res.json({ success: true });
   });
 
-  // ── DELETE /api/search-profiles/:id ───────────────
+  // â”€â”€ DELETE /api/search-profiles/:id â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.delete('/api/search-profiles/:id', (req, res) => {
     const data = loadSearchProfiles();
     const before = data.profiles.length;
@@ -3545,7 +3547,7 @@ function startDashboard() {
     res.json({ success: true });
   });
 
-  // ── POST /api/search-profiles/:id/toggle ──────────
+  // â”€â”€ POST /api/search-profiles/:id/toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/search-profiles/:id/toggle', (req, res) => {
     const data = loadSearchProfiles();
     const profile = data.profiles.find(p => p.id === req.params.id);
@@ -3555,7 +3557,7 @@ function startDashboard() {
     res.json({ success: true, active: profile.active });
   });
 
-  // ── GET /api/role-suggestions ──────────────────────
+  // â”€â”€ GET /api/role-suggestions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/role-suggestions', (req, res) => {
     const q = (req.query.q || '').toLowerCase();
     if (!q) return res.json([]);
@@ -3563,7 +3565,7 @@ function startDashboard() {
     res.json(matches);
   });
 
-  // ── GET /api/jobs ──────────────────────────────────
+  // â”€â”€ GET /api/jobs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/jobs', async (req, res) => {
     const loaded = await loadAllJobs();
     let jobs = Array.isArray(loaded) ? loaded : [];
@@ -3575,12 +3577,12 @@ function startDashboard() {
     res.json(jobs);
   });
 
-  // ── GET /api/pipeline ─────────────────────────────
+  // â”€â”€ GET /api/pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/pipeline', (req, res) => {
     res.json(getPipelineSummary());
   });
 
-  // ── GET /api/generate-cover-letter/:jobId ─────────
+  // â”€â”€ GET /api/generate-cover-letter/:jobId â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/generate-cover-letter/:jobId', async (req, res) => {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
@@ -3619,7 +3621,7 @@ function startDashboard() {
     }
   });
 
-  // ── GET /api/autofill/:jobId ───────────────────────
+  // â”€â”€ GET /api/autofill/:jobId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/autofill/:jobId', async (req, res) => {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
@@ -3635,7 +3637,7 @@ function startDashboard() {
     }
   });
 
-  // ── POST /api/update-status ────────────────────────
+  // â”€â”€ POST /api/update-status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/update-status', (req, res) => {
     const { id, status, notes } = req.body;
     if (!id || !status) {
@@ -3648,7 +3650,7 @@ function startDashboard() {
     res.json({ success: true, application });
   });
 
-  // ── POST /api/add-application ──────────────────────
+  // â”€â”€ POST /api/add-application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/add-application', async (req, res) => {
     const job = req.body;
     if (!job || !job.title || !job.company) {
@@ -3670,7 +3672,7 @@ function startDashboard() {
     res.json({ success: true, application });
   });
 
-  // ── POST /api/add-job-from-url ─────────────────────────
+  // â”€â”€ POST /api/add-job-from-url â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/add-job-from-url', async (req, res) => {
     const { url, manualData } = req.body;
     if (!url) return res.json({ success: false, message: 'URL required' });
@@ -3706,7 +3708,7 @@ function startDashboard() {
     });
   });
 
-  // ── POST /api/add-job-browser ──────────────────────────
+  // â”€â”€ POST /api/add-job-browser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/add-job-browser', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.json({ success: false, message: 'URL required' });
@@ -3726,9 +3728,9 @@ function startDashboard() {
           overlay.id = 'gcc-overlay';
           overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#1B2A4A;color:white;padding:14px 20px;z-index:999999;font-family:Arial,sans-serif;font-size:14px;';
           overlay.innerHTML =
-            '<div style="font-weight:bold;color:#F5A623">🤖 GCC Job Agent — Job Extractor</div>' +
+            '<div style="font-weight:bold;color:#F5A623">ðŸ¤– GCC Job Agent â€” Job Extractor</div>' +
             '<div style="color:white">If this page requires login, please sign in now.</div>' +
-            '<div style="color:#3FB950">✅ Job details will be extracted automatically once you reach the job page.</div>' +
+            '<div style="color:#3FB950">âœ… Job details will be extracted automatically once you reach the job page.</div>' +
             '<div style="color:#8B949E;font-size:12px">Do not close this browser. Return to dashboard after you see the job details.</div>';
           document.body.insertBefore(overlay, document.body.firstChild);
         }).catch(() => {});
@@ -3802,7 +3804,7 @@ function startDashboard() {
     })();
   });
 
-  // ── GET /api/browser-status ────────────────────────────
+  // â”€â”€ GET /api/browser-status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/browser-status', (req, res) => {
     if (!browserExtractionResult) return res.json({ status: 'idle' });
     const result = { ...browserExtractionResult };
@@ -3810,7 +3812,7 @@ function startDashboard() {
     res.json(result);
   });
 
-  // ── GET /api/interview-prep/:jobId ──────────────────────
+  // â”€â”€ GET /api/interview-prep/:jobId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/interview-prep/:jobId', async (req, res) => {
     const jobId = decodeURIComponent(req.params.jobId);
 
@@ -3920,7 +3922,7 @@ function startDashboard() {
     }
   });
 
-  // ── DELETE /api/remove-job/:jobId ─────────────────
+  // â”€â”€ DELETE /api/remove-job/:jobId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.delete('/api/remove-job/:jobId', async (req, res) => {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
@@ -4013,17 +4015,17 @@ function startDashboard() {
     }
   });
 
-  // ── GET /favorites ──────────────────────────────────
+  // â”€â”€ GET /favorites â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/favorites', (req, res) => {
     res.send(buildFavoritesHtml());
   });
 
-  // ── GET /api/favorites ──────────────────────────────
+  // â”€â”€ GET /api/favorites â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.get('/api/favorites', (req, res) => {
     res.json(loadFavorites());
   });
 
-  // ── POST /api/favorites ─────────────────────────────
+  // â”€â”€ POST /api/favorites â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.post('/api/favorites', async (req, res) => {
     try {
       const { jobId } = req.body;
@@ -4042,7 +4044,7 @@ function startDashboard() {
     }
   });
 
-  // ── DELETE /api/favorites/:jobId ────────────────────
+  // â”€â”€ DELETE /api/favorites/:jobId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.delete('/api/favorites/:jobId', (req, res) => {
     try {
       const jobId = decodeURIComponent(req.params.jobId);
@@ -4054,7 +4056,7 @@ function startDashboard() {
     }
   });
 
-  // ── DELETE /api/tracker/:applicationId ─────────────
+  // â”€â”€ DELETE /api/tracker/:applicationId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   app.delete('/api/tracker/:applicationId', async (req, res) => {
     try {
       const applicationId = decodeURIComponent(req.params.applicationId);
@@ -4083,9 +4085,9 @@ function startDashboard() {
   return app;
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // STOP DASHBOARD
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function stopDashboard() {
   if (server) {
@@ -4096,16 +4098,14 @@ function stopDashboard() {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EXPORTS
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 
 startDashboard();
 
 app.get('/calculator', (req, res) => res.sendFile(require('path').join(__dirname, '..', 'public', 'calculator.html')));
-
-app.use('/api/property', require('./propertyIntel'));
 
 app.use(express.static('public'));
