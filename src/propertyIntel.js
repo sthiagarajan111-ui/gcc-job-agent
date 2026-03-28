@@ -184,5 +184,3 @@ router.post('/refresh', async (req, res) => {
 });
 
 module.exports = router;
-
-router.get('/test', async (req, res) => { if (!RAPIDAPI_KEY) return res.status(503).json({ error: 'no key' }); try { const r = await rapidGet('/locations/list?query=jumeirah+village+circle&hitsPerPage=5&lang=en'); res.json(r); } catch(e) { res.status(500).json({ error: e.message }); } });
