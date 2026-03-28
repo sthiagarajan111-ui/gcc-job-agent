@@ -332,16 +332,20 @@ function App() {
   const [mgmtPct, setMgmtPct] = useState(saved?.mgmtPct ?? 8);
   const [capRate, setCapRate] = useState(saved?.capRate ?? 5);
   const [sellingCost, setSellingCost] = useState(saved?.sellingCost ?? 2);
+  const [dldPct, setDldPct] = useState(saved?.dldPct ?? 4);
+  const [servicePct, setServicePct] = useState(saved?.servicePct ?? 2);
+  const [bankProcPct, setBankProcPct] = useState(saved?.bankProcPct ?? 1);
+  const [otherChgPct, setOtherChgPct] = useState(saved?.otherChgPct ?? 0.5);
   const [tab, setTab] = useState('monthly');
   const [shown, setShown] = useState(false);
   const [saveStatus, setSaveStatus] = useState(saved ? 'loaded' : 'none');
 
   // Auto-save whenever any input changes
   useEffect(() => {
-    const data = { cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost };
+    const data = { cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost,dldPct,servicePct,bankProcPct,otherChgPct };
     save(data);
     if (saveStatus === 'loaded') setSaveStatus('saved');
-  }, [cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost]);
+  }, [cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost,dldPct,servicePct,bankProcPct,otherChgPct]);
 
   const handleClear = () => {
     clearSaved();
@@ -358,7 +362,11 @@ function App() {
 
   const calc = useMemo(()=>{
     const P=+price, dP=+downP, prP=+preP, poP=+postP;
-    const downAmt=P*dP/100, dld=P*0.04, preTotal=P*prP/100, postTotal=P*poP/100;
+    const downAmt=P*dP/100, preTotal=P*prP/100, postTotal=P*poP/100;
+    const dldAmt=P*+dldPct/100, serviceAmt=P*+servicePct/100;
+    const bankProcAmt=postTotal*+bankProcPct/100, otherAmt=P*+otherChgPct/100;
+    const totalInitCharges=dldAmt+serviceAmt+bankProcAmt+otherAmt;
+    const dld=dldAmt; // keep alias for compat
     const cM=+cmo, r=+bankRate/100/12, n=+mortYrs*12;
     const emi = r===0 ? postTotal/n : postTotal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
     const [yr,mo]=start.split('-').map(Number);
@@ -367,7 +375,10 @@ function App() {
     let rows=[];
     // Day 1
     rows.push({month:0,date:dt(0),phase:'Initial',type:'Down Payment',amount:downAmt,inc:false});
-    rows.push({month:0,date:dt(0),phase:'Initial',type:'DLD Tax (4%)',amount:dld,inc:false});
+    rows.push({month:0,date:dt(0),phase:'Initial',type:'DLD Charges ('+dldPct+'%)',amount:dldAmt,inc:false});
+    rows.push({month:0,date:dt(0),phase:'Initial',type:'Service Fee ('+servicePct+'%)',amount:serviceAmt,inc:false});
+    rows.push({month:0,date:dt(0),phase:'Initial',type:'Bank Processing Fee ('+bankProcPct+'%)',amount:bankProcAmt,inc:false});
+    if(otherAmt>0) rows.push({month:0,date:dt(0),phase:'Initial',type:'Other Charges ('+otherChgPct+'%)',amount:otherAmt,inc:false});
 
     // Pre-handover
     if(preMode==='equal'){
@@ -508,8 +519,8 @@ function App() {
     const propValAtEnd = P * Math.pow(1 + capRateMonthly, totalMonths);
     const totalAppreciation = propValAtEnd - P;
 
-    return {downAmt,dld,preTotal,postTotal,emi,totInt,totRent,totMaint,totMgmt,totExpenses:totMaint+totMgmt,totOut,initOut:downAmt+dld,rows,mlist,cM,n,P,r,be,liqRows,grossYield,netYield,propValAtEnd,totalAppreciation};
-  },[price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost]);
+    return {downAmt,dld,dldAmt,serviceAmt,bankProcAmt,otherAmt,totalInitCharges,preTotal,postTotal,emi,totInt,totRent,totMaint,totMgmt,totExpenses:totMaint+totMgmt,totOut,initOut:downAmt+totalInitCharges,rows,mlist,cM,n,P,r,be,liqRows,grossYield,netYield,propValAtEnd,totalAppreciation};
+  },[price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost,dldPct,servicePct,bankProcPct,otherChgPct]);
 
   const go = () => { if(!pctOk) return; setShown(true); setTab('monthly'); };
 
@@ -552,7 +563,33 @@ function App() {
             <input type="month" value={start} onChange={e=>setStart(e.target.value)} />
           </div>
         </div>
-        <div className="info-box">ℹ️ DLD Tax (4%) — {cur} {N(+price*0.04)} — payable at booking alongside the down payment.</div>
+        <div style={{marginBottom:'10px'}}>
+          <div style={{fontSize:'11px',fontWeight:'700',color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'8px'}}>One-time Initial Charges (payable at booking)</div>
+          <div className="grid-4">
+            {[
+              {lbl:'DLD Charges',v:dldPct,set:setDldPct,basis:'of property',hint:'Government transfer tax'},
+              {lbl:'Service Fee',v:servicePct,set:setServicePct,basis:'of property',hint:'Developer admin fee'},
+              {lbl:'Bank Processing Fee',v:bankProcPct,set:setBankProcPct,basis:'of loan',hint:'One-time bank fee on loan amount'},
+              {lbl:'Other Charges',v:otherChgPct,set:setOtherChgPct,basis:'of property',hint:'Registration, misc'},
+            ].map(ch=>(
+              <div key={ch.lbl} style={{background:'#FFFDF5',border:'1.5px solid #E8CF7A',borderRadius:'8px',padding:'10px 12px'}}>
+                <div style={{fontSize:'10px',fontWeight:'700',color:'#7A5A00',textTransform:'uppercase',letterSpacing:'0.4px',marginBottom:'3px'}}>{ch.lbl}</div>
+                <div style={{fontSize:'9px',color:'var(--text-muted)',marginBottom:'6px'}}>{ch.hint}</div>
+                <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'4px'}}>
+                  <input type="number" value={ch.v} onChange={e=>ch.set(e.target.value)} min="0" max="20" step="0.25"
+                    style={{width:'52px',padding:'4px 6px',border:'1px solid #E8CF7A',borderRadius:'5px',fontSize:'13px',fontWeight:'700',color:'#7A5A00',background:'white',outline:'none',fontFamily:'DM Sans'}} />
+                  <span style={{fontSize:'11px',fontWeight:'600',color:'#7A5A00'}}>%</span>
+                </div>
+                <div style={{fontSize:'11px',fontWeight:'600',color:'var(--gold-dark)'}}>{cur} {N(ch.lbl==='Bank Processing Fee' ? +price*+postP/100*+ch.v/100 : +price*+ch.v/100)}</div>
+                <div style={{fontSize:'9px',color:'var(--text-muted)',marginTop:'1px'}}>{ch.basis}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'#FFF8E6',border:'1px solid #E8CF7A',borderRadius:'7px',padding:'8px 12px',marginTop:'8px'}}>
+            <span style={{fontSize:'11px',fontWeight:'700',color:'#7A5A00'}}>Total One-time Charges</span>
+            <span style={{fontSize:'14px',fontWeight:'700',color:'var(--gold-dark)'}}>{cur} {N(+price*(+dldPct + +servicePct + +otherChgPct)/100 + +price*+postP/100*+bankProcPct/100)}</span>
+          </div>
+        </div>
         <div style={{marginBottom:'8px',fontSize:'13px',fontWeight:'600',color:'var(--text-secondary)'}}>Payment Split (must total 100%)</div>
         <div className="pct-row">
           {[{lbl:'Down Payment',v:downP,set:setDownP,active:true},{lbl:'Pre-Handover',v:preP,set:setPreP,active:false},{lbl:'Post-Handover',v:postP,set:setPostP,active:false}].map(item=>(
@@ -772,7 +809,7 @@ function App() {
             <div className="metric-card gold">
               <div className="lbl">Initial Outlay (Day 1)</div>
               <div className="val neg">- {cur} {K(calc.initOut)}</div>
-              <div className="sub">Down payment + 4% DLD Tax</div>
+              <div className="sub">Down payment + DLD {dldPct}% + Service {servicePct}% + Bank {bankProcPct}% + Other {otherChgPct}%</div>
             </div>
             <div className="metric-card">
               <div className="lbl">Pre-Handover Total</div>
@@ -847,7 +884,10 @@ function App() {
           </div>
           {[
             {lbl:'Down Payment',amt:calc.downAmt,color:'#C9A84C',inc:false},
-            {lbl:'DLD Tax (4%)',amt:calc.dld,color:'#E07B39',inc:false},
+            {lbl:'DLD Charges ('+dldPct+'%)',amt:calc.dldAmt,color:'#E07B39',inc:false},
+            {lbl:'Service Fee ('+servicePct+'%)',amt:calc.serviceAmt,color:'#D4AC0D',inc:false},
+            {lbl:'Bank Processing Fee',amt:calc.bankProcAmt,color:'#A04000',inc:false},
+            {lbl:'Other Charges',amt:calc.otherAmt,color:'#784212',inc:false},
             {lbl:'Pre-Handover Payments',amt:calc.preTotal,color:'#2A7F8A',inc:false},
             {lbl:'Bank EMI — Principal',amt:calc.postTotal,color:'#3AABB8',inc:false},
             {lbl:'Bank Interest',amt:calc.totInt,color:'#888799',inc:false},
