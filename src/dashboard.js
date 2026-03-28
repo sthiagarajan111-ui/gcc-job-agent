@@ -4107,3 +4107,5 @@ startDashboard();
 app.get('/calculator', (req, res) => res.sendFile(require('path').join(__dirname, '..', 'public', 'calculator.html')));
 
 app.use('/api/property', require('./propertyIntel'));
+
+app.use(express.static('public'));
