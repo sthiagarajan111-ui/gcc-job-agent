@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dubai Property Investment Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-lt:#F0D89A;--gold-dk:#8A6A1F;
+  --navy:#0D1B2A;--cream:#F5F3EE;
+  --t1:#1A2535;--t2:#4A6080;--t3:#8099B8;
+  --bd:#DDE6F0;--bd2:#EEF3FA;--surf:#FFF;--surf2:#F7FAFD;
+  --green:#1A7A5E;--gbg:#EBF7F3;--gbd:#B2DDD4;
+  --red:#C0392B;--rbg:#FEF5F4;--rbd:#F5B7B1;
+  --amber:#B7770D;--abg:#FFF8E6;--abd:#E8CF7A;
+  --purple:#5B2FBE;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--t1);min-height:100vh;font-size:13px}
+/* Header */
+.hdr{background:var(--navy);padding:12px 26px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:200}
+.hico{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.hdr h1{font-family:'Playfair Display',serif;font-size:17px;color:#FAF7F0;font-weight:700}
+.hdr p{font-size:10px;color:var(--t3);margin-top:1px}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px}
+.p-green{background:rgba(26,122,94,.3);color:#7FDFBE;border:1px solid rgba(26,122,94,.4)}
+.p-amber{background:rgba(201,168,76,.3);color:#F0D89A;border:1px solid rgba(201,168,76,.4)}
+.p-red{background:rgba(192,57,43,.3);color:#F5B7B1;border:1px solid rgba(192,57,43,.4)}
+.btn{padding:7px 16px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:#B8932F}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn-outline{background:transparent;border:1.5px solid var(--bd);color:var(--t2)}
+.btn-outline:hover{border-color:var(--t2)}
+/* Main */
+.main{max-width:1440px;margin:0 auto;padding:16px 20px}
+/* KPIs */
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:13px}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:9px;padding:10px 13px;border-left:4px solid var(--bd);box-shadow:0 1px 3px rgba(13,27,42,.04)}
+.kpi.kg{border-left-color:var(--green)}.kpi.ka{border-left-color:var(--gold)}.kpi.kp{border-left-color:var(--purple)}.kpi.kt{border-left-color:#2A7F8A}.kpi.kr{border-left-color:var(--red)}.kpi.kb{border-left-color:#1A56DB}
+.kl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:2px}
+.kv{font-size:19px;font-weight:700;color:var(--navy)}
+.ks{font-size:10px;color:var(--t3);margin-top:1px}
+.kpi.kg .kv{color:var(--green)}.kpi.ka .kv{color:var(--gold-dk)}.kpi.kp .kv{color:var(--purple)}
+/* Filter bar */
+.fbar{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;box-shadow:0 1px 3px rgba(13,27,42,.04)}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.fg select,.fg input{padding:7px 10px;border:1.5px solid var(--bd);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t1);background:var(--surf2);outline:none;appearance:none;cursor:pointer;min-width:128px}
+.fg select:focus,.fg input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.12)}
+.fg input{min-width:85px;max-width:95px}
+.faction{margin-left:auto;display:flex;gap:8px;align-items:flex-end}
+/* Sort */
+.srow{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.srow label{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
+.sbtn{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:#fff;color:var(--t2);transition:all .12s;white-space:nowrap}
+.sbtn.act{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+.rcount{font-size:11px;color:var(--t3);margin-left:auto}
+/* Table */
+.twrap{overflow-x:auto;overflow-y:auto;max-height:600px;border-radius:10px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse;min-width:1060px}
+thead{background:var(--navy)}
+thead th{position:sticky;top:0;z-index:10;background:var(--navy);padding:8px 9px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gold-lt);white-space:nowrap;text-align:right;box-shadow:inset 0 -2px 0 var(--gold);cursor:pointer;user-select:none}
+thead th:hover{background:#162840}
+thead th.tl{text-align:left}
+thead th.sorted{color:var(--gold)}
+tbody tr{border-bottom:1px solid var(--bd2);transition:background .1s}
+tbody tr:hover{background:#F0F6FF}
+tbody tr.top-row{background:linear-gradient(90deg,rgba(26,122,94,.04),transparent)}
+tbody td{padding:7px 9px;font-variant-numeric:tabular-nums;font-size:12px;text-align:right}
+tbody td.tl{text-align:left}
+.acell{font-weight:700;color:var(--navy);font-size:12px}
+.ctag{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle}
+.ct-dxb{background:#E8F0FE;color:#1A56DB}
+.ct-shj{background:#FEF3C7;color:#B45309}
+.rbdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#E8EFF8;color:#2C4A7C}
+.y-hi{color:var(--green);font-weight:700}
+.y-md{color:var(--amber);font-weight:700}
+.y-lo{color:var(--red);font-weight:600}
+.vs-g{color:var(--green);font-weight:700}
+.vs-f{color:var(--amber);font-weight:600}
+.vs-o{color:var(--red);font-weight:600}
+.sbar-wrap{display:flex;align-items:center;gap:5px}
+.sbar{height:7px;border-radius:4px}
+.snum{font-size:11px;font-weight:700;color:var(--navy);min-width:24px}
+.cnt{font-size:10px;color:var(--t3)}
+.dash{color:var(--t3)}
+/* Info bar */
+.ibar{background:linear-gradient(135deg,#FFFDF0,#F5FBFC);border:1px solid var(--bd);border-radius:8px;padding:9px 14px;margin-bottom:12px;font-size:11.5px;color:var(--t2);line-height:1.55}
+.ibar strong{color:var(--navy)}
+/* States */
+.state{text-align:center;padding:50px 20px}
+.sico{font-size:40px;margin-bottom:12px}
+.state h3{font-family:'Playfair Display',serif;font-size:19px;color:var(--navy);margin-bottom:10px}
+.state p{font-size:13px;color:var(--t2);max-width:500px;margin:0 auto 18px;line-height:1.65}
+.spin{display:inline-block;width:30px;height:30px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.setup-card{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:22px;max-width:560px;margin:0 auto;text-align:left;box-shadow:0 2px 8px rgba(13,27,42,.06)}
+.setup-card h4{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.step{display:flex;gap:12px;margin-bottom:13px;align-items:flex-start}
+.stepn{width:22px;height:22px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.stept{font-size:12px;color:var(--t1);line-height:1.6}
+.stept a{color:#2A7F8A;text-decoration:none;font-weight:600}
+.stept code{background:#EEF3FA;padding:1px 6px;border-radius:4px;font-size:11px;color:var(--navy);font-family:monospace}
+@media(max-width:900px){
+  .kgrid{grid-template-columns:repeat(3,1fr)}
+  .fbar{flex-direction:column}
+  .fg select,.fg input{min-width:100%}
+  .main{padding:12px}
+}
+@media(max-width:480px){
+  .kgrid{grid-template-columns:1fr 1fr}
+  .hdr h1{font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hico">🏙</div>
+  <div>
+    <h1>Dubai Property Investment Intelligence</h1>
+    <p>DLD official data via Bayut API · Price/sqft · Rent/sqft · Gross yield · ROI score · 15 areas</p>
+  </div>
+  <div class="hright">
+    <span id="data-pill" style="display:none"></span>
+    <span id="updated-at" style="font-size:10px;color:var(--t3)"></span>
+    <button class="btn btn-gold" id="btn-refresh" onclick="refreshData()" disabled>⟳ Refresh</button>
+  </div>
+</div>
+<div class="main">
+
+  <!-- Loading state -->
+  <div class="state" id="st-loading" style="display:none">
+    <div class="spin"></div>
+    <h3>Fetching market data...</h3>
+    <p>Pulling listings and transactions from Bayut/DLD for all 15 areas. This takes about 30–60 seconds on first load.</p>
+  </div>
+
+  <!-- Setup state -->
+  <div class="state" id="st-setup">
+    <div class="sico">🔑</div>
+    <h3>One-time Setup Required</h3>
+    <p>This dashboard needs a free RapidAPI key to pull live Bayut/DLD property data. Register takes 5 minutes, no credit card needed.</p>
+    <div class="setup-card">
+      <h4>Setup steps</h4>
+      <div class="step"><div class="stepn">1</div><div class="stept">Go to <a href="https://rapidapi.com" target="_blank">rapidapi.com</a> → Sign Up free (no credit card)</div></div>
+      <div class="step"><div class="stepn">2</div><div class="stept">Search <strong>"Bayut"</strong> → select <strong>"Bayut API"</strong> by bayutapi.com → click <strong>Subscribe to Test</strong> (free — 750 calls/month)</div></div>
+      <div class="step"><div class="stepn">3</div><div class="stept">Copy your <strong>X-RapidAPI-Key</strong> from the dashboard</div></div>
+      <div class="step"><div class="stepn">4</div><div class="stept">Go to <a href="https://dashboard.render.com" target="_blank">Render dashboard</a> → gcc-job-agent → <strong>Environment</strong> → Add:<br/><code>RAPIDAPI_KEY = your-key-here</code> → Save Changes</div></div>
+      <div class="step"><div class="stepn">5</div><div class="stept">Render will auto-redeploy. Come back here and click <strong>⟳ Refresh</strong> in the top right. Data loads in ~60 seconds and caches for 12 hours.</div></div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div class="state" id="st-error" style="display:none">
+    <div class="sico">⚠️</div>
+    <h3>Could not load data</h3>
+    <p id="err-msg"></p>
+    <button class="btn btn-gold" onclick="loadData()">Try Again</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" style="display:none">
+    <div class="kgrid" id="kpis"></div>
+    <div class="ibar" id="ibar"></div>
+    <div class="fbar">
+      <div class="fg"><label>City</label>
+        <select id="f-city" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option value="Dubai">Dubai</option>
+          <option value="Sharjah">Sharjah</option>
+        </select>
+      </div>
+      <div class="fg"><label>Area</label>
+        <select id="f-area" onchange="applyFilters()">
+          <option value="">All Areas</option>
+        </select>
+      </div>
+      <div class="fg"><label>Bedrooms</label>
+        <select id="f-rooms" onchange="applyFilters()">
+          <option value="">All Types</option>
+          <option value="Studio">Studio</option>
+          <option value="1 BR">1 Bedroom</option>
+          <option value="2 BR">2 Bedroom</option>
+          <option value="3 BR">3 Bedroom</option>
+        </select>
+      </div>
+      <div class="fg"><label>Min Price (AED)</label>
+        <input type="number" id="f-minp" placeholder="e.g. 300000" onchange="applyFilters()" step="50000"/>
+      </div>
+      <div class="fg"><label>Max Price (AED)</label>
+        <input type="number" id="f-maxp" placeholder="e.g. 1000000" onchange="applyFilters()" step="50000"/>
+      </div>
+      <div class="fg"><label>Min Gross Yield %</label>
+        <input type="number" id="f-yield" placeholder="e.g. 6" onchange="applyFilters()" step="0.5" style="max-width:80px"/>
+      </div>
+      <div class="faction">
+        <button class="btn btn-outline btn-sm" onclick="resetFilters()">✕ Reset</button>
+      </div>
+    </div>
+    <div class="srow">
+      <label>Sort by:</label>
+      <div id="sort-btns"></div>
+      <span class="rcount" id="rcount"></span>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="tl" onclick="sortBy('area')">Area <span id="s-area"></span></th>
+            <th class="tl" onclick="sortBy('rooms')">Type <span id="s-rooms"></span></th>
+            <th onclick="sortBy('medSalePrice')">Median Price <span id="s-medSalePrice"></span></th>
+            <th onclick="sortBy('medSalePsf')">Price/sqft <span id="s-medSalePsf"></span></th>
+            <th onclick="sortBy('medTxPsf')">DLD Tx/sqft <span id="s-medTxPsf"></span></th>
+            <th onclick="sortBy('valueSignal')">Value Signal <span id="s-valueSignal"></span></th>
+            <th onclick="sortBy('medRentAnnual')">Median Rent/yr <span id="s-medRentAnnual"></span></th>
+            <th onclick="sortBy('medRentPsf')">Rent/sqft/yr <span id="s-medRentPsf"></span></th>
+            <th onclick="sortBy('medSaleArea')">Median Size <span id="s-medSaleArea"></span></th>
+            <th onclick="sortBy('grossYield')">Gross Yield <span id="s-grossYield"></span></th>
+            <th onclick="sortBy('netYield')">Net Yield <span id="s-netYield"></span></th>
+            <th onclick="sortBy('paybackYrs')">Payback <span id="s-paybackYrs"></span></th>
+            <th onclick="sortBy('roiScore')">ROI Score <span id="s-roiScore"></span></th>
+            <th onclick="sortBy('saleCount')">Listings <span id="s-saleCount"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:10.5px;color:var(--t3);margin-top:10px;line-height:1.6">
+      ⓘ <strong>Price/sqft & Rent/sqft:</strong> median of live Bayut listings. &nbsp;
+      <strong>DLD Tx/sqft:</strong> median of actual recorded DLD transactions. &nbsp;
+      <strong>Value Signal:</strong> negative = listing below DLD transaction average = potential undervalue. &nbsp;
+      <strong>Net Yield:</strong> gross yield × 0.8 (approx 20% deduction for service charge, maintenance, mgmt, vacancy). &nbsp;
+      <strong>ROI Score /10:</strong> composite of yield + value signal.
+    </div>
+  </div>
+</div>
+
+<script>
+let allData = [], sortKey = 'grossYield', sortDir = -1;
+
+const SORT_BTNS = [
+  { key:'grossYield',  lbl:'Gross Yield' },
+  { key:'roiScore',    lbl:'ROI Score'   },
+  { key:'medSalePsf',  lbl:'Price/sqft'  },
+  { key:'medRentAnnual',lbl:'Annual Rent'},
+  { key:'valueSignal', lbl:'Best Value'  },
+  { key:'paybackYrs',  lbl:'Payback'     },
+];
+
+const fmt = n => n != null ? new Intl.NumberFormat('en-AE',{maximumFractionDigits:0}).format(n) : '—';
+const fmt1 = n => n != null ? n.toFixed(1) : '—';
+
+function yClass(y) {
+  if (!y) return 'dash';
+  if (y >= 7)  return 'y-hi';
+  if (y >= 5)  return 'y-md';
+  return 'y-lo';
+}
+function vsClass(vs) {
+  if (vs == null) return 'dash';
+  if (vs <= -5)  return 'vs-g';
+  if (vs <= 5)   return 'vs-f';
+  return 'vs-o';
+}
+function vsLabel(vs) {
+  if (vs == null) return '—';
+  const sign = vs > 0 ? '+' : '';
+  const label = vs <= -5 ? ' ✓ Undervalued' : vs <= 5 ? ' ~ Fair' : ' ↑ Premium';
+  return `${sign}${fmt1(vs)}%${label}`;
+}
+function scoreBar(score) {
+  if (score == null) return '—';
+  const w = Math.round(score / 10 * 80);
+  const col = score >= 7 ? '#1A7A5E' : score >= 5 ? '#C9A84C' : '#C0392B';
+  return `<div class="sbar-wrap"><div class="sbar" style="width:${w}px;background:${col}"></div><span class="snum">${fmt1(score)}</span></div>`;
+}
+
+function renderKPIs(data) {
+  const yields = data.map(r=>r.grossYield).filter(Boolean);
+  const bestY  = yields.length ? Math.max(...yields).toFixed(1)+'%' : '—';
+  const avgY   = yields.length ? (yields.reduce((a,b)=>a+b,0)/yields.length).toFixed(1)+'%' : '—';
+  const cheapest = data.filter(r=>r.minPrice).sort((a,b)=>a.minPrice-b.minPrice)[0];
+  const bestRoi = data.filter(r=>r.roiScore).sort((a,b)=>b.roiScore-a.roiScore)[0];
+  const underval = data.filter(r=>r.valueSignal!=null&&r.valueSignal<-5).length;
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi kg"><div class="kl">Best Gross Yield</div><div class="kv">${bestY}</div><div class="ks">across all areas & types</div></div>
+    <div class="kpi ka"><div class="kl">Avg Gross Yield</div><div class="kv">${avgY}</div><div class="ks">${data.length} area-type combos</div></div>
+    <div class="kpi kp"><div class="kl">Best ROI Score</div><div class="kv">${bestRoi?fmt1(bestRoi.roiScore)+'/10':'—'}</div><div class="ks">${bestRoi?bestRoi.area+' '+bestRoi.rooms:''}</div></div>
+    <div class="kpi kt"><div class="kl">Undervalued Picks</div><div class="kv">${underval}</div><div class="ks">listing below DLD tx price</div></div>
+    <div class="kpi kb"><div class="kl">Entry From</div><div class="kv">${cheapest?'AED '+fmt(cheapest.minPrice):'—'}</div><div class="ks">${cheapest?cheapest.area+' '+cheapest.rooms:''}</div></div>
+    <div class="kpi kr"><div class="kl">Areas Tracked</div><div class="kv">${[...new Set(data.map(r=>r.area))].length}</div><div class="ks">Dubai + Sharjah</div></div>
+  `;
+}
+
+function renderSortBtns() {
+  document.getElementById('sort-btns').innerHTML = SORT_BTNS.map(b =>
+    `<button class="sbtn${sortKey===b.key?' act':''}" onclick="sortBy('${b.key}')">${b.lbl}</button>`
+  ).join('');
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = key === 'paybackYrs' || key === 'medSalePsf' || key === 'valueSignal' ? 1 : -1; }
+  renderSortBtns();
+  renderTable(filteredData());
+}
+
+function filteredData() {
+  const city  = document.getElementById('f-city')?.value  || '';
+  const area  = document.getElementById('f-area')?.value  || '';
+  const rooms = document.getElementById('f-rooms')?.value || '';
+  const minp  = parseFloat(document.getElementById('f-minp')?.value)  || 0;
+  const maxp  = parseFloat(document.getElementById('f-maxp')?.value)  || Infinity;
+  const miny  = parseFloat(document.getElementById('f-yield')?.value) || 0;
+  return allData.filter(r =>
+    (!city  || r.city  === city)  &&
+    (!area  || r.area  === area)  &&
+    (!rooms || r.rooms === rooms) &&
+    (!r.medSalePrice || (r.medSalePrice >= minp && r.medSalePrice <= maxp)) &&
+    (!miny  || (r.grossYield && r.grossYield >= miny))
+  ).sort((a,b) => {
+    const av = a[sortKey] ?? (sortDir > 0 ? Infinity : -Infinity);
+    const bv = b[sortKey] ?? (sortDir > 0 ? Infinity : -Infinity);
+    return (av - bv) * sortDir;
+  });
+}
+
+function applyFilters() { renderTable(filteredData()); }
+
+function resetFilters() {
+  ['f-city','f-area','f-rooms'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['f-minp','f-maxp','f-yield'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  applyFilters();
+}
+
+function renderTable(rows) {
+  document.getElementById('rcount').textContent = rows.length + ' results';
+  document.getElementById('tbody').innerHTML = rows.map((r,i) => `
+    <tr class="${i<3?'top-row':''}">
+      <td class="tl acell">${r.area}<span class="ctag ${r.city==='Sharjah'?'ct-shj':'ct-dxb'}">${r.city}</span></td>
+      <td class="tl"><span class="rbdg">${r.rooms}</span></td>
+      <td>AED ${fmt(r.medSalePrice)}</td>
+      <td>${r.medSalePsf ? 'AED '+fmt(r.medSalePsf) : '<span class="dash">—</span>'}</td>
+      <td>${r.medTxPsf  ? 'AED '+fmt(r.medTxPsf)   : '<span class="dash">—</span>'}</td>
+      <td class="${vsClass(r.valueSignal)}">${vsLabel(r.valueSignal)}</td>
+      <td>${r.medRentAnnual ? 'AED '+fmt(r.medRentAnnual) : '<span class="dash">—</span>'}</td>
+      <td>${r.medRentPsf ? fmt1(r.medRentPsf) : '<span class="dash">—</span>'}</td>
+      <td>${r.medSaleArea ? fmt(r.medSaleArea)+' sqft' : '<span class="dash">—</span>'}</td>
+      <td><span class="${yClass(r.grossYield)}">${r.grossYield ? r.grossYield+'%' : '—'}</span></td>
+      <td><span class="${yClass(r.netYield)}">${r.netYield ? r.netYield+'%' : '—'}</span></td>
+      <td>${r.paybackYrs ? r.paybackYrs+' yrs' : '<span class="dash">—</span>'}</td>
+      <td>${scoreBar(r.roiScore)}</td>
+      <td class="cnt">${r.saleCount}s / ${r.rentCount}r</td>
+    </tr>
+  `).join('');
+}
+
+function populateAreaFilter(data) {
+  const areas = [...new Set(data.map(r=>r.area))].sort();
+  const sel = document.getElementById('f-area');
+  sel.innerHTML = '<option value="">All Areas</option>' + areas.map(a=>`<option value="${a}">${a}</option>`).join('');
+}
+
+function setDefaultFilters() {
+  // Pre-select user's target areas & budget
+  document.getElementById('f-maxp').value = '1000000';
+}
+
+async function loadData() {
+  show('st-loading');
+  try {
+    const res  = await fetch('/api/property/data');
+    const json = await res.json();
+    if (!res.ok || json.error) {
+      if (json.error && json.error.includes('RAPIDAPI_KEY')) { show('st-setup'); return; }
+      document.getElementById('err-msg').textContent = json.error || 'Unknown error';
+      show('st-error'); return;
+    }
+    allData = json.data || [];
+    // Set pill
+    const pill = document.getElementById('data-pill');
+    pill.style.display = '';
+    pill.className = 'pill ' + (json.source==='cache' ? 'p-amber' : 'p-green');
+    pill.textContent = json.source === 'cache' ? '📦 Cached' : '✓ Live';
+    if (json.updatedAt) {
+      document.getElementById('updated-at').textContent = 'Updated: ' + new Date(json.updatedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    }
+    document.getElementById('btn-refresh').disabled = false;
+    populateAreaFilter(allData);
+    setDefaultFilters();
+    renderKPIs(allData);
+    renderSortBtns();
+    const filtered = filteredData();
+    renderTable(filtered);
+    // Info bar
+    const topPick = filtered[0];
+    document.getElementById('ibar').innerHTML = topPick
+      ? `<strong>Top pick right now:</strong> ${topPick.area} · ${topPick.rooms} · Gross yield <strong>${topPick.grossYield}%</strong> · Median price <strong>AED ${fmt(topPick.medSalePrice)}</strong> · Price/sqft <strong>AED ${fmt(topPick.medSalePsf)}</strong> · ROI Score <strong>${fmt1(topPick.roiScore)}/10</strong> &nbsp;|&nbsp; Data from Bayut/DLD — ${allData.length} area-bedroom combinations tracked.`
+      : 'Data loaded. Use filters above to narrow your investment search.';
+    show('dashboard');
+  } catch(e) {
+    document.getElementById('err-msg').textContent = e.message;
+    show('st-error');
+  }
+}
+
+async function refreshData() {
+  const btn = document.getElementById('btn-refresh');
+  btn.disabled = true; btn.textContent = '⟳ Refreshing...';
+  try {
+    const res  = await fetch('/api/property/refresh', { method:'POST' });
+    const json = await res.json();
+    if (!res.ok) { alert('Error: ' + (json.error||'unknown')); }
+    else { await loadData(); }
+  } catch(e) { alert('Error: '+e.message); }
+  btn.disabled = false; btn.textContent = '⟳ Refresh';
+}
+
+function show(id) {
+  ['st-loading','st-setup','st-error','dashboard'].forEach(s => {
+    document.getElementById(s).style.display = s===id ? '' : 'none';
+  });
+}
+
+// Auto-load on page open
+loadData();
+</script>
+</body>
+</html>

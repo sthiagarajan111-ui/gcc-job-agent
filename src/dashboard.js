@@ -4105,3 +4105,5 @@ module.exports = { startDashboard, stopDashboard, loadTodaysJobs, loadAllJobs };
 startDashboard();
 
 app.get('/calculator', (req, res) => res.sendFile(require('path').join(__dirname, '..', 'public', 'calculator.html')));
+
+app.use('/api/property', require('./propertyIntel'));
