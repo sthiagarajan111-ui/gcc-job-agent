@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Property EMI Calculator</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C; --gold-light: #F0D89A; --gold-dark: #8A6A1F;
+    --navy: #0D1B2A; --teal: #2A7F8A;
+    --cream: #F5F3EE; --text-primary: #1A2535; --text-secondary: #4A6080;
+    --text-muted: #8099B8; --border: #DDE6F0; --border-light: #EBF1F8;
+    --surface: #FFFFFF; --surface-alt: #F7FAFD;
+    --success: #1A7A5E; --success-bg: #EBF7F3; --success-border: #B2DDD4;
+    --danger: #C0392B;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-primary); min-height: 100vh; font-size: 13px; line-height: 1.5; }
+
+  /* ── Header ── */
+  .header { background: var(--navy); padding: 12px 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--gold); }
+  .header-icon { width: 32px; height: 32px; background: var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 18px; color: #FAF7F0; font-weight: 600; }
+  .header p { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 18px 22px; }
+
+  /* ── Grid ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── Form Cards ── */
+  .card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-left: 4px solid #D5E0EE;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(13,27,42,0.05);
+  }
+  .card.card-blue  { border-left-color: #4A90D9; background: linear-gradient(135deg, #FAFCFF 0%, #FFFFFF 100%); }
+  .card.card-amber { border-left-color: #C9A84C; background: linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 100%); }
+  .card.card-teal  { border-left-color: #2A7F8A; background: linear-gradient(135deg, #F5FBFC 0%, #FFFFFF 100%); }
+  .card.rent-card  { border-left-color: #1A7A5E; border-color: var(--success-border); background: linear-gradient(135deg, #F0FAF6 0%, #FAFFFE 100%); }
+  .card.expense-card { border-left-color: #C0392B; border-color: #F5B7B1; background: linear-gradient(135deg, #FEF8F7 0%, #FFFEFE 100%); }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; gap: 8px;
+    letter-spacing: 0.1px;
+  }
+  .rent-card .card-title { border-bottom-color: var(--success-border); color: #0B4532; }
+  .expense-card .card-title { border-bottom-color: #F5B7B1; color: #7B241C; }
+
+  /* ── Badges ── */
+  .badge { background: var(--navy); color: var(--gold); font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px; }
+  .badge-green { background: var(--success); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .badge-red { background: var(--danger); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+  /* ── Fields & Inputs ── */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--text-secondary); text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 5px;
+  }
+  .rent-card .field label { color: #1A6B54; }
+  .expense-card .field label { color: #922B21; }
+  .field input, .field select {
+    width: 100%; padding: 8px 12px;
+    border: 1.5px solid var(--border); border-radius: 7px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    color: var(--text-primary); background: #FAFCFF;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    outline: none; appearance: none;
+  }
+  .field input:hover { border-color: #B8CCDF; background: #FFFFFF; }
+  .field input:focus, .field select:focus {
+    border-color: var(--gold); background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  }
+  .rent-card .field input { border-color: var(--success-border); background: #F5FFFB; }
+  .rent-card .field input:focus { border-color: var(--success); box-shadow: 0 0 0 3px rgba(26,122,94,0.12); }
+  .expense-card .field input { border-color: #F5B7B1; background: #FFF8F8; }
+  .expense-card .field input:focus { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(192,57,43,0.10); }
+
+  .input-group { position: relative; }
+  .input-prefix { position: absolute; top: 50%; transform: translateY(-50%); left: 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); pointer-events: none; }
+  .input-suffix { position: absolute; top: 50%; transform: translateY(-50%); right: 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); pointer-events: none; }
+  .input-group input { padding-left: 34px; }
+  .input-group.suf input { padding-right: 34px; padding-left: 12px; }
+
+  /* ── Radio Options ── */
+  .radio-group { display: flex; gap: 10px; }
+  .radio-option {
+    flex: 1; padding: 9px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    cursor: pointer; text-align: center;
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    transition: all 0.15s; user-select: none; background: #FAFCFF;
+  }
+  .radio-option:hover { border-color: var(--gold-dark); background: #FFFDF5; }
+  .radio-option.active { border-color: var(--gold); background: rgba(201,168,76,0.10); color: var(--gold-dark); font-weight: 600; }
+
+  /* ── Payment Split Boxes ── */
+  .pct-row { display: flex; gap: 10px; align-items: stretch; margin-bottom: 12px; }
+  .pct-box {
+    flex: 1; text-align: center;
+    background: #F7FAFD; border: 1.5px solid var(--border);
+    border-radius: 9px; padding: 10px 8px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .pct-box:hover { border-color: #B8CCDF; background: #FAFCFF; }
+  .pct-box.active { background: var(--navy); border-color: var(--navy); box-shadow: 0 2px 8px rgba(13,27,42,0.18); }
+  .pct-box label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .pct-box.active label { color: var(--gold-light); }
+  .pct-box input { width: 100%; border: none; background: transparent; font-size: 22px; font-weight: 700; color: var(--navy); text-align: center; font-family: 'DM Sans', sans-serif; outline: none; line-height: 1.2; }
+  .pct-box.active input { color: var(--gold); }
+  .pct-total { font-size: 11px; text-align: right; color: var(--text-muted); margin-top: 4px; }
+  .pct-total.error { color: var(--danger); font-weight: 700; }
+  .pct-total.ok { color: var(--success); font-weight: 600; }
+
+  /* ── Buttons ── */
+  .btn { padding: 10px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-primary { background: var(--gold); color: var(--navy); letter-spacing: 0.2px; }
+  .btn-primary:hover { background: #B8932F; box-shadow: 0 2px 8px rgba(201,168,76,0.35); }
+  .btn-secondary { background: #FFFFFF; border: 1.5px solid var(--border); color: var(--text-secondary); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; }
+  .btn-secondary:hover { border-color: #8099B8; background: #F7FAFD; }
+  .btn-sm { padding: 6px 14px; font-size: 11px; }
+  .btn-danger-sm { padding: 4px 10px; font-size: 10px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; border: 1px solid #F5B7B1; border-radius: 6px; background: #FFF5F5; color: var(--danger); transition: background 0.12s; }
+  .btn-danger-sm:hover { background: #FDD; }
+
+  /* ── Metric Cards & Summary ── */
+  .summary-section { margin-bottom: 8px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+  .metric-grid { display: grid; gap: 8px; margin-bottom: 10px; }
+  .metric-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .metric-card { background: #FFFFFF; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(13,27,42,0.04); }
+  .metric-card .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .metric-card .val { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .metric-card .sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .metric-card.gold { border-color: #E8CF7A; background: linear-gradient(135deg, #FFFDF0 0%, #FFFFF8 100%); }
+  .metric-card.gold .val { color: var(--gold-dark); }
+  .metric-card.green { border-color: var(--success-border); background: linear-gradient(135deg, #EBF7F3 0%, #F8FFFC 100%); }
+  .metric-card.green .lbl { color: #1A6B54; }
+  .metric-card.green .val { color: var(--success); }
+  .metric-card.red { border-color: #F5B7B1; background: linear-gradient(135deg, #FEF5F4 0%, #FFFEFE 100%); }
+  .metric-card.red .val { color: var(--danger); }
+  .metric-card.navy { background: linear-gradient(135deg, #0D1B2A 0%, #162840 100%); border-color: #1D3452; }
+  .metric-card.navy .lbl { color: rgba(255,255,255,0.45); }
+  .metric-card.navy .val { color: var(--gold); }
+  .metric-card.navy .sub { color: rgba(255,255,255,0.35); }
+
+  /* ── Tabs ── */
+  .tab-bar { display: flex; gap: 3px; background: #EDF2F8; border-radius: 9px; padding: 3px; margin-bottom: 12px; border: 1px solid var(--border); }
+  .tab { flex: 1; padding: 7px 8px; border-radius: 7px; text-align: center; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--text-muted); border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
+  .tab:hover { background: rgba(255,255,255,0.6); color: var(--text-secondary); }
+  .tab.active { background: var(--navy); color: var(--gold); font-weight: 600; box-shadow: 0 1px 4px rgba(13,27,42,0.2); }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; overflow-y: auto; max-height: 560px; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; min-width: 660px; }
+  thead { background: var(--navy); }
+  thead th { position: sticky; top: 0; z-index: 10; background: var(--navy); padding: 8px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--gold-light); white-space: nowrap; text-align: right; box-shadow: inset 0 -2px 0 var(--gold); }
+  thead th.tl { text-align: left; }
+  tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #F5F9FF; }
+  tbody td { padding: 5px 8px; text-align: right; font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  tbody td.tl { text-align: left; }
+
+  /* ── Phase Badges ── */
+  .phase-badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.2px; }
+  .ph-initial { background: #FFF3CD; color: #7A5A00; }
+  .ph-pre { background: #D6EFF5; color: #0A4E5C; }
+  .ph-post { background: #D4EDDA; color: #155724; }
+  .ph-bullet { background: #E8E0F8; color: #5B1FA8; }
+  .ph-rent { background: #D4EDDA; color: #155724; }
+  .ph-expense { background: #FDDEDE; color: #8C1F1F; }
+
+  /* ── Colour signals ── */
+  .neg { color: var(--danger); font-weight: 600; }
+  .pos { color: var(--success); font-weight: 600; }
+  .net-pos { color: var(--success); font-weight: 700; }
+  .net-neg { color: var(--danger); font-weight: 700; }
+  .net-zero { color: var(--text-muted); font-weight: 600; }
+  .muted { color: var(--text-muted); }
+  .totals-row td { background: rgba(201,168,76,0.08); font-weight: 700; border-top: 2px solid var(--gold); }
+  .pos-row { background: rgba(26,122,94,0.035); }
+
+  /* ── Bar chart ── */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .bar-lbl { width: 160px; font-size: 11px; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 16px; background: var(--surface-alt); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; font-size: 9px; font-weight: 700; color: white; }
+  .bar-val { width: 105px; font-size: 11px; font-weight: 600; text-align: right; flex-shrink: 0; }
+
+  /* ── Bullet / milestone rows ── */
+  .bullet-row { display: flex; gap: 8px; align-items: center; margin-bottom: 7px; }
+  .bullet-row input { padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text-primary); outline: none; background: #FAFCFF; }
+  .bullet-row input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.12); }
+
+  /* ── Info boxes ── */
+  .info-box { background: rgba(42,127,138,0.07); border: 1px solid rgba(42,127,138,0.22); border-radius: 8px; padding: 9px 13px; font-size: 11.5px; color: var(--teal); margin-bottom: 12px; line-height: 1.55; }
+  .info-box.green { background: #EBF7F3; border-color: var(--success-border); color: var(--success); }
+
+  /* ── Toggle ── */
+  .toggle { width: 38px; height: 22px; border-radius: 11px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; border: none; padding: 0; }
+  .toggle-knob { position: absolute; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.22); }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+    .metric-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .metric-grid[style] { grid-template-columns: 1fr 1fr !important; }
+    .main { padding: 14px 12px; }
+    .header { padding: 10px 14px; }
+    .header h1 { font-size: 15px; }
+    .card { padding: 14px 14px; }
+    .tab-bar { flex-wrap: wrap; gap: 3px; }
+    .tab { font-size: 10px; padding: 6px 4px; flex: 1 1 45%; }
+    .pct-row { gap: 7px; }
+    .pct-box { padding: 9px 6px; }
+    .pct-box input { font-size: 19px; }
+    .radio-group { flex-direction: column; gap: 7px; }
+    .bar-lbl { width: 110px; }
+    .bar-val { width: 85px; }
+    .table-wrap { max-height: 420px; }
+    table { min-width: 540px; }
+    thead th { padding: 6px 6px; font-size: 9px; }
+    tbody td { padding: 4px 6px; font-size: 10.5px; }
+    .metric-card .val { font-size: 13px; }
+    .bullet-row { flex-wrap: wrap; gap: 6px; }
+  }
+  @media (max-width: 480px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .metric-grid.cols-3, .metric-grid[style] { grid-template-columns: 1fr !important; }
+    .pct-row { flex-direction: column; gap: 8px; }
+    .pct-box { width: 100%; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .pct-box label { margin-bottom: 0; }
+    .tab { flex: 1 1 100%; }
+    .header-icon { display: none; }
+    .header h1 { font-size: 14px; }
+    .btn-primary { width: 100%; font-size: 13px; padding: 11px 18px; }
+    table { min-width: 500px; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">🏛</div>
+  <div>
+    <h1>Property EMI Calculator</h1>
+    <p>Down payment · Developer installments · Bank mortgage · Rental income · Net cash flow</p>
+  </div>
+  <div id="save-indicator" style="margin-left:auto"></div>
+</div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useEffect, useCallback } = React;
+
+const STORAGE_KEY = 'propEmiCalc_v1';
+
+const loadSaved = () => {
+  try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; } catch { return null; }
+};
+const save = (data) => {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true; } catch { return false; }
+};
+const clearSaved = () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} };
+
+const N = (v, abs=false) => {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  const r = Math.round(v);
+  const formatted = new Intl.NumberFormat('en-AE',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.abs(r));
+  if (abs) return formatted;
+  return formatted;
+};
+const signed = (v) => {
+  if (v === null || isNaN(v)) return '—';
+  const r = Math.round(v);
+  return (r >= 0 ? '+ ' : '- ') + new Intl.NumberFormat('en-AE',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.abs(r));
+};
+const K = (v) => {
+  const a = Math.abs(v);
+  if (a >= 1000000) return (a/1000000).toFixed(2)+'M';
+  if (a >= 1000) return (a/1000).toFixed(0)+'K';
+  return N(a);
+};
+const nc = (v) => v > 0.5 ? 'net-pos' : v < -0.5 ? 'net-neg' : 'net-zero';
+
+const phClass = (phase, type) => {
+  if (phase==='Initial') return 'ph-initial';
+  if (type==='Milestone Payment') return 'ph-bullet';
+  if (phase==='Pre-Handover') return 'ph-pre';
+  if (phase==='Rental') return 'ph-rent';
+  if (phase==='Expenses') return 'ph-expense';
+  return 'ph-post';
+};
+
+function App() {
+  const saved = loadSaved();
+  const [cur, setCur] = useState(saved?.cur ?? 'AED');
+  const [price, setPrice] = useState(saved?.price ?? 1500000);
+  const [downP, setDownP] = useState(saved?.downP ?? 20);
+  const [preP, setPreP] = useState(saved?.preP ?? 40);
+  const [postP, setPostP] = useState(saved?.postP ?? 40);
+  const [cmo, setCmo] = useState(saved?.cmo ?? 36);
+  const [start, setStart] = useState(saved?.start ?? new Date().toISOString().slice(0,7));
+  const [preMode, setPreMode] = useState(saved?.preMode ?? 'equal');
+  const [bullets, setBullets] = useState(saved?.bullets ?? [{month:6,pct:10},{month:18,pct:10}]);
+  const [bankRate, setBankRate] = useState(saved?.bankRate ?? 4.5);
+  const [mortYrs, setMortYrs] = useState(saved?.mortYrs ?? 25);
+  const [rentOn, setRentOn] = useState(saved?.rentOn ?? true);
+  const [rentAmt, setRentAmt] = useState(saved?.rentAmt ?? 6000);
+  const [rentInc, setRentInc] = useState(saved?.rentInc ?? 5);
+  const [vacancy, setVacancy] = useState(saved?.vacancy ?? 1);
+  const [maintAnnual, setMaintAnnual] = useState(saved?.maintAnnual ?? 15000);
+  const [mgmtPct, setMgmtPct] = useState(saved?.mgmtPct ?? 8);
+  const [capRate, setCapRate] = useState(saved?.capRate ?? 5);
+  const [sellingCost, setSellingCost] = useState(saved?.sellingCost ?? 2);
+  const [tab, setTab] = useState('monthly');
+  const [shown, setShown] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(saved ? 'loaded' : 'none');
+
+  // Auto-save whenever any input changes
+  useEffect(() => {
+    const data = { cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost };
+    save(data);
+    if (saveStatus === 'loaded') setSaveStatus('saved');
+  }, [cur,price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost]);
+
+  const handleClear = () => {
+    clearSaved();
+    setSaveStatus('cleared');
+    setTimeout(() => setSaveStatus('none'), 2500);
+  };
+
+  const pctSum = +downP + +preP + +postP;
+  const pctOk = Math.abs(pctSum-100)<0.01;
+
+  const addB = () => setBullets([...bullets,{month:12,pct:5}]);
+  const delB = i => setBullets(bullets.filter((_,j)=>j!==i));
+  const updB = (i,k,v) => { const b=[...bullets]; b[i]={...b[i],[k]:v}; setBullets(b); };
+
+  const calc = useMemo(()=>{
+    const P=+price, dP=+downP, prP=+preP, poP=+postP;
+    const downAmt=P*dP/100, dld=P*0.04, preTotal=P*prP/100, postTotal=P*poP/100;
+    const cM=+cmo, r=+bankRate/100/12, n=+mortYrs*12;
+    const emi = r===0 ? postTotal/n : postTotal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+    const [yr,mo]=start.split('-').map(Number);
+    const dt=off=>new Date(yr,mo-1+off,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+
+    let rows=[];
+    // Day 1
+    rows.push({month:0,date:dt(0),phase:'Initial',type:'Down Payment',amount:downAmt,inc:false});
+    rows.push({month:0,date:dt(0),phase:'Initial',type:'DLD Tax (4%)',amount:dld,inc:false});
+
+    // Pre-handover
+    if(preMode==='equal'){
+      const m=preTotal/cM;
+      for(let i=1;i<=cM;i++) rows.push({month:i,date:dt(i),phase:'Pre-Handover',type:'Developer Installment',amount:m,inc:false});
+    } else {
+      let bTotal=0; const bMap={};
+      bullets.forEach(b=>{ const a=preTotal*+b.pct/100; bTotal+=a; const mm=+b.month; bMap[mm]=(bMap[mm]||0)+a; });
+      const ePre=cM>0?(preTotal-bTotal)/cM:0;
+      for(let i=1;i<=cM;i++){
+        if(bMap[i]) rows.push({month:i,date:dt(i),phase:'Pre-Handover',type:'Milestone Payment',amount:bMap[i],inc:false});
+        if(ePre>0.5) rows.push({month:i,date:dt(i),phase:'Pre-Handover',type:'Developer EMI',amount:ePre,inc:false});
+      }
+    }
+
+    // Post bank EMI + amort
+    let bal=postTotal, totInt=0;
+    for(let i=1;i<=n;i++){
+      const int=r>0?bal*r:0, prin=emi-int, balAfter=Math.max(0,bal-prin);
+      totInt+=int;
+      rows.push({month:cM+i,date:dt(cM+i),phase:'Post-Handover',type:'Bank EMI',amount:emi,inc:false,int,prin,balAfter});
+      bal=balAfter; if(bal<0.01) break;
+    }
+
+    // Rent — starts month cM+1, annual increase, vacancy months skipped per year
+    let totRent=0;
+    const vac=+vacancy, base=+rentAmt, incRate=+rentInc/100;
+    // Track rent per month for mgmt fee calc
+    const rentByMonth={};
+    if(rentOn && base>0){
+      for(let i=1;i<=n;i++){
+        const absM=cM+i, tenYr=Math.floor((i-1)/12), miy=((i-1)%12)+1;
+        if(miy<=vac && vac>0){
+          rows.push({month:absM,date:dt(absM),phase:'Rental',type:`Vacancy (Yr ${tenYr+1})`,amount:0,inc:true,vac:true});
+          rentByMonth[absM]=0;
+          continue;
+        }
+        const rent=base*Math.pow(1+incRate,tenYr);
+        totRent+=rent;
+        rentByMonth[absM]=rent;
+        rows.push({month:absM,date:dt(absM),phase:'Rental',type:'Rental Income',amount:rent,inc:true});
+      }
+    }
+
+    // Post-handover recurring expenses
+    const maintMonthly=+maintAnnual/12;
+    const mgmtRate=+mgmtPct/100;
+    let totMaint=0, totMgmt=0;
+    for(let i=1;i<=n;i++){
+      const absM=cM+i;
+      // Maintenance charge (monthly portion of annual fee)
+      if(maintMonthly>0){
+        totMaint+=maintMonthly;
+        rows.push({month:absM,date:dt(absM),phase:'Expenses',type:'Maintenance Charge',amount:maintMonthly,inc:false});
+      }
+      // Property management fee — only on months rent is actually collected
+      const rentThisMonth=rentByMonth[absM]||0;
+      if(rentOn && mgmtRate>0 && rentThisMonth>0){
+        const fee=rentThisMonth*mgmtRate;
+        totMgmt+=fee;
+        rows.push({month:absM,date:dt(absM),phase:'Expenses',type:'Property Mgmt Fee ('+mgmtPct+'%)',amount:fee,inc:false});
+      }
+    }
+
+    // Month aggregation
+    const mmap={};
+    rows.forEach(r=>{
+      if(!mmap[r.month]) mmap[r.month]={month:r.month,date:r.date,out:0,inn:0,rows:[]};
+      if(r.inc) mmap[r.month].inn+=r.amount; else mmap[r.month].out+=r.amount;
+      mmap[r.month].rows.push(r);
+    });
+    let cumNet=0;
+    const mlist=Object.values(mmap).sort((a,b)=>a.month-b.month).map(m=>{
+      const net=m.inn-m.out; cumNet+=net;
+      return {...m,net,cumNet};
+    });
+
+    const totOut=rows.filter(r=>!r.inc).reduce((s,r)=>s+r.amount,0);
+    const be=mlist.find(m=>m.cumNet>=0);
+
+    // ---- Capital appreciation & ROI ----
+    const capRateMonthly = +capRate / 100 / 12;
+    const sellCostFrac = +sellingCost / 100;
+
+    // Build mortgage balance lookup by absolute month
+    const mortBalByMonth = {};
+    let mbBal = postTotal;
+    for (let i=1; i<=n; i++) {
+      const mInt = r>0 ? mbBal*r : 0;
+      const mPrin = emi - mInt;
+      mbBal = Math.max(0, mbBal - mPrin);
+      mortBalByMonth[cM+i] = mbBal;
+    }
+
+    // Build developer balance lookup (remaining pre-handover payments)
+    const devBalByMonth = {};
+    let devPaid = 0;
+    for (let m=0; m<=cM; m++) {
+      const paidThisMonth = rows.filter(r=>!r.inc && r.month===m && r.phase!=='Initial').reduce((s,r)=>s+r.amount,0);
+      devPaid += paidThisMonth;
+      devBalByMonth[m] = Math.max(0, preTotal - devPaid);
+    }
+
+    // Cumulative outflow and inflow by month
+    const cumOutByMonth = {}, cumInByMonth = {};
+    let co=0, ci=0;
+    mlist.forEach(m => {
+      co += m.out; ci += m.inn;
+      cumOutByMonth[m.month] = co;
+      cumInByMonth[m.month] = ci;
+    });
+
+    // Liquidation rows — every month from 1 to cM+n
+    const totalMonths = cM + n;
+    const liqRows = [];
+    for (let m=0; m<=totalMonths; m++) {
+      const propVal = P * Math.pow(1 + capRateMonthly, m);
+      const netSaleProceeds = propVal * (1 - sellCostFrac);
+      const outstandingDebt = m <= cM ? (devBalByMonth[m] ?? 0) : (mortBalByMonth[m] ?? 0);
+      const equity = propVal - outstandingDebt;
+      const cumOut = cumOutByMonth[m] ?? (m===0 ? 0 : co);
+      const cumIn  = cumInByMonth[m]  ?? ci;
+      // P&L = net sale proceeds - outstanding debt - net cash still invested
+      const netPL = netSaleProceeds - outstandingDebt - cumOut + cumIn;
+      const roiPct = cumOut > 0 ? (netPL / cumOut * 100) : 0;
+      const annRoi = m > 0 ? (Math.pow(1 + netPL/Math.max(cumOut,1), 12/m) - 1) * 100 : 0;
+      const dateLabel = m === 0
+        ? mlist[0]?.date ?? ''
+        : (mlist.find(ml=>ml.month===m)?.date ?? '');
+      liqRows.push({ month:m, date:dateLabel, propVal, netSaleProceeds, outstandingDebt, equity, cumOut, cumIn, netPL, roiPct, annRoi, phase: m<=cM?'Pre-Handover':'Post-Handover' });
+    }
+
+    // Yield metrics (Year 1)
+    const yr1Rent = +rentAmt * (12 - +vacancy);
+    const yr1Expenses = +maintAnnual + yr1Rent * +mgmtPct/100;
+    const grossYield = P > 0 ? yr1Rent / P * 100 : 0;
+    const netYield   = P > 0 ? (yr1Rent - yr1Expenses) / P * 100 : 0;
+    const propValAtEnd = P * Math.pow(1 + capRateMonthly, totalMonths);
+    const totalAppreciation = propValAtEnd - P;
+
+    return {downAmt,dld,preTotal,postTotal,emi,totInt,totRent,totMaint,totMgmt,totExpenses:totMaint+totMgmt,totOut,initOut:downAmt+dld,rows,mlist,cM,n,P,r,be,liqRows,grossYield,netYield,propValAtEnd,totalAppreciation};
+  },[price,downP,preP,postP,cmo,start,preMode,bullets,bankRate,mortYrs,rentOn,rentAmt,rentInc,vacancy,maintAnnual,mgmtPct,capRate,sellingCost]);
+
+  const go = () => { if(!pctOk) return; setShown(true); setTab('monthly'); };
+
+  return (
+    <div className="main">
+
+      {/* Save status bar */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px',gap:'10px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+          {saveStatus==='loaded' && <span style={{fontSize:'10px',background:'#E8F6F1',color:'#1A7A5E',border:'1px solid #A8DDD0',borderRadius:'20px',padding:'2px 9px',fontWeight:'600'}}>✓ Last session restored</span>}
+          {saveStatus==='saved' && <span style={{fontSize:'10px',background:'#E8F6F1',color:'#1A7A5E',border:'1px solid #A8DDD0',borderRadius:'20px',padding:'2px 9px',fontWeight:'600'}}>💾 Auto-saved</span>}
+          {saveStatus==='cleared' && <span style={{fontSize:'10px',background:'#FEF9F8',color:'#C0392B',border:'1px solid #F5B7B1',borderRadius:'20px',padding:'2px 9px',fontWeight:'600'}}>✕ Saved data cleared</span>}
+          {saveStatus==='none' && <span style={{fontSize:'10px',color:'var(--text-muted)'}}>Entries auto-saved to this browser</span>}
+        </div>
+        {(saveStatus==='saved'||saveStatus==='loaded') && (
+          <button onClick={handleClear} style={{fontSize:'10px',background:'transparent',border:'1px solid var(--border)',borderRadius:'20px',padding:'2px 9px',color:'var(--text-muted)',cursor:'pointer',fontFamily:'DM Sans',fontWeight:'500'}}>
+            Clear saved data
+          </button>
+        )}
+      </div>
+
+      {/* Property */}
+      <div className="card card-blue">
+        <div className="card-title">
+          🏠 Property Details
+          <select value={cur} onChange={e=>setCur(e.target.value)} style={{marginLeft:'auto',padding:'5px 10px',borderRadius:'6px',border:'1px solid #D5E0EE',fontFamily:'DM Sans',fontSize:'13px',fontWeight:'600',background:'white',color:'#0D1B2A'}}>
+            {['AED','SAR','QAR','KWD','BHD','OMR','INR','USD','GBP','EUR'].map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="grid-2">
+          <div className="field">
+            <label>Property Price</label>
+            <div className="input-group">
+              <span className="input-prefix">{cur}</span>
+              <input type="number" value={price} onChange={e=>setPrice(e.target.value)} min="0" step="50000" />
+            </div>
+          </div>
+          <div className="field">
+            <label>Construction Start Date</label>
+            <input type="month" value={start} onChange={e=>setStart(e.target.value)} />
+          </div>
+        </div>
+        <div className="info-box">ℹ️ DLD Tax (4%) — {cur} {N(+price*0.04)} — payable at booking alongside the down payment.</div>
+        <div style={{marginBottom:'8px',fontSize:'13px',fontWeight:'600',color:'var(--text-secondary)'}}>Payment Split (must total 100%)</div>
+        <div className="pct-row">
+          {[{lbl:'Down Payment',v:downP,set:setDownP,active:true},{lbl:'Pre-Handover',v:preP,set:setPreP,active:false},{lbl:'Post-Handover',v:postP,set:setPostP,active:false}].map(item=>(
+            <div className={`pct-box${item.active?' active':''}`} key={item.lbl}>
+              <label>{item.lbl}</label>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'2px'}}>
+                <input type="number" value={item.v} onChange={e=>item.set(e.target.value)} min="0" max="100" step="1" style={{width:'70px'}} />
+                <span style={{fontSize:'18px',color:item.active?'var(--gold-light)':'var(--text-muted)',fontWeight:'500'}}>%</span>
+              </div>
+              <div style={{fontSize:'11px',color:item.active?'rgba(255,255,255,0.5)':'var(--text-muted)',marginTop:'4px'}}>{cur} {N(+price*+item.v/100)}</div>
+            </div>
+          ))}
+        </div>
+        <div className={`pct-total${pctOk?' ok':' error'}`}>Total: {pctSum.toFixed(1)}% {pctOk?'✓ Balanced':`— ${(100-pctSum).toFixed(1)}% short`}</div>
+      </div>
+
+      {/* Pre-Handover */}
+      <div className="card card-amber">
+        <div className="card-title">🏗 Pre-Handover Payment Plan <span className="badge">Developer</span></div>
+        <div className="grid-2">
+          <div className="field">
+            <label>Construction Period (months)</label>
+            <div className="input-group suf">
+              <input type="number" value={cmo} onChange={e=>setCmo(e.target.value)} min="1" max="120" />
+              <span className="input-suffix">mo</span>
+            </div>
+          </div>
+          <div className="field">
+            <label>Pre-Handover Amount</label>
+            <div style={{background:'var(--surface-alt)',border:'1px solid var(--border)',borderRadius:'8px',padding:'10px 14px',fontSize:'14px',fontWeight:'600',color:'var(--text-secondary)'}}>{cur} {N(+price*+preP/100)}</div>
+          </div>
+        </div>
+        <div className="field">
+          <label>Payment Mode</label>
+          <div className="radio-group">
+            <div className={`radio-option${preMode==='equal'?' active':''}`} onClick={()=>setPreMode('equal')}>📅 Equal Monthly Installments</div>
+            <div className={`radio-option${preMode==='bullet'?' active':''}`} onClick={()=>setPreMode('bullet')}>🎯 Milestone Bullets + Monthly EMI</div>
+          </div>
+        </div>
+        {preMode==='equal' && <div className="info-box">Monthly developer payment: <strong>{cur} {N(+price*+preP/100/+cmo)}</strong> for {cmo} months</div>}
+        {preMode==='bullet' && (
+          <div>
+            <div style={{fontSize:'12px',fontWeight:'600',color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'10px'}}>Milestone Payments — balance paid as equal monthly EMI</div>
+            {bullets.map((b,i)=>(
+              <div className="bullet-row" key={i}>
+                <div style={{fontSize:'12px',color:'var(--text-muted)',width:'28px',textAlign:'right'}}>#{i+1}</div>
+                <div style={{display:'flex',gap:'8px',flex:1}}>
+                  <div style={{position:'relative',flex:1}}>
+                    <input type="number" value={b.month} onChange={e=>updB(i,'month',e.target.value)} min="1" max={cmo} style={{width:'100%'}} />
+                    <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',fontSize:'11px',color:'var(--text-muted)'}}>mo</span>
+                  </div>
+                  <div style={{position:'relative',flex:1}}>
+                    <input type="number" value={b.pct} onChange={e=>updB(i,'pct',e.target.value)} min="0" max="100" step="1" style={{width:'100%'}} />
+                    <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',fontSize:'11px',color:'var(--text-muted)'}}>%</span>
+                  </div>
+                  <div style={{padding:'8px 12px',background:'var(--surface-alt)',border:'1px solid var(--border)',borderRadius:'7px',fontSize:'13px',fontWeight:'600',color:'var(--text-secondary)',whiteSpace:'nowrap',minWidth:'110px'}}>{cur} {N(+price*+preP/100*+b.pct/100)}</div>
+                </div>
+                <button className="btn-danger-sm" onClick={()=>delB(i)}>✕</button>
+              </div>
+            ))}
+            <button className="btn btn-secondary btn-sm" onClick={addB} style={{marginTop:'6px'}}>+ Add Milestone</button>
+            {(()=>{
+              const pt=+price*+preP/100, ba=bullets.reduce((s,b)=>s+pt*+b.pct/100,0), ea=Math.max(0,pt-ba);
+              return <div className="info-box" style={{marginTop:'14px'}}>Milestone total: <strong>{cur} {N(ba)}</strong> &nbsp;|&nbsp; EMI balance: <strong>{cur} {N(ea)}</strong> &nbsp;|&nbsp; Monthly: <strong>{cur} {N(ea/+cmo)}</strong></div>;
+            })()}
+          </div>
+        )}
+      </div>
+
+      {/* Mortgage */}
+      <div className="card card-teal">
+        <div className="card-title">🏦 Post-Handover Bank Mortgage</div>
+        <div className="grid-3">
+          <div className="field">
+            <label>Mortgage Amount</label>
+            <div style={{background:'var(--surface-alt)',border:'1px solid var(--border)',borderRadius:'8px',padding:'10px 14px',fontSize:'14px',fontWeight:'600',color:'var(--text-secondary)'}}>{cur} {N(+price*+postP/100)}</div>
+          </div>
+          <div className="field">
+            <label>Annual Interest Rate</label>
+            <div className="input-group suf"><input type="number" value={bankRate} onChange={e=>setBankRate(e.target.value)} min="0" max="20" step="0.05" /><span className="input-suffix">%</span></div>
+          </div>
+          <div className="field">
+            <label>Mortgage Tenure</label>
+            <div className="input-group suf"><input type="number" value={mortYrs} onChange={e=>setMortYrs(e.target.value)} min="1" max="30" step="1" /><span className="input-suffix">yrs</span></div>
+          </div>
+        </div>
+        <div className="info-box">Monthly Bank EMI: <strong>{cur} {N(calc.emi)}</strong> for {mortYrs} years &nbsp;|&nbsp; Total Interest: <strong>{cur} {N(calc.totInt)}</strong></div>
+      </div>
+
+      {/* Rental Income */}
+      <div className={`card${rentOn?' rent-card':''}`}>
+        <div className="card-title">
+          🏠 Rental Income <span className="badge-green">Income +</span>
+          <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'10px'}}>
+            <span style={{fontSize:'13px',color:rentOn?'#1A6B54':'var(--text-muted)',fontWeight:'500'}}>{rentOn?'Enabled':'Disabled'}</span>
+            <button className="toggle" style={{background:rentOn?'var(--success)':'#CCC'}} onClick={()=>setRentOn(!rentOn)}>
+              <div className="toggle-knob" style={{left:rentOn?'21px':'3px'}}></div>
+            </button>
+          </div>
+        </div>
+        {rentOn && <>
+          <div className="info-box green">Rent starts <strong>1 month after handover</strong> (Month {+cmo+1}) and runs for the full mortgage tenure. Annual % increase applies from Year 2. Vacancy months are skipped at start of each tenancy year.</div>
+          <div className="grid-4">
+            <div className="field">
+              <label>Monthly Rent</label>
+              <div className="input-group"><span className="input-prefix">{cur}</span><input type="number" value={rentAmt} onChange={e=>setRentAmt(e.target.value)} min="0" step="500" /></div>
+            </div>
+            <div className="field">
+              <label>Annual Increase</label>
+              <div className="input-group suf"><input type="number" value={rentInc} onChange={e=>setRentInc(e.target.value)} min="0" max="20" step="0.5" /><span className="input-suffix">%</span></div>
+            </div>
+            <div className="field">
+              <label>Vacancy / Year</label>
+              <div className="input-group suf"><input type="number" value={vacancy} onChange={e=>setVacancy(e.target.value)} min="0" max="6" step="1" /><span className="input-suffix">mo</span></div>
+            </div>
+            <div className="field">
+              <label>Yr 1 Net Annual Rent</label>
+              <div style={{background:'white',border:'1px solid var(--success-border)',borderRadius:'8px',padding:'10px 14px',fontSize:'14px',fontWeight:'600',color:'var(--success)'}}>{cur} {N(+rentAmt*(12-+vacancy))}</div>
+            </div>
+          </div>
+        </>}
+      </div>
+
+      {/* Recurring Expenses */}
+      <div className="card expense-card">
+        <div className="card-title">
+          🔧 Recurring Post-Handover Expenses <span className="badge-red">Debit —</span>
+        </div>
+        <div className="info-box" style={{background:'#FEF0EF',border:'1px solid #F5B7B1',color:'#922B21'}}>
+          Both charges start from <strong>Month {+cmo+1}</strong> (handover) and recur monthly for the full mortgage tenure. Shown as debits in the cash flow. Property mgmt fee is only charged on months when rent is actually collected (not vacancy months).
+        </div>
+        <div className="grid-2">
+          <div className="field">
+            <label>Annual Maintenance Charge</label>
+            <div style={{fontSize:'11px',color:'#922B21',marginBottom:'6px',opacity:0.7}}>Building/community fee — divided into equal monthly debits</div>
+            <div className="input-group"><span className="input-prefix">{cur}</span><input type="number" value={maintAnnual} onChange={e=>setMaintAnnual(e.target.value)} min="0" step="1000" /></div>
+          </div>
+          <div className="field">
+            <label>Property Management Fee</label>
+            <div style={{fontSize:'11px',color:'#922B21',marginBottom:'6px',opacity:0.7}}>Charged as % of rent collected — zero during vacancy months</div>
+            <div className="input-group suf"><input type="number" value={mgmtPct} onChange={e=>setMgmtPct(e.target.value)} min="0" max="30" step="0.5" /><span className="input-suffix">% of rent</span></div>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:'12px',flexWrap:'wrap',marginTop:'4px'}}>
+          <div style={{background:'white',border:'1px solid #F5B7B1',borderRadius:'8px',padding:'10px 16px',fontSize:'13px',flex:'1',minWidth:'200px'}}>
+            <div style={{fontSize:'11px',fontWeight:'600',color:'#922B21',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'4px'}}>Maintenance / month</div>
+            <span style={{fontWeight:'600',color:'var(--danger)',fontSize:'16px'}}>{cur} {N(+maintAnnual/12)}</span>
+            <span style={{color:'var(--text-muted)',fontSize:'12px',marginLeft:'8px'}}>Annual: {cur} {N(+maintAnnual)}</span>
+          </div>
+          {rentOn && +rentAmt>0 && <div style={{background:'white',border:'1px solid #F5B7B1',borderRadius:'8px',padding:'10px 16px',fontSize:'13px',flex:'1',minWidth:'200px'}}>
+            <div style={{fontSize:'11px',fontWeight:'600',color:'#922B21',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'4px'}}>Mgmt Fee / month (Yr 1)</div>
+            <span style={{fontWeight:'600',color:'var(--danger)',fontSize:'16px'}}>{cur} {N(+rentAmt*+mgmtPct/100)}</span>
+            <span style={{color:'var(--text-muted)',fontSize:'12px',marginLeft:'8px'}}>Yr 1 net annual: {cur} {N(+rentAmt*(12-+vacancy)*+mgmtPct/100)}</span>
+          </div>}
+          <div style={{background:'white',border:'1px solid #F5B7B1',borderRadius:'8px',padding:'10px 16px',fontSize:'13px',flex:'1',minWidth:'200px'}}>
+            <div style={{fontSize:'11px',fontWeight:'600',color:'#922B21',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'4px'}}>Combined Monthly Expense (Yr 1)</div>
+            <span style={{fontWeight:'600',color:'var(--danger)',fontSize:'16px'}}>{cur} {N(+maintAnnual/12 + (rentOn?+rentAmt*+mgmtPct/100:0))}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Capital Appreciation & Returns */}
+      <div className="card" style={{borderColor:'#B8A0E8',background:'#F5F0FE'}}>
+        <div className="card-title" style={{color:'#4A1F9E',borderBottomColor:'#C9B8F0'}}>
+          📈 Capital Appreciation &amp; ROI Settings
+          <span style={{background:'#6C3FBE',color:'#fff',fontFamily:'DM Sans',fontSize:'10px',fontWeight:'600',padding:'2px 7px',borderRadius:'20px',marginLeft:'4px'}}>New</span>
+        </div>
+        <div className="info-box" style={{background:'#EDE8FD',border:'1px solid #C9B8F0',color:'#4A1F9E'}}>
+          Used to compute property value growth over time and net ROI if you liquidate (sell) at any month. Selling cost is deducted from sale proceeds in the liquidation analysis.
+        </div>
+        <div className="grid-2">
+          <div className="field">
+            <label>Annual Capital Appreciation</label>
+            <div style={{fontSize:'10px',color:'#6C3FBE',marginBottom:'3px',opacity:0.8}}>Expected annual % growth in property value</div>
+            <div className="input-group suf"><input type="number" value={capRate} onChange={e=>setCapRate(e.target.value)} min="0" max="30" step="0.5" style={{borderColor:'#C9B8F0'}} /><span className="input-suffix">% p.a.</span></div>
+          </div>
+          <div className="field">
+            <label>Selling / Transfer Cost</label>
+            <div style={{fontSize:'10px',color:'#6C3FBE',marginBottom:'3px',opacity:0.8}}>Agent commission + transfer fees at time of sale</div>
+            <div className="input-group suf"><input type="number" value={sellingCost} onChange={e=>setSellingCost(e.target.value)} min="0" max="10" step="0.25" style={{borderColor:'#C9B8F0'}} /><span className="input-suffix">% of sale</span></div>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:'10px',flexWrap:'wrap',marginTop:'4px'}}>
+          <div style={{background:'white',border:'1px solid #C9B8F0',borderRadius:'7px',padding:'8px 12px',flex:'1',minWidth:'160px'}}>
+            <div style={{fontSize:'9px',fontWeight:'600',color:'#6C3FBE',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'3px'}}>Value after {mortYrs} yrs</div>
+            <span style={{fontWeight:'600',color:'#4A1F9E',fontSize:'14px'}}>{cur} {K(+price * Math.pow(1 + +capRate/100, +mortYrs))}</span>
+            <span style={{color:'var(--text-muted)',fontSize:'10px',marginLeft:'6px'}}>+{cur} {K(+price * Math.pow(1 + +capRate/100, +mortYrs) - +price)}</span>
+          </div>
+          <div style={{background:'white',border:'1px solid #C9B8F0',borderRadius:'7px',padding:'8px 12px',flex:'1',minWidth:'160px'}}>
+            <div style={{fontSize:'9px',fontWeight:'600',color:'#6C3FBE',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'3px'}}>Gross Rental Yield (Yr 1)</div>
+            <span style={{fontWeight:'600',color:'#4A1F9E',fontSize:'14px'}}>{rentOn?(+rentAmt*(12-+vacancy)/+price*100).toFixed(2):0}%</span>
+            <span style={{color:'var(--text-muted)',fontSize:'10px',marginLeft:'6px'}}>of property price</span>
+          </div>
+          <div style={{background:'white',border:'1px solid #C9B8F0',borderRadius:'7px',padding:'8px 12px',flex:'1',minWidth:'160px'}}>
+            <div style={{fontSize:'9px',fontWeight:'600',color:'#6C3FBE',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'3px'}}>Net Rental Yield (Yr 1)</div>
+            <span style={{fontWeight:'600',color:'#4A1F9E',fontSize:'14px'}}>{rentOn?(Math.max(0,+rentAmt*(12-+vacancy) - +maintAnnual - +rentAmt*(12-+vacancy)*+mgmtPct/100)/+price*100).toFixed(2):0}%</span>
+            <span style={{color:'var(--text-muted)',fontSize:'10px',marginLeft:'6px'}}>after expenses</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Calculate button */}
+      <div style={{textAlign:'center',margin:'8px 0 28px'}}>
+        <button className="btn btn-primary" onClick={go} style={{fontSize:'16px',padding:'15px 48px',opacity:pctOk?1:0.5,cursor:pctOk?'pointer':'not-allowed'}}>
+          Generate Net Cash Flow Statement →
+        </button>
+        {!pctOk && <div style={{marginTop:'8px',fontSize:'12px',color:'var(--danger)'}}>Payment split must total 100%</div>}
+      </div>
+
+      {/* Results */}
+      {shown && <>
+
+        {/* Metric cards */}
+        <div className="summary-section">
+          <div className="section-label">Outflows (shown as negative)</div>
+          <div className="metric-grid" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
+            <div className="metric-card gold">
+              <div className="lbl">Initial Outlay (Day 1)</div>
+              <div className="val neg">- {cur} {K(calc.initOut)}</div>
+              <div className="sub">Down payment + 4% DLD Tax</div>
+            </div>
+            <div className="metric-card">
+              <div className="lbl">Pre-Handover Total</div>
+              <div className="val neg">- {cur} {K(calc.preTotal)}</div>
+              <div className="sub">Paid to developer over {cmo} months</div>
+            </div>
+            <div className="metric-card">
+              <div className="lbl">Bank Mortgage Total</div>
+              <div className="val neg">- {cur} {K(calc.postTotal+calc.totInt)}</div>
+              <div className="sub">Principal + {cur} {K(calc.totInt)} interest</div>
+            </div>
+            <div className="metric-card red">
+              <div className="lbl">Recurring Expenses Total</div>
+              <div className="val neg">- {cur} {K(calc.totExpenses)}</div>
+              <div className="sub">Maint. {cur} {K(calc.totMaint)} + Mgmt {cur} {K(calc.totMgmt)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="summary-section">
+          <div className="section-label">Inflows & Net Position</div>
+          <div className="metric-grid cols-3">
+            {rentOn
+              ? <div className="metric-card green"><div className="lbl">Total Rental Income</div><div className="val pos">+ {cur} {K(calc.totRent)}</div><div className="sub">Over {mortYrs} yrs post-handover</div></div>
+              : <div className="metric-card"><div className="lbl">Rental Income</div><div className="val" style={{color:'var(--text-muted)'}}>Not modelled</div><div className="sub">Enable above to include</div></div>
+            }
+            <div className="metric-card navy">
+              <div className="lbl">Net Total Cost of Ownership</div>
+              <div className="val">- {cur} {K(Math.max(0, calc.totOut - calc.totRent))}</div>
+              <div className="sub">All outflows incl. expenses, minus rent</div>
+            </div>
+            {rentOn && calc.be
+              ? <div className="metric-card green"><div className="lbl">Cumulative Break-even</div><div className="val">{calc.be.date}</div><div className="sub">Month {calc.be.month} — when net turns positive</div></div>
+              : <div className="metric-card red"><div className="lbl">Cumulative Break-even</div><div className="val" style={{fontSize:'15px'}}>Not within tenure</div><div className="sub">Cumulative remains negative</div></div>
+            }
+          </div>
+        </div>
+
+        <div className="summary-section">
+          <div className="section-label">Capital Appreciation & Yield</div>
+          <div className="metric-grid" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
+            <div className="metric-card" style={{borderColor:'#C9B8F0',background:'#F5F0FE'}}>
+              <div className="lbl" style={{color:'#6C3FBE'}}>Property Value at End</div>
+              <div className="val" style={{color:'#4A1F9E'}}>{cur} {K(calc.propValAtEnd)}</div>
+              <div className="sub">After {mortYrs} yrs @ {capRate}% p.a.</div>
+            </div>
+            <div className="metric-card" style={{borderColor:'#C9B8F0',background:'#F5F0FE'}}>
+              <div className="lbl" style={{color:'#6C3FBE'}}>Total Appreciation Gain</div>
+              <div className="val" style={{color:'#4A1F9E'}}>+ {cur} {K(calc.totalAppreciation)}</div>
+              <div className="sub">{((calc.propValAtEnd/calc.P-1)*100).toFixed(1)}% over purchase price</div>
+            </div>
+            <div className="metric-card" style={{borderColor:'#C9B8F0',background:'#F5F0FE'}}>
+              <div className="lbl" style={{color:'#6C3FBE'}}>Gross Rental Yield</div>
+              <div className="val" style={{color:'#4A1F9E'}}>{calc.grossYield.toFixed(2)}%</div>
+              <div className="sub">Annual rent ÷ property price (Yr 1)</div>
+            </div>
+            <div className="metric-card" style={{borderColor:'#C9B8F0',background:'#F5F0FE'}}>
+              <div className="lbl" style={{color:'#6C3FBE'}}>Net Rental Yield</div>
+              <div className="val" style={{color:'#4A1F9E'}}>{calc.netYield.toFixed(2)}%</div>
+              <div className="sub">After maintenance &amp; mgmt fees (Yr 1)</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bar chart */}
+        <div className="card">
+          <div className="card-title">💡 Cash Flow Breakdown</div>
+          <div className="legend">
+            <div className="legend-item"><div className="legend-dot" style={{background:'#C0392B'}}></div>Outflow — payments &amp; expenses (negative)</div>
+            <div className="legend-item"><div className="legend-dot" style={{background:'#1A7A5E'}}></div>Inflow — rental income (positive)</div>
+            <div className="legend-item"><div className="legend-dot" style={{background:'#6C3FBE'}}></div>Appreciation gain</div>
+          </div>
+          {[
+            {lbl:'Down Payment',amt:calc.downAmt,color:'#C9A84C',inc:false},
+            {lbl:'DLD Tax (4%)',amt:calc.dld,color:'#E07B39',inc:false},
+            {lbl:'Pre-Handover Payments',amt:calc.preTotal,color:'#2A7F8A',inc:false},
+            {lbl:'Bank EMI — Principal',amt:calc.postTotal,color:'#3AABB8',inc:false},
+            {lbl:'Bank Interest',amt:calc.totInt,color:'#888799',inc:false},
+            {lbl:'Maintenance Charges',amt:calc.totMaint,color:'#E74C3C',inc:false},
+            {lbl:'Property Mgmt Fees',amt:calc.totMgmt,color:'#C0392B',inc:false},
+            ...(rentOn&&calc.totRent>0?[{lbl:'Total Rental Income',amt:calc.totRent,color:'#1A7A5E',inc:true}]:[]),
+            {lbl:'Appreciation Gain',amt:calc.totalAppreciation,color:'#6C3FBE',inc:true},
+          ].map((row,i)=>{
+            const pct=row.amt/Math.max(calc.totOut,calc.totalAppreciation)*100;
+            return (
+              <div className="bar-row" key={i}>
+                <div className="bar-lbl">{row.lbl}</div>
+                <div className="bar-track"><div className="bar-fill" style={{width:`${Math.max(1,pct)}%`,background:row.color}}>{pct>8?`${pct.toFixed(1)}%`:''}</div></div>
+                <div className="bar-val" style={{color:row.inc?'var(--success)':'var(--danger)'}}>{row.inc?'+ ':' - '}{cur} {K(row.amt)}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Tabs */}
+        <div className="tab-bar">
+          <button className={`tab${tab==='monthly'?' active':''}`} onClick={()=>setTab('monthly')}>📅 Monthly Cash Flow</button>
+          <button className={`tab${tab==='detail'?' active':''}`} onClick={()=>setTab('detail')}>📋 Transactions</button>
+          <button className={`tab${tab==='amort'?' active':''}`} onClick={()=>setTab('amort')}>🏦 Mortgage</button>
+          <button className={`tab${tab==='liq'?' active':''}`} onClick={()=>setTab('liq')}>📈 Liquidation ROI</button>
+        </div>
+
+        {/* MONTHLY NET */}
+        {tab==='monthly' && (
+          <div className="table-wrap">
+            <table>
+              <thead><tr>
+                <th className="tl">Month</th>
+                <th className="tl">Date</th>
+                <th className="tl">Phase</th>
+                <th>Outflow — ({cur})</th>
+                <th>Inflow + ({cur})</th>
+                <th>Net ({cur})</th>
+                <th>Cumulative Net ({cur})</th>
+              </tr></thead>
+              <tbody>
+                {calc.mlist.map((m,i)=>{
+                  const phases=[...new Set(m.rows.map(r=>r.phase))];
+                  return (
+                    <tr key={i} className={m.cumNet>0?'pos-row':''}>
+                      <td className="tl muted">{m.month===0?'Day 1':`M ${m.month}`}</td>
+                      <td className="tl">{m.date}</td>
+                      <td className="tl">{phases.map(p=><span key={p} className={`phase-badge ${phClass(p,'')} `} style={{marginRight:'3px'}}>{p}</span>)}</td>
+                      <td><span className="neg">{m.out>0?`(${N(m.out)})`:'—'}</span></td>
+                      <td><span className="pos">{m.inn>0?`+ ${N(m.inn)}`:'—'}</span></td>
+                      <td><span className={nc(m.net)}>{signed(m.net)}</span></td>
+                      <td><span className={nc(m.cumNet)}>{signed(m.cumNet)}</span></td>
+                    </tr>
+                  );
+                })}
+                <tr className="totals-row">
+                  <td className="tl" colSpan="3" style={{textAlign:'right'}}>Totals</td>
+                  <td><span className="neg">({N(calc.totOut)})</span></td>
+                  <td><span className="pos">+ {N(calc.totRent)}</span></td>
+                  <td><span className={nc(calc.totRent-calc.totOut)}>{signed(calc.totRent-calc.totOut)}</span></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* DETAILED */}
+        {tab==='detail' && (
+          <div className="table-wrap">
+            <table>
+              <thead><tr>
+                <th className="tl">Month</th>
+                <th className="tl">Date</th>
+                <th className="tl">Phase</th>
+                <th className="tl">Transaction Type</th>
+                <th>Amount ({cur})</th>
+                <th>Cumulative Net ({cur})</th>
+              </tr></thead>
+              <tbody>
+                {(()=>{
+                  let cn=0;
+                  return calc.rows.filter(r=>r.amount>0||!r.vac).map((row,i)=>{
+                    cn += row.inc ? row.amount : -row.amount;
+                    return (
+                      <tr key={i} className={cn>0?'pos-row':''}>
+                        <td className="tl muted">{row.month===0?'Day 1':`M ${row.month}`}</td>
+                        <td className="tl">{row.date}</td>
+                        <td className="tl"><span className={`phase-badge ${phClass(row.phase,row.type)}`}>{row.phase}</span></td>
+                        <td className="tl">{row.type}</td>
+                        <td>{row.inc ? <span className="pos">+ {N(row.amount)}</span> : <span className="neg">({N(row.amount)})</span>}</td>
+                        <td><span className={nc(cn)}>{signed(cn)}</span></td>
+                      </tr>
+                    );
+                  });
+                })()}
+                <tr className="totals-row">
+                  <td className="tl" colSpan="4" style={{textAlign:'right'}}>Final Net Position</td>
+                  <td></td>
+                  <td><span className={nc(calc.totRent-calc.totOut)}>{signed(calc.totRent-calc.totOut)}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* AMORTISATION */}
+        {tab==='amort' && (
+          <div>
+            <div className="info-box">Loan: {cur} {N(calc.postTotal)} @ {bankRate}% p.a. | Monthly EMI: {cur} {N(calc.emi)} | Tenure: {mortYrs} yrs ({mortYrs*12} months) | Commences: Month {calc.cM+1}</div>
+            <div className="table-wrap">
+              <table>
+                <thead><tr>
+                  <th className="tl">Month</th>
+                  <th className="tl">Date</th>
+                  <th>EMI ({cur})</th>
+                  <th>Principal ({cur})</th>
+                  <th>Interest ({cur})</th>
+                  <th>Balance ({cur})</th>
+                </tr></thead>
+                <tbody>
+                  {calc.rows.filter(r=>r.phase==='Post-Handover').map((row,i)=>(
+                    <tr key={i}>
+                      <td className="tl muted">M {row.month}</td>
+                      <td className="tl">{row.date}</td>
+                      <td><span className="neg">({N(row.amount)})</span></td>
+                      <td style={{color:'var(--success)'}}>{N(row.prin)}</td>
+                      <td style={{color:'#9B5D3A'}}>{N(row.int)}</td>
+                      <td style={{color:'var(--gold-dark)',fontWeight:'600'}}>{N(row.balAfter)}</td>
+                    </tr>
+                  ))}
+                  <tr className="totals-row">
+                    <td className="tl" colSpan="2" style={{textAlign:'right'}}>Totals</td>
+                    <td><span className="neg">({N(calc.rows.filter(r=>r.phase==='Post-Handover').reduce((s,r)=>s+r.amount,0))})</span></td>
+                    <td style={{color:'var(--success)'}}>{N(calc.postTotal)}</td>
+                    <td style={{color:'#9B5D3A'}}>{N(calc.totInt)}</td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* LIQUIDATION ROI */}
+        {tab==='liq' && (
+          <div>
+            <div className="info-box" style={{background:'#EDE8FD',border:'1px solid #C9B8F0',color:'#4A1F9E'}}>
+              <strong>Liquidation ROI Analysis</strong> — shows what happens if you sell the property at any given month. Property value grows at <strong>{capRate}% p.a.</strong> Selling costs of <strong>{sellingCost}%</strong> are deducted from sale proceeds. Net P&amp;L = Sale proceeds (net of selling cost &amp; outstanding debt) + cumulative rent received − cumulative total payments made. Annualised ROI is IRR-equivalent.
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead><tr>
+                  <th className="tl">Month</th>
+                  <th className="tl">Date</th>
+                  <th className="tl">Phase</th>
+                  <th>Prop. Value ({cur})</th>
+                  <th>Outstanding Debt ({cur})</th>
+                  <th>Equity ({cur})</th>
+                  <th>Net Sale Proceeds ({cur})</th>
+                  <th>Cum. Invested ({cur})</th>
+                  <th>Cum. Rent ({cur})</th>
+                  <th>Net P&amp;L ({cur})</th>
+                  <th>ROI %</th>
+                  <th>Ann. ROI %</th>
+                </tr></thead>
+                <tbody>
+                  {calc.liqRows.map((row,i)=>{
+                    const roiColor = row.netPL >= 0 ? 'var(--success)' : 'var(--danger)';
+                    const roiSign = row.netPL >= 0 ? '+' : '';
+                    return (
+                      <tr key={i} className={row.netPL>=0?'pos-row':''}>
+                        <td className="tl muted">{row.month===0?'Day 1':`M ${row.month}`}</td>
+                        <td className="tl">{row.date}</td>
+                        <td className="tl"><span className={`phase-badge ${row.phase==='Pre-Handover'?'ph-pre':'ph-post'}`}>{row.phase}</span></td>
+                        <td style={{fontWeight:'500'}}>{N(row.propVal)}</td>
+                        <td style={{color:'var(--danger)'}}>{row.outstandingDebt>0?`(${N(row.outstandingDebt)})`:'—'}</td>
+                        <td style={{color:row.equity>=0?'var(--success)':'var(--danger)',fontWeight:'600'}}>{N(row.equity)}</td>
+                        <td style={{fontWeight:'600'}}>{N(row.netSaleProceeds)}</td>
+                        <td className="muted">{N(row.cumOut)}</td>
+                        <td style={{color:'var(--success)'}}>{row.cumIn>0?N(row.cumIn):'—'}</td>
+                        <td style={{color:roiColor,fontWeight:'700'}}>{roiSign}{N(row.netPL)}</td>
+                        <td style={{color:roiColor,fontWeight:'700'}}>{roiSign}{row.roiPct.toFixed(1)}%</td>
+                        <td style={{color:roiColor,fontWeight:'700'}}>{row.month>0?`${roiSign}${row.annRoi.toFixed(1)}%`:'—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Export */}
+        <div style={{textAlign:'center',marginTop:'20px'}}>
+          <button className="btn btn-secondary" onClick={()=>window.print()} style={{marginRight:'12px'}}>🖨 Print / Save PDF</button>
+          <button className="btn btn-secondary" onClick={()=>{
+            const csv = tab==='liq'
+              ? ['Month,Date,Phase,Property Value,Outstanding Debt,Equity,Net Sale Proceeds,Cum Invested,Cum Rent,Net P&L,ROI %,Ann ROI %',
+                  ...calc.liqRows.map(r=>`${r.month},${r.date},${r.phase},${Math.round(r.propVal)},${Math.round(r.outstandingDebt)},${Math.round(r.equity)},${Math.round(r.netSaleProceeds)},${Math.round(r.cumOut)},${Math.round(r.cumIn)},${Math.round(r.netPL)},${r.roiPct.toFixed(2)},${r.month>0?r.annRoi.toFixed(2):''}`)
+                ].join('\n')
+              : ['Month,Date,Outflow (EMI+Expenses),Inflow (Rent),Net Cash Flow,Cumulative Net',
+                  ...calc.mlist.map(m=>`${m.month},${m.date},${-Math.round(m.out)},${Math.round(m.inn)},${Math.round(m.net)},${Math.round(m.cumNet)}`)
+                ].join('\n');
+            const fname = tab==='liq'?'liquidation_roi.csv':'net_cashflow.csv';
+            const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=fname; a.click();
+          }}>⬇ Export CSV</button>
+        </div>
+      </>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
