@@ -3474,8 +3474,7 @@ function startDashboard() {
   // â”€â”€ Bind port IMMEDIATELY so Render health check passes â”€â”€
   const PORT = process.env.PORT || 3000;
   app.use('/api/property', require('./propertyIntel'));
-  server = app.listen(PORT,
-app.listen(PORT, () => {
+  server = app.listen(PORT, () => {
     console.log(`GCC Job Agent Dashboard running at port ${PORT}`);
   });
 
