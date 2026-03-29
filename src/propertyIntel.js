@@ -73,7 +73,7 @@ async function fetchProps(locationId, purpose, rooms) {
     const path = `/uae-re-search-properties?location_id=${locationId}&purpose=${purpose}`
                + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
     const r = await rapidGet(path);
-    return r?.data || r?.results || r?.hits || [];
+    const d=r&&r.data?r.data:r;return(d&&d.properties)?d.properties:Array.isArray(d)?d:[];
   } catch(e) {
     console.error(`[PI] props failed loc=${locationId} ${purpose} ${rooms}:`, e.message);
     return [];
@@ -90,11 +90,7 @@ const r1 = n => n!=null ? Math.round(n*10)/10 : null;
 const r0 = n => n!=null ? Math.round(n) : null;
 
 function parseProps(hits) {
-  return hits.map(h => {
-    const price = h.price || h.rental_price || 0;
-    const area  = h.area  || h.size || 0;
-    return { price, area, psf: price&&area ? r0(price/area) : null };
-  }).filter(h => h.price > 1000 && h.area > 50);
+  const arr=Array.isArray(hits)?hits:(hits&&hits.properties?hits.properties:[]); return arr.map(h=>{const price=h.price||0;const area=Math.round((h.area||0)*10.764);return{price,area,psf:price&&area?r0(price/area):null};}).filter(h=>h.price>1000&&h.area>100);
 }
 
 // ── Build all market rows ─────────────────────────────────────
@@ -215,7 +211,7 @@ router.get('/test', async (req, res) => {
     if (id) {
       props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
     }
-    res.json({ ok:true, locationSample: r?.data?.slice(0,3), locationId:id, propSample: (props?.data||[]).slice(0,2) });
+    const pl=(props&&props.data&&props.data.properties)?props.data.properties.slice(0,2):[]; res.json({ok:true,locId:id,propCount:pl.length,sample:pl.map(p=>({price:p.price,areaSqm:p.area,rooms:p.rooms}))});
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
