@@ -7,7 +7,7 @@ const { MongoClient } = require('mongodb');
 
 const RAPIDAPI_KEY  = process.env.RAPIDAPI_KEY || '';
 const MONGO_URI     = process.env.MONGODB_URI  || '';
-const RAPIDAPI_HOST = 'uae-real-estate2.p.rapidapi.com';
+const RAPIDAPI_HOST = 'uae-real-estate-api.p.rapidapi.com';
 
 const TARGET_AREAS = [
   { name:'JVC',                   query:'Jumeirah Village Circle', city:'Dubai'   },
@@ -51,7 +51,7 @@ function rapidGet(path) {
 // ── Get location_id for area name ────────────────────────────
 async function getLocationId(query) {
   try {
-    const r = await rapidGet(`/uae-re-autocomplete?query=${encodeURIComponent(query)}`);
+    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}`);
     const hits = r?.data || [];
     // Find best match
     const match = hits.find(h =>
