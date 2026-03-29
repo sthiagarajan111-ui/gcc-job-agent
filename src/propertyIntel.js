@@ -73,7 +73,7 @@ async function fetchProps(locationId, purpose, rooms) {
     const path = `/search-properties?location_id=${locationId}&purpose=&platform=bayut${purpose}`
                + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
     const r = await rapidGet(path);
-    return r?.data || r?.results || r?.hits || [];
+    const hits = r && r.data ? (r.data.properties || r.data) : (r && r.results ? r.results : []); return Array.isArray(hits) ? hits : [];
   } catch(e) {
     console.error(`[PI] props failed loc=${locationId} ${purpose} ${rooms}:`, e.message);
     return [];
@@ -90,10 +90,14 @@ const r1 = n => n!=null ? Math.round(n*10)/10 : null;
 const r0 = n => n!=null ? Math.round(n) : null;
 
 function parseProps(hits) {
-  return hits.map(h => {
-    const price = h.price || h.rental_price || 0;
-    const area  = h.area  || h.size || 0;
-    return { price, area, psf: price&&area ? r0(price/area) : null };
+  const arr = Array.isArray(hits) ? hits : (hits && hits.properties ? hits.properties : []);
+  return arr.map(h => {
+    const price   = h.price || 0;
+    const areaSqm = h.area  || 0;
+    const area    = Math.round(areaSqm * 10.764);
+    return { price, area, psf: price && area ? r0(price / area) : null };
+  }).filter(h => h.price > 1000 && h.area > 100);
+};
   }).filter(h => h.price > 1000 && h.area > 50);
 }
 
