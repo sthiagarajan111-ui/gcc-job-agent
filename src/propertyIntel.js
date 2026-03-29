@@ -70,8 +70,8 @@ async function getLocationId(query) {
 async function fetchProps(locationId, purpose, rooms) {
   try {
     const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-    const path = `/properties/list?locationExternalIDs=${locationId}&purpose=${purpose}`
-               + `&categoryExternalID=4&${roomParam}&page=1&sort=price_asc`;
+    const path = `/uae-re-search-properties?location_id=${locationId}&purpose=${purpose}`
+               + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
     const r = await rapidGet(path);
     return r?.data || r?.results || r?.hits || [];
   } catch(e) {
@@ -213,7 +213,7 @@ router.get('/test', async (req, res) => {
     const id = r?.data?.[0]?.location_id;
     let props = null;
     if (id) {
-      props = await rapidGet(`/properties/list?locationExternalIDs=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
+      props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
     }
     res.json({ ok:true, rawLoc:r, locId:id, rawProps:props });
   } catch(e) { res.status(500).json({ error:e.message }); }
