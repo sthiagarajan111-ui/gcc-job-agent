@@ -7,7 +7,7 @@ const { MongoClient } = require('mongodb');
 
 const RAPIDAPI_KEY  = process.env.RAPIDAPI_KEY || '';
 const MONGO_URI     = process.env.MONGODB_URI  || '';
-const RAPIDAPI_HOST = 'uae-real-estate2.p.rapidapi.com';
+const RAPIDAPI_HOST = 'uae-real-estate-api.p.rapidapi.com';
 
 const TARGET_AREAS = [
   { name:'JVC',                   query:'Jumeirah Village Circle', city:'Dubai'   },
