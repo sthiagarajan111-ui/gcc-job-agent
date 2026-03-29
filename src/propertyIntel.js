@@ -1,5 +1,5 @@
 // propertyIntel.js – Dubai Property Investment Intelligence
-// Usage: app.use('/api/property', require('./propertyIntel'))
+// Mount: app.use('/api/property', require('./propertyIntel'))
 const express = require('express');
 const router  = express.Router();
 const https   = require('https');
@@ -10,21 +10,21 @@ const MONGO_URI     = process.env.MONGODB_URI  || '';
 const RAPIDAPI_HOST = 'uae-real-estate2.p.rapidapi.com';
 
 const TARGET_AREAS = [
-  { name:'JVC',                  slug:'jumeirah-village-circle-jvc',  city:'Dubai'   },
-  { name:'JLT',                  slug:'jumeirah-lake-towers-jlt',     city:'Dubai'   },
-  { name:'Arjan',                slug:'arjan',                        city:'Dubai'   },
-  { name:'Meydan City',          slug:'meydan-city',                  city:'Dubai'   },
-  { name:'Business Bay',         slug:'business-bay',                 city:'Dubai'   },
-  { name:'Downtown Dubai',       slug:'downtown-dubai',               city:'Dubai'   },
-  { name:'Dubai Marina',         slug:'dubai-marina',                 city:'Dubai'   },
-  { name:'Dubai Hills',          slug:'dubai-hills-estate',           city:'Dubai'   },
-  { name:'Silicon Oasis',        slug:'dubai-silicon-oasis',          city:'Dubai'   },
-  { name:'International City',   slug:'international-city',           city:'Dubai'   },
-  { name:'Al Furjan',            slug:'al-furjan',                    city:'Dubai'   },
-  { name:'Dubai South',          slug:'dubai-south',                  city:'Dubai'   },
-  { name:'DIP',                  slug:'dubai-investment-park-dip',    city:'Dubai'   },
-  { name:'Dubai Production City',slug:'dubai-production-city-impz',   city:'Dubai'   },
-  { name:'Tilal City',           slug:'tilal-city',                   city:'Sharjah' },
+  { name:'JVC',                   query:'Jumeirah Village Circle', city:'Dubai'   },
+  { name:'JLT',                   query:'Jumeirah Lake Towers',    city:'Dubai'   },
+  { name:'Arjan',                 query:'Arjan',                   city:'Dubai'   },
+  { name:'Meydan City',           query:'Meydan City',             city:'Dubai'   },
+  { name:'Business Bay',          query:'Business Bay',            city:'Dubai'   },
+  { name:'Downtown Dubai',        query:'Downtown Dubai',          city:'Dubai'   },
+  { name:'Dubai Marina',          query:'Dubai Marina',            city:'Dubai'   },
+  { name:'Dubai Hills',           query:'Dubai Hills Estate',      city:'Dubai'   },
+  { name:'Silicon Oasis',         query:'Dubai Silicon Oasis',     city:'Dubai'   },
+  { name:'International City',    query:'International City',      city:'Dubai'   },
+  { name:'Al Furjan',             query:'Al Furjan',               city:'Dubai'   },
+  { name:'Dubai South',           query:'Dubai South',             city:'Dubai'   },
+  { name:'DIP',                   query:'Dubai Investment Park',   city:'Dubai'   },
+  { name:'Dubai Production City', query:'Dubai Production City',   city:'Dubai'   },
+  { name:'Tilal City',            query:'Tilal City',              city:'Sharjah' },
 ];
 
 const ROOM_TYPES = [
@@ -34,69 +34,92 @@ const ROOM_TYPES = [
   { label:'3 BR',   rooms:3 },
 ];
 
+// ── HTTP GET helper ───────────────────────────────────────────
 function rapidGet(path) {
   return new Promise((resolve, reject) => {
     const req = https.request(
       { hostname: RAPIDAPI_HOST, path, method:'GET',
         headers:{ 'x-rapidapi-key': RAPIDAPI_KEY, 'x-rapidapi-host': RAPIDAPI_HOST } },
-      res => {
-        let d = '';
-        res.on('data', c => d += c);
-        res.on('end', () => {
-          try { resolve(JSON.parse(d)); }
-          catch(e) { reject(new Error('Parse: ' + d.slice(0,120))); }
-        });
-      }
+      res => { let d=''; res.on('data',c=>d+=c); res.on('end',()=>{ try{resolve(JSON.parse(d))}catch(e){reject(new Error('Parse:'+d.slice(0,200)))} }); }
     );
     req.on('error', reject);
-    req.setTimeout(15000, () => { req.destroy(); reject(new Error('Timeout')); });
+    req.setTimeout(15000, ()=>{ req.destroy(); reject(new Error('Timeout')); });
     req.end();
   });
 }
 
-async function fetchListings(slug, purpose, rooms) {
-  const rp = rooms === 0 ? 'rooms=0' : `rooms=${rooms}`;
-  const p  = `/properties/list?locationSlug=${slug}&purpose=${purpose}`
-           + `&categoryExternalID=4&${rp}&hitsPerPage=50&page=0&lang=en&sort=price_asc`;
-  try { const r = await rapidGet(p); return r.hits || []; }
-  catch(e) { console.error(`[PI] ${slug} ${purpose} ${rooms}:`, e.message); return []; }
+// ── Get location_id for area name ────────────────────────────
+async function getLocationId(query) {
+  try {
+    const r = await rapidGet(`/uae-re-autocomplete?query=${encodeURIComponent(query)}`);
+    const hits = r?.data || [];
+    // Find best match
+    const match = hits.find(h =>
+      (h.name||'').toLowerCase() === query.toLowerCase()
+    ) || hits.find(h =>
+      (h.name||'').toLowerCase().includes(query.toLowerCase().split(' ')[0].toLowerCase())
+    ) || hits[0];
+    return match?.location_id || null;
+  } catch(e) {
+    console.error(`[PI] location lookup failed "${query}":`, e.message);
+    return null;
+  }
 }
 
-async function fetchTransactions(slug, rooms) {
-  const rp = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-  const p  = `/transactions/list?locationSlug=${slug}&categoryExternalID=4`
-           + `&${rp}&hitsPerPage=50&page=0&lang=en`;
-  try { const r = await rapidGet(p); return r.hits || []; }
-  catch(e) { console.error(`[PI] tx ${slug} ${rooms}:`, e.message); return []; }
+// ── Fetch property listings ───────────────────────────────────
+async function fetchProps(locationId, purpose, rooms) {
+  try {
+    const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
+    const path = `/uae-re-search-properties?location_id=${locationId}&purpose=${purpose}`
+               + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
+    const r = await rapidGet(path);
+    return r?.data || r?.results || r?.hits || [];
+  } catch(e) {
+    console.error(`[PI] props failed loc=${locationId} ${purpose} ${rooms}:`, e.message);
+    return [];
+  }
 }
 
+// ── Stats helpers ─────────────────────────────────────────────
 const median = a => {
   if (!a.length) return null;
-  const s = [...a].sort((x,y)=>x-y), m = Math.floor(s.length/2);
+  const s=[...a].sort((x,y)=>x-y), m=Math.floor(s.length/2);
   return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
 };
-const r1 = n => n !== null ? Math.round(n*10)/10 : null;
-const r0 = n => n !== null ? Math.round(n) : null;
+const r1 = n => n!=null ? Math.round(n*10)/10 : null;
+const r0 = n => n!=null ? Math.round(n) : null;
 
+function parseProps(hits) {
+  return hits.map(h => {
+    const price = h.price || h.rental_price || 0;
+    const area  = h.area  || h.size || 0;
+    return { price, area, psf: price&&area ? r0(price/area) : null };
+  }).filter(h => h.price > 1000 && h.area > 50);
+}
+
+// ── Build all market rows ─────────────────────────────────────
 async function buildRows() {
   const rows = [];
+
+  // Resolve location IDs
+  const areaWithIds = [];
   for (const area of TARGET_AREAS) {
+    const id = await getLocationId(area.query);
+    if (id) { areaWithIds.push({ ...area, id }); console.log(`[PI] ${area.name} → ${id}`); }
+    else console.error(`[PI] No ID for ${area.name}`);
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  // Fetch listings per area per room type
+  for (const area of areaWithIds) {
     for (const rt of ROOM_TYPES) {
-      const [saleH, rentH, txH] = await Promise.all([
-        fetchListings(area.slug, 'for-sale', rt.rooms),
-        fetchListings(area.slug, 'for-rent', rt.rooms),
-        fetchTransactions(area.slug, rt.rooms),
+      const [saleH, rentH] = await Promise.all([
+        fetchProps(area.id, 'for-sale', rt.rooms),
+        fetchProps(area.id, 'for-rent',  rt.rooms),
       ]);
 
-      const sales = saleH
-        .map(h => ({ price:h.price||0, area:h.area||0, psf: h.price&&h.area ? r0(h.price/h.area) : null }))
-        .filter(h => h.price>50000 && h.area>100);
-      const rents = rentH
-        .map(h => ({ price:h.price||0, area:h.area||0, psf: h.price&&h.area ? r1(h.price/h.area) : null }))
-        .filter(h => h.price>5000 && h.area>100);
-      const txs = txH
-        .map(h => ({ price:h.transactionValue||0, area:h.area||0, psf: h.transactionValue&&h.area ? r0(h.transactionValue/h.area) : null }))
-        .filter(h => h.price>50000 && h.area>100);
+      const sales = parseProps(saleH).filter(h => h.price > 50000);
+      const rents = parseProps(rentH).filter(h => h.price > 3000);
 
       if (sales.length < 2 && rents.length < 2) continue;
 
@@ -104,41 +127,39 @@ async function buildRows() {
       const medSalePsf    = median(sales.map(s=>s.psf).filter(Boolean));
       const medRentAnnual = median(rents.map(r=>r.price));
       const medRentPsf    = median(rents.map(r=>r.psf).filter(Boolean));
-      const medTxPsf      = median(txs.map(t=>t.psf).filter(Boolean));
       const medSaleArea   = median(sales.map(s=>s.area).filter(Boolean));
       const minPrice      = sales.length ? Math.min(...sales.map(s=>s.price)) : null;
       const maxPrice      = sales.length ? Math.max(...sales.map(s=>s.price)) : null;
 
-      const grossYield = medSalePrice && medRentAnnual ? r1(medRentAnnual/medSalePrice*100) : null;
+      const grossYield = medSalePrice&&medRentAnnual ? r1(medRentAnnual/medSalePrice*100) : null;
       const netYield   = grossYield ? r1(grossYield*0.80) : null;
-      const paybackYrs = medSalePrice && medRentAnnual ? r1(medSalePrice/medRentAnnual) : null;
-      // valueSignal: negative = listing below DLD actual transactions = good value
-      const valueSignal = medTxPsf && medSalePsf ? r1((medSalePsf-medTxPsf)/medTxPsf*100) : null;
-      // ROI score /10
-      const yScore = grossYield ? Math.min(grossYield/10*6,6) : 0;
-      const vScore = valueSignal!==null ? Math.min(Math.max((-valueSignal/20)*4,0),4) : 2;
-      const roiScore = r1(yScore+vScore);
+      const paybackYrs = medSalePrice&&medRentAnnual ? r1(medSalePrice/medRentAnnual) : null;
+      const roiScore   = grossYield ? r1(Math.min(grossYield/10*10,10)) : null;
 
       rows.push({
         area: area.name, city: area.city, rooms: rt.label,
-        saleCount: sales.length, rentCount: rents.length, txCount: txs.length,
+        locationId: area.id,
+        saleCount: sales.length, rentCount: rents.length,
         medSalePrice:  r0(medSalePrice),
         medSalePsf:    r0(medSalePsf),
+        medTxPsf:      null,
         medRentAnnual: r0(medRentAnnual),
         medRentPsf:    r1(medRentPsf),
-        medTxPsf:      r0(medTxPsf),
         medSaleArea:   r0(medSaleArea),
         minPrice:      r0(minPrice),
         maxPrice:      r0(maxPrice),
-        grossYield, netYield, paybackYrs, valueSignal, roiScore,
+        grossYield, netYield, paybackYrs,
+        valueSignal: null,
+        roiScore,
         fetchedAt: new Date(),
       });
-      await new Promise(r => setTimeout(r, 350));
+      await new Promise(r => setTimeout(r, 400));
     }
   }
-  return rows.sort((a,b) => (b.grossYield||0)-(a.grossYield||0));
+  return rows.sort((a,b)=>(b.grossYield||0)-(a.grossYield||0));
 }
 
+// ── MongoDB cache ─────────────────────────────────────────────
 async function getCached() {
   if (!MONGO_URI) return null;
   try {
@@ -161,13 +182,14 @@ async function setCache(data) {
   } catch(e) { console.error('[PI] cache write:', e.message); }
 }
 
+// ── Routes ────────────────────────────────────────────────────
 router.get('/data', async (req, res) => {
   try {
     const cached = await getCached();
     if (cached && new Date(cached.expiresAt) > new Date())
       return res.json({ source:'cache', updatedAt:cached.updatedAt, data:cached.data });
     if (!RAPIDAPI_KEY)
-      return res.status(503).json({ error:'RAPIDAPI_KEY not configured in Render environment variables.' });
+      return res.status(503).json({ error:'RAPIDAPI_KEY not configured.' });
     const data = await buildRows();
     await setCache(data);
     res.json({ source:'live', updatedAt:new Date(), data });
@@ -183,6 +205,18 @@ router.post('/refresh', async (req, res) => {
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
-router.get('/test', async (req, res) => { if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' }); try { const r = await rapidGet('/locations_search?query=jumeirah+village+circle&langs=en'); res.json({ ok:true, host:RAPIDAPI_HOST, results:r }); } catch(e) { res.status(500).json({ error:e.message }); } });
+// Test route — verify one location lookup
+router.get('/test', async (req, res) => {
+  if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
+  try {
+    const r = await rapidGet('/uae-re-autocomplete?query=jumeirah+village+circle');
+    const id = r?.data?.[0]?.location_id;
+    let props = null;
+    if (id) {
+      props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
+    }
+    res.json({ ok:true, locationSample: r?.data?.slice(0,3), locationId:id, propSample: (props?.data||[]).slice(0,2) });
+  } catch(e) { res.status(500).json({ error:e.message }); }
+});
 
 module.exports = router;
