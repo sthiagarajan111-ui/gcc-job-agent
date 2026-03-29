@@ -209,7 +209,7 @@ router.post('/refresh', async (req, res) => {
 router.get('/test', async (req, res) => {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
-    const r = await rapidGet('/uae-re-autocomplete?query=jumeirah+village+circle');
+    const r = await rapidGet('/autocomplete?query=jumeirah+village+circle&platform=bayut');
     const id = r?.data?.[0]?.location_id;
     let props = null;
     if (id) {
