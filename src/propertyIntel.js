@@ -98,6 +98,8 @@ function parseProps(hits) {
     return { price, area, psf: price && area ? r0(price / area) : null };
   }).filter(h => h.price > 1000 && h.area > 100);
 };
+  }).filter(h => h.price > 1000 && h.area > 100);
+};
   }).filter(h => h.price > 1000 && h.area > 50);
 }
 
