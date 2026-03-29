@@ -215,7 +215,7 @@ router.get('/test', async (req, res) => {
     if (id) {
       props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
     }
-    res.json({ ok:true, locationSample: r?.data?.slice(0,3), locationId:id, propSample: (props?.data||[]).slice(0,2) });
+    res.json({ ok:true, rawLoc:r, locId:id, rawProps:props });
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
