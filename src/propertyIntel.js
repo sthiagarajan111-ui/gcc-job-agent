@@ -51,7 +51,7 @@ function rapidGet(path) {
 // ── Get location_id for area name ────────────────────────────
 async function getLocationId(query) {
   try {
-    const r = await rapidGet(`/autocomplete?query=&platform=bayut${encodeURIComponent(query)}`);
+    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}&platform=bayut`);
     const hits = r?.data || [];
     // Find best match
     const match = hits.find(h =>
