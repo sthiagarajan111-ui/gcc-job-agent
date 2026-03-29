@@ -7,7 +7,7 @@ const { MongoClient } = require('mongodb');
 
 const RAPIDAPI_KEY  = process.env.RAPIDAPI_KEY || '';
 const MONGO_URI     = process.env.MONGODB_URI  || '';
-const RAPIDAPI_HOST = 'uae-real-estate-api.p.rapidapi.com';
+const RAPIDAPI_HOST = 'uae-real-estate2.p.rapidapi.com';
 
 const TARGET_AREAS = [
   { name:'JVC',                   query:'Jumeirah Village Circle', city:'Dubai'   },
@@ -51,7 +51,7 @@ function rapidGet(path) {
 // ── Get location_id for area name ────────────────────────────
 async function getLocationId(query) {
   try {
-    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}`);
+    const r = await rapidGet(`/uae-re-autocomplete?query=${encodeURIComponent(query)}`);
     const hits = r?.data || [];
     // Find best match
     const match = hits.find(h =>
@@ -70,10 +70,10 @@ async function getLocationId(query) {
 async function fetchProps(locationId, purpose, rooms) {
   try {
     const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-    const path = `/search-properties?location_id=${locationId}&purpose=&platform=bayut${purpose}`
+    const path = `/uae-re-search-properties?location_id=${locationId}&purpose=${purpose}`
                + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
     const r = await rapidGet(path);
-    const hits = r && r.data ? (r.data.properties || r.data) : (r && r.results ? r.results : []); return Array.isArray(hits) ? hits : [];
+    return r?.data || r?.results || r?.hits || [];
   } catch(e) {
     console.error(`[PI] props failed loc=${locationId} ${purpose} ${rooms}:`, e.message);
     return [];
@@ -90,16 +90,10 @@ const r1 = n => n!=null ? Math.round(n*10)/10 : null;
 const r0 = n => n!=null ? Math.round(n) : null;
 
 function parseProps(hits) {
-  const arr = Array.isArray(hits) ? hits : (hits && hits.properties ? hits.properties : []);
-  return arr.map(h => {
-    const price   = h.price || 0;
-    const areaSqm = h.area  || 0;
-    const area    = Math.round(areaSqm * 10.764);
-    return { price, area, psf: price && area ? r0(price / area) : null };
-  }).filter(h => h.price > 1000 && h.area > 100);
-};
-  }).filter(h => h.price > 1000 && h.area > 100);
-};
+  return hits.map(h => {
+    const price = h.price || h.rental_price || 0;
+    const area  = h.area  || h.size || 0;
+    return { price, area, psf: price&&area ? r0(price/area) : null };
   }).filter(h => h.price > 1000 && h.area > 50);
 }
 
@@ -215,13 +209,13 @@ router.post('/refresh', async (req, res) => {
 router.get('/test', async (req, res) => {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
-    const r = await rapidGet('/autocomplete?query=jumeirah+village+circle&platform=bayut');
+    const r = await rapidGet('/uae-re-autocomplete?query=jumeirah+village+circle');
     const id = r?.data?.[0]?.location_id;
     let props = null;
     if (id) {
-      props = await rapidGet(`/search-properties?location_id=${id}&purpose=buy&platform=bayut&category=apartments&bedrooms=1&page=1`);
+      props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
     }
-    res.json({ ok:true, rawLoc:r, locId:id, rawProps:props });
+    res.json({ ok:true, locationSample: r?.data?.slice(0,3), locationId:id, propSample: (props?.data||[]).slice(0,2) });
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
