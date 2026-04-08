@@ -51,7 +51,7 @@ function rapidGet(path) {
 // ── Get location_id for area name ────────────────────────────
 async function getLocationId(query) {
   try {
-    const r = await rapidGet(`/uae-re-autocomplete?query=${encodeURIComponent(query)}`);
+    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}&platform=bayut`);
     const hits = r?.data || [];
     // Find best match
     const match = hits.find(h =>
@@ -70,8 +70,8 @@ async function getLocationId(query) {
 async function fetchProps(locationId, purpose, rooms) {
   try {
     const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-    const path = `/uae-re-search-properties?location_id=${locationId}&purpose=${purpose}`
-               + `&category=apartments&${roomParam}&page=1&sort=price_asc`;
+    const path = `/search-properties?location_id=${locationId}&purpose=${purpose==="for-sale"?"buy":"rent"}&platform=bayut`
+               + `&category=apartments&${roomParam}&page=1`;
     const r = await rapidGet(path);
     return r?.data || r?.results || r?.hits || [];
   } catch(e) {
@@ -209,13 +209,13 @@ router.post('/refresh', async (req, res) => {
 router.get('/test', async (req, res) => {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
-    const r = await rapidGet('/uae-re-autocomplete?query=jumeirah+village+circle');
+    const r = await rapidGet('/autocomplete?query=jumeirah+village+circle&platform=bayut');
     const id = r?.data?.[0]?.location_id;
     let props = null;
     if (id) {
-      props = await rapidGet(`/uae-re-search-properties?location_id=${id}&purpose=for-sale&category=apartments&bedrooms=1&page=1`);
+      props = await rapidGet(`/search-properties?location_id=${id}&purpose=buy&platform=bayut&category=apartments&bedrooms=1&page=1`);
     }
-    res.json({ ok:true, locationSample: r?.data?.slice(0,3), locationId:id, propSample: (props?.data||[]).slice(0,2) });
+    const cnt=(props&&props.data&&props.data.properties)?props.data.properties.length:0; res.json({ok:true,locId:id,propCount:cnt,host:RAPIDAPI_HOST});
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
