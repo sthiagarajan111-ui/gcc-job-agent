@@ -52,7 +52,7 @@ function rapidGet(path) {
 async function getLocationId(query) {
   try {
     const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}`);
-    const hits = (r && r.data && r.data.hits) ? r.data.hits : [];
+    const hits = (r && r.datan && r.datan.hits) ? r.datan.hits : (r && r.data && r.data.hits) ? r.data.hits : [];
     if (!hits.length) { console.error('[PI] No hits for: ' + query); return null; }
     const match = hits.find(h => (h.name||'').toLowerCase() === query.toLowerCase())
                || hits.find(h => (h.name||'').toLowerCase().includes(query.toLowerCase().split(' ')[0].toLowerCase()))
@@ -208,7 +208,7 @@ router.get('/test', async (req, res) => {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
     const r = await rapidGet('/autocomplete?query=Jumeirah+Village+Circle');
-    const hits = (r && r.data && r.data.hits) ? r.data.hits : []; const id = hits[0] ? hits[0].externalID : null;
+    const hits = (r && r.datan && r.datan.hits) ? r.datan.hits : (r && r.data && r.data.hits) ? r.data.hits : []; const id = hits[0] ? hits[0].externalID : null;
     let props = null;
     if (id) {
       if (id) props = await rapidGet(`/search/property?location_external_id=${id}&purpose=for-sale&hitsPerPage=5&page=0&category=residential&rooms=1`);
