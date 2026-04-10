@@ -7,7 +7,7 @@ const { MongoClient } = require('mongodb');
 
 const RAPIDAPI_KEY  = process.env.RAPIDAPI_KEY || '';
 const MONGO_URI     = process.env.MONGODB_URI  || '';
-const RAPIDAPI_HOST = 'uae-real-estate-api.p.rapidapi.com';
+const RAPIDAPI_HOST = 'bayuut-working-api.p.rapidapi.com';
 
 const TARGET_AREAS = [
   { name:'JVC',                   query:'Jumeirah Village Circle', city:'Dubai'   },
@@ -51,17 +51,15 @@ function rapidGet(path) {
 // ── Get location_id for area name ────────────────────────────
 async function getLocationId(query) {
   try {
-    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}&platform=bayut`);
-    const hits = r?.data || [];
-    // Find best match
-    const match = hits.find(h =>
-      (h.name||'').toLowerCase() === query.toLowerCase()
-    ) || hits.find(h =>
-      (h.name||'').toLowerCase().includes(query.toLowerCase().split(' ')[0].toLowerCase())
-    ) || hits[0];
-    return match?.location_id || null;
+    const r = await rapidGet(`/autocomplete?query=${encodeURIComponent(query)}`);
+    const hits = (r && r.data && r.data.hits) ? r.data.hits : [];
+    if (!hits.length) { console.error('[PI] No hits for: ' + query); return null; }
+    const match = hits.find(h => (h.name||'').toLowerCase() === query.toLowerCase())
+               || hits.find(h => (h.name||'').toLowerCase().includes(query.toLowerCase().split(' ')[0].toLowerCase()))
+               || hits[0];
+    return match ? (match.externalID || null) : null;
   } catch(e) {
-    console.error(`[PI] location lookup failed "${query}":`, e.message);
+    console.error('[PI] location lookup failed ' + query + ': ' + e.message);
     return null;
   }
 }
@@ -209,13 +207,13 @@ router.post('/refresh', async (req, res) => {
 router.get('/test', async (req, res) => {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
-    const r = await rapidGet('/autocomplete?query=jumeirah+village+circle&platform=bayut');
-    const id = r?.data?.[0]?.location_id;
+    const r = await rapidGet('/autocomplete?query=Jumeirah+Village+Circle');
+    const hits = (r && r.data && r.data.hits) ? r.data.hits : []; const id = hits[0] ? hits[0].externalID : null;
     let props = null;
     if (id) {
-      props = await rapidGet(`/search-properties?location_id=${id}&purpose=buy&platform=bayut&category=apartments&bedrooms=1&page=1`);
+      if (id) props = await rapidGet(`/search/property?location_external_id=${id}&purpose=for-sale&hitsPerPage=5&page=0&category=residential&rooms=1`);
     }
-    res.json({ok:true,locId:id,host:RAPIDAPI_HOST,rawLoc:r});
+    const cnt=(props&&props.data&&props.data.hits)?props.data.hits.length:0; res.json({ok:true,locId:id,propCount:cnt,host:RAPIDAPI_HOST});
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
