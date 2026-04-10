@@ -213,7 +213,7 @@ router.get('/test', async (req, res) => {
     if (id) {
       if (id) props = await rapidGet(`/property/search?location_external_id=${id}&purpose=for-sale&hitsPerPage=5&page=0&category=residential&rooms=1`);
     }
-    const cnt=(props&&props.data&&props.data.hits)?props.data.hits.length:0; res.json({ok:true,locId:id,propCount:cnt,host:RAPIDAPI_HOST});
+    res.json({ok:true,locId:id,host:RAPIDAPI_HOST,rawProps:props});
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
