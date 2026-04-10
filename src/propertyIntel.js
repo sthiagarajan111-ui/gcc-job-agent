@@ -67,11 +67,10 @@ async function getLocationId(query) {
 // ── Fetch property listings ───────────────────────────────────
 async function fetchProps(locationId, purpose, rooms) {
   try {
-    const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-    const path = `/search/property?location_external_id=${locationId}&purpose=${purpose==="for-sale"?"for-sale":"for-rent"}&hitsPerPage=50&page=0&category=residential`
-               + ``;
+    const roomParam = rooms === 0 ? 'rooms=0' : `rooms=${rooms}`;
+    const path = `/search/property?location_external_id=${locationId}&purpose=${purpose==="for-sale"?"for-sale":"for-rent"}&hitsPerPage=50&page=0&category=residential&${roomParam}`;
     const r = await rapidGet(path);
-    return r?.data || r?.results || r?.hits || [];
+    return (r && r.datan && r.datan.hits) ? r.datan.hits : [];
   } catch(e) {
     console.error(`[PI] props failed loc=${locationId} ${purpose} ${rooms}:`, e.message);
     return [];
@@ -88,11 +87,13 @@ const r1 = n => n!=null ? Math.round(n*10)/10 : null;
 const r0 = n => n!=null ? Math.round(n) : null;
 
 function parseProps(hits) {
+  if (!Array.isArray(hits)) return [];
   return hits.map(h => {
-    const price = h.price || h.rental_price || 0;
-    const area  = h.area  || h.size || 0;
-    return { price, area, psf: price&&area ? r0(price/area) : null };
-  }).filter(h => h.price > 1000 && h.area > 50);
+    const price   = h.price || 0;
+    const areaSqm = h.area  || 0;
+    const area    = Math.round(areaSqm * 10.764);
+    return { price, area, psf: price && area ? r0(price/area) : null };
+  }).filter(h => h.price > 5000 && h.area > 100);
 }
 
 // ── Build all market rows ─────────────────────────────────────
