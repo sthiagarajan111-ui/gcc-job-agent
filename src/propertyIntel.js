@@ -212,7 +212,7 @@ async function buildRows() {
 async function getCache() {
   if (!MONGO_URI) return null;
   try {
-    var c = new MongoClient(MONGO_URI);
+    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000,connectTimeoutMS:30000});
     await c.connect();
     var doc = await c.db('gcc-job-agent').collection('propertyIntel').findOne({_id:'cache'});
     await c.close(); return doc;
@@ -222,7 +222,7 @@ async function getCache() {
 async function setCache(data) {
   if (!MONGO_URI) return;
   try {
-    var c = new MongoClient(MONGO_URI);
+    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000,connectTimeoutMS:30000});
     await c.connect();
     await c.db('gcc-job-agent').collection('propertyIntel').replaceOne(
       {_id:'cache'},
