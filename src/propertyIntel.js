@@ -215,7 +215,7 @@ router.get('/test', async (req, res) => {
     if (id) {
       props = await rapidGet(`/search-properties?location_id=${id}&purpose=buy&platform=bayut&category=apartments&bedrooms=1&page=1`);
     }
-    const cnt=(props&&props.data&&props.data.properties)?props.data.properties.length:0; res.json({ok:true,locId:id,propCount:cnt,host:RAPIDAPI_HOST});
+    res.json({ok:true,locId:id,host:RAPIDAPI_HOST,rawLoc:r});
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
