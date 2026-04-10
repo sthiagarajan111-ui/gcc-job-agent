@@ -68,8 +68,8 @@ async function getLocationId(query) {
 async function fetchProps(locationId, purpose, rooms) {
   try {
     const roomParam = rooms === 0 ? 'bedrooms=0' : `bedrooms=${rooms}`;
-    const path = `/search-properties?location_id=${locationId}&purpose=${purpose==="for-sale"?"buy":"rent"}&platform=bayut`
-               + `&category=apartments&${roomParam}&page=1`;
+    const path = `/search/property?location_external_id=${locationId}&purpose=${purpose==="for-sale"?"for-sale":"for-rent"}&hitsPerPage=50&page=0&category=residential`
+               + ``;
     const r = await rapidGet(path);
     return r?.data || r?.results || r?.hits || [];
   } catch(e) {
