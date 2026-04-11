@@ -9,22 +9,23 @@ const MONGO_URI     = process.env.MONGODB_URI  || '';
 const RAPIDAPI_HOST = 'bayuut-working-api.p.rapidapi.com';
 const PF_HOST       = 'propertyfinder-uae-data.p.rapidapi.com';
 
+// Hardcoded location IDs (no autocomplete API calls needed)
 const AREAS = [
-  { name:'JVC',                   q:'Jumeirah Village Circle', city:'Dubai'   },
-  { name:'JLT',                   q:'Jumeirah Lake Towers',    city:'Dubai'   },
-  { name:'Arjan',                 q:'Arjan',                   city:'Dubai'   },
-  { name:'Meydan City',           q:'Meydan City',             city:'Dubai'   },
-  { name:'Business Bay',          q:'Business Bay',            city:'Dubai'   },
-  { name:'Downtown Dubai',        q:'Downtown Dubai',          city:'Dubai'   },
-  { name:'Dubai Marina',          q:'Dubai Marina',            city:'Dubai'   },
-  { name:'Dubai Hills',           q:'Dubai Hills Estate',      city:'Dubai'   },
-  { name:'Silicon Oasis',         q:'Dubai Silicon Oasis',     city:'Dubai'   },
-  { name:'International City',    q:'International City',      city:'Dubai'   },
-  { name:'Al Furjan',             q:'Al Furjan',               city:'Dubai'   },
-  { name:'Dubai South',           q:'Dubai South',             city:'Dubai'   },
-  { name:'DIP',                   q:'Dubai Investment Park',   city:'Dubai'   },
-  { name:'Dubai Production City', q:'Dubai Production City',   city:'Dubai'   },
-  { name:'Tilal City',            q:'Tilal City',              city:'Sharjah' },
+  { name:'JVC',                   city:'Dubai',   bayuutId:'5416', pfId:73   },
+  { name:'JLT',                   city:'Dubai',   bayuutId:'5152', pfId:71   },
+  { name:'Arjan',                 city:'Dubai',   bayuutId:'5785', pfId:126  },
+  { name:'Meydan City',           city:'Dubai',   bayuutId:'6854', pfId:13691},
+  { name:'Business Bay',          city:'Dubai',   bayuutId:'5093', pfId:36   },
+  { name:'Downtown Dubai',        city:'Dubai',   bayuutId:'6901', pfId:41   },
+  { name:'Dubai Marina',          city:'Dubai',   bayuutId:'5003', pfId:50   },
+  { name:'Dubai Hills',           city:'Dubai',   bayuutId:'8288', pfId:105  },
+  { name:'Silicon Oasis',         city:'Dubai',   bayuutId:'5361', pfId:54   },
+  { name:'International City',    city:'Dubai',   bayuutId:'5317', pfId:63   },
+  { name:'Al Furjan',             city:'Dubai',   bayuutId:'6688', pfId:14   },
+  { name:'Dubai South',           city:'Dubai',   bayuutId:'8881', pfId:8648 },
+  { name:'DIP',                   city:'Dubai',   bayuutId:'5241', pfId:46   },
+  { name:'Dubai Production City', city:'Dubai',   bayuutId:'5900', pfId:62   },
+  { name:'Tilal City',            city:'Sharjah', bayuutId:'8537', pfId:213  },
 ];
 
 const ROOMS = [
@@ -64,34 +65,18 @@ function median(arr) {
 function r0(n) { return n!=null ? Math.round(n) : null; }
 function r1(n) { return n!=null ? Math.round(n*10)/10 : null; }
 
-// Bayuut location lookup
-async function getBayuutLocId(query) {
-  var r = await apiGet(RAPIDAPI_HOST, '/autocomplete?query=' + encodeURIComponent(query));
-  var hits = (r && r.data && r.data.hits) ? r.data.hits : [];
-  if (!hits.length) { console.error('[PI] No hits for: ' + query); return null; }
-  var m = hits.find(function(h){ return (h.name||'').toLowerCase()===query.toLowerCase(); }) || hits[0];
-  return m ? (m.externalID || null) : null;
-}
-
-// PropertyFinder location lookup (for DLD transactions)
-async function getPFLocId(query) {
-  try {
-    var r = await apiGet(PF_HOST, '/autocomplete-location?query=' + encodeURIComponent(query));
-    var hits = (r && Array.isArray(r.data)) ? r.data : [];
-    var m = hits.find(function(h){ return (h.name||'').toLowerCase()===query.toLowerCase(); }) || hits[0];
-    return m ? m.id : null;
-  } catch(e) { return null; }
-}
-
 // Bayuut property listings
-async function fetchListings(locId, purpose, rooms) {
+async function fetchListings(bayuutId, purpose, rooms) {
   var bp = purpose === 'sale' ? 'for-sale' : 'for-rent';
-  var path = '/search/property?location_external_id=' + locId
+  var path = '/search/property?location_external_id=' + bayuutId
            + '&purpose=' + bp + '&hitsPerPage=50&page=0&category=residential&rooms=' + rooms;
   try {
     var r = await apiGet(RAPIDAPI_HOST, path);
     return (r && r.datan && r.datan.hits) ? r.datan.hits : [];
-  } catch(e) { return []; }
+  } catch(e) {
+    console.error('[PI] fetchListings error: ' + e.message);
+    return [];
+  }
 }
 
 // DLD actual transactions via PropertyFinder
@@ -126,36 +111,16 @@ function parseListings(hits) {
 
 async function buildRows() {
   var rows = [];
-  var resolved = [];
 
-  // Step 1: resolve all location IDs
-  for (var i=0; i<AREAS.length; i++) {
-    var area = AREAS[i];
-    try {
-      var bayuutId = await getBayuutLocId(area.q);
-      await sleep(400);
-      var pfId = await getPFLocId(area.q);
-      await sleep(400);
-      if (bayuutId) {
-        resolved.push({ name:area.name, city:area.city, id:bayuutId, pfId:pfId });
-        console.log('[PI] ' + area.name + ' -> bayuut:' + bayuutId + ' pf:' + pfId);
-      } else {
-        console.error('[PI] No ID for ' + area.name);
-      }
-    } catch(e) {
-      console.error('[PI] Error ' + area.name + ': ' + e.message);
-    }
-  }
-
-  // Step 2: fetch listings + DLD transactions per area per room type
-  for (var ai=0; ai<resolved.length; ai++) {
-    var a = resolved[ai];
+  for (var ai=0; ai<AREAS.length; ai++) {
+    var a = AREAS[ai];
+    console.log('[PI] Processing ' + a.name);
     for (var ri=0; ri<ROOMS.length; ri++) {
       var rt = ROOMS[ri];
       try {
-        var saleHits = await fetchListings(a.id, 'sale', rt.n);
+        var saleHits = await fetchListings(a.bayuutId, 'sale', rt.n);
         await sleep(400);
-        var rentHits = await fetchListings(a.id, 'rent', rt.n);
+        var rentHits = await fetchListings(a.bayuutId, 'rent', rt.n);
         await sleep(400);
 
         var sales = parseListings(saleHits).filter(function(h){ return h.price>50000; });
@@ -163,18 +128,16 @@ async function buildRows() {
 
         if (sales.length < 2 && rents.length < 2) continue;
 
-        var sp = sales.map(function(s){ return s.price; });
-        var rp = rents.map(function(r){ return r.price; });
+        var sp  = sales.map(function(s){ return s.price; });
+        var rp  = rents.map(function(r){ return r.price; });
         var msp = median(sp);
         var mrp = median(rp);
         var gy  = (msp && mrp) ? r1(mrp/msp*100) : null;
 
         // DLD actual transactions
         var dld = null;
-        if (a.pfId) {
-          try { dld = await getDLDTx(a.pfId, rt.n); await sleep(400); } catch(e) {}
-        }
-        var medTxPsf = dld ? dld.medTxPsf : null;
+        try { dld = await getDLDTx(a.pfId, rt.n); await sleep(400); } catch(e) {}
+        var medTxPsf   = dld ? dld.medTxPsf : null;
         var medSalePsf = r0(median(sales.map(function(s){ return s.psf; }).filter(Boolean)));
         var valueSignal = (medTxPsf && medSalePsf) ? r1((medSalePsf - medTxPsf) / medTxPsf * 100) : null;
 
@@ -197,7 +160,7 @@ async function buildRows() {
           dldTxCount:    dld ? dld.txCount : null,
           fetchedAt:     new Date(),
         });
-        console.log('[PI] OK ' + a.name + ' ' + rt.label + (medTxPsf?' DLD:'+medTxPsf:''));
+        console.log('[PI] OK ' + a.name + ' ' + rt.label + (medTxPsf ? ' DLD:'+medTxPsf : ''));
       } catch(e) {
         console.error('[PI] row error ' + a.name + ' ' + rt.label + ': ' + e.message);
       }
@@ -212,17 +175,17 @@ async function buildRows() {
 async function getCache() {
   if (!MONGO_URI) return null;
   try {
-    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000,connectTimeoutMS:30000});
+    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000});
     await c.connect();
     var doc = await c.db('gcc-job-agent').collection('propertyIntel').findOne({_id:'cache'});
     await c.close(); return doc;
-  } catch(e) { return null; }
+  } catch(e) { console.error('[PI] cache read: ' + e.message); return null; }
 }
 
 async function setCache(data) {
   if (!MONGO_URI) return;
   try {
-    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000,connectTimeoutMS:30000});
+    var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000});
     await c.connect();
     await c.db('gcc-job-agent').collection('propertyIntel').replaceOne(
       {_id:'cache'},
@@ -230,6 +193,7 @@ async function setCache(data) {
       {upsert:true}
     );
     await c.close();
+    console.log('[PI] Cache saved: ' + data.length + ' rows');
   } catch(e) { console.error('[PI] cache write: ' + e.message); }
 }
 
@@ -257,16 +221,10 @@ router.post('/refresh', async function(req, res) {
 router.get('/test', async function(req, res) {
   if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
   try {
-    var r = await apiGet(RAPIDAPI_HOST, '/autocomplete?query=Jumeirah+Village+Circle');
-    var hits = (r && r.data && r.data.hits) ? r.data.hits : [];
-    var id = hits[0] ? hits[0].externalID : null;
-    var pfId = await getPFLocId('Jumeirah Village Circle');
-    var cnt = 0;
-    if (id) {
-      var p = await apiGet(RAPIDAPI_HOST, '/search/property?location_external_id='+id+'&purpose=for-sale&hitsPerPage=5&page=0&category=residential&rooms=1');
-      cnt = (p && p.datan && p.datan.hits) ? p.datan.hits.length : 0;
-    }
-    res.json({ ok:true, bayuutId:id, pfId:pfId, propCount:cnt });
+    var p = await apiGet(RAPIDAPI_HOST, '/search/property?location_external_id=5416&purpose=for-sale&hitsPerPage=5&page=0&category=residential&rooms=1');
+    var cnt = (p && p.datan && p.datan.hits) ? p.datan.hits.length : 0;
+    var dld = await getDLDTx(73, 1);
+    res.json({ ok:true, bayuutCount:cnt, dldTxPsf: dld ? dld.medTxPsf : null });
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
