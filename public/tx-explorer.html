@@ -344,6 +344,9 @@ async function fetchData() {
   try {
     let allResults = [];
     const areas = areaId ? [areaId] : Object.keys(areaNameMap);
+    if (!areaId) {
+      document.getElementById('state-area').innerHTML = '<div class="spinner"></div><div>Fetching latest transactions across all areas (first 2 pages per area)...<br><small style="color:#7a8099">For complete history, select a specific area</small></div>';
+    }
 
     for (const aid of areas) {
       let page = 1;
