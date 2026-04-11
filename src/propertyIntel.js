@@ -228,4 +228,32 @@ router.get('/test', async function(req, res) {
   } catch(e) { res.status(500).json({ error:e.message }); }
 });
 
+
+router.get('/transactions', async function(req, res) {
+  if (!RAPIDAPI_KEY) return res.status(503).json({ error:'no key' });
+  try {
+    var locId   = req.query.location_id || '73';
+    var beds    = req.query.bedrooms !== undefined ? req.query.bedrooms : '1';
+    var period  = req.query.period  || '1y';
+    var page    = req.query.page    || '1';
+    var sort    = req.query.sort    || 'newest';
+    var path = '/get-transactions?location_id=' + locId
+             + '&transaction_type=sold&property_type=apartment'
+             + '&bedrooms=' + beds
+             + '&period=' + period
+             + '&sort=' + sort
+             + '&page=' + page;
+    var r = await apiGet(PF_HOST, path);
+    var attrs = (r && r.data && r.data.data && r.data.data.attributes) ? r.data.data.attributes : null;
+    if (!attrs) return res.status(502).json({ error: 'No data', raw: r });
+    res.json({
+      transactions: attrs.transactions || [],
+      totalItems:   attrs.total_items  || 0,
+      totalPages:   attrs.total_pages  || 1,
+      page:         attrs.page         || 1,
+      summary:      attrs.summary      || null,
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;

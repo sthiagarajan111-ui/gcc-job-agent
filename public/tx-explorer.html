@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DLD Transaction Explorer · Dubai Property Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #13161e;
+  --surface2: #1a1e28;
+  --border: #252a38;
+  --gold: #c9a84c;
+  --gold-dim: #8a6e30;
+  --teal: #3ecfb2;
+  --red: #e05c5c;
+  --text: #e8eaf0;
+  --text-dim: #7a8099;
+  --text-muted: #454b60;
+  --ready: #3ecfb2;
+  --offplan: #c9a84c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+/* Header */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px; position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo { width: 36px; height: 36px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.header-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--text); }
+.header-sub { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--text-dim); font-size: 13px; text-decoration: none;
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  transition: all 0.2s;
+}
+.back-btn:hover { color: var(--text); border-color: var(--gold-dim); }
+
+/* Filters */
+.filters-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+}
+.filter-group { display: flex; flex-direction: column; gap: 5px; }
+.filter-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'DM Mono', monospace; }
+.filter-group select, .filter-group input {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif;
+  padding: 7px 10px; border-radius: 6px; outline: none;
+  transition: border-color 0.2s; min-width: 140px;
+}
+.filter-group select:focus, .filter-group input:focus { border-color: var(--gold-dim); }
+.filter-group input[type="date"] { min-width: 140px; color-scheme: dark; }
+.fetch-btn {
+  padding: 8px 20px; background: var(--gold); color: #0d0f14;
+  border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.fetch-btn:hover { background: #dbb95a; }
+.fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.reset-btn {
+  padding: 8px 14px; background: transparent; color: var(--text-dim);
+  border: 1px solid var(--border); border-radius: 6px; font-size: 13px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--text-dim); color: var(--text); }
+
+/* Summary cards */
+.summary-bar {
+  padding: 20px 32px;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+.stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+.stat-value { font-size: 20px; font-family: 'Fraunces', serif; font-weight: 600; color: var(--text); }
+.stat-value.gold { color: var(--gold); }
+.stat-value.teal { color: var(--teal); }
+.stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+
+/* Table */
+.table-wrap { padding: 0 32px 40px; overflow-x: auto; }
+.tx-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  min-width: 900px;
+}
+.tx-table thead tr {
+  background: var(--surface2); border-bottom: 2px solid var(--border);
+}
+.tx-table th {
+  padding: 10px 12px; text-align: left; color: var(--text-dim);
+  font-size: 11px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+  letter-spacing: 0.06em; white-space: nowrap; cursor: pointer;
+  user-select: none; transition: color 0.15s;
+}
+.tx-table th:hover { color: var(--gold); }
+.tx-table th.sorted { color: var(--gold); }
+.sort-icon { margin-left: 4px; opacity: 0.5; font-size: 10px; }
+.tx-table th.sorted .sort-icon { opacity: 1; }
+.tx-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.tx-table tbody tr:hover { background: var(--surface); }
+.tx-table td { padding: 10px 12px; color: var(--text); vertical-align: middle; }
+.tx-table td.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+.tx-table td.dim { color: var(--text-dim); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500;
+}
+.badge.ready { background: rgba(62,207,178,0.12); color: var(--ready); border: 1px solid rgba(62,207,178,0.25); }
+.badge.offplan { background: rgba(201,168,76,0.12); color: var(--offplan); border: 1px solid rgba(201,168,76,0.25); }
+.area-tag { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
+.building-name { font-weight: 500; color: var(--text); }
+.price-cell { font-family: 'DM Mono', monospace; font-size: 13px; }
+.price-cell .aed { font-size: 10px; color: var(--text-muted); }
+.psf-cell { font-family: 'DM Mono', monospace; color: var(--gold); font-size: 13px; }
+
+/* State messages */
+.state-msg {
+  text-align: center; padding: 60px 32px;
+  color: var(--text-dim); font-size: 14px;
+}
+.state-msg .icon { font-size: 40px; margin-bottom: 12px; }
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--border);
+  border-top-color: var(--gold); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-dim);
+}
+.page-btns { display: flex; gap: 6px; }
+.page-btn {
+  padding: 5px 12px; border: 1px solid var(--border); border-radius: 5px;
+  background: transparent; color: var(--text-dim); cursor: pointer;
+  font-size: 12px; font-family: 'DM Mono', monospace; transition: all 0.15s;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold); }
+.page-btn.active { background: var(--gold); color: #0d0f14; border-color: var(--gold); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🏙</div>
+    <div>
+      <div class="header-title">DLD Transaction Explorer</div>
+      <div class="header-sub">Actual recorded sale transactions · PropertyFinder UAE Data</div>
+    </div>
+  </div>
+  <a href="/property-intel.html" class="back-btn">← Back to Dashboard</a>
+</div>
+
+<div class="filters-bar">
+  <div class="filter-group">
+    <div class="filter-label">Area</div>
+    <select id="f-area">
+      <option value="">All Areas</option>
+      <option value="73">JVC</option>
+      <option value="71">JLT</option>
+      <option value="126">Arjan</option>
+      <option value="13691">Meydan City</option>
+      <option value="36">Business Bay</option>
+      <option value="41">Downtown Dubai</option>
+      <option value="50">Dubai Marina</option>
+      <option value="105">Dubai Hills</option>
+      <option value="54">Silicon Oasis</option>
+      <option value="63">International City</option>
+      <option value="14">Al Furjan</option>
+      <option value="8648">Dubai South</option>
+      <option value="46">DIP</option>
+      <option value="62">Dubai Production City</option>
+      <option value="213">Tilal City</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Bedrooms</div>
+    <select id="f-beds">
+      <option value="0">Studio</option>
+      <option value="1" selected>1 BR</option>
+      <option value="2">2 BR</option>
+      <option value="3">3 BR</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Period</div>
+    <select id="f-period">
+      <option value="1y" selected>Last 12 months</option>
+      <option value="6m">Last 6 months</option>
+      <option value="3m">Last 3 months</option>
+      <option value="1m">Last month</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Status</div>
+    <select id="f-status">
+      <option value="">All</option>
+      <option value="Ready">Ready</option>
+      <option value="Off-plan">Off-plan</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Min Price (AED)</div>
+    <input type="number" id="f-minprice" placeholder="e.g. 500000" step="50000">
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Max Price (AED)</div>
+    <input type="number" id="f-maxprice" placeholder="e.g. 2000000" step="50000">
+  </div>
+  <button class="fetch-btn" id="fetch-btn" onclick="fetchData()">
+    <span id="fetch-icon">⟳</span> Fetch Transactions
+  </button>
+  <button class="reset-btn" onclick="resetFilters()">Reset</button>
+</div>
+
+<div class="summary-bar" id="summary-bar" style="display:none">
+  <div class="stat-card">
+    <div class="stat-label">Total Transactions</div>
+    <div class="stat-value gold" id="s-total">—</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Median Price</div>
+    <div class="stat-value" id="s-median">—</div>
+    <div class="stat-sub">AED</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Median Price/sqft</div>
+    <div class="stat-value teal" id="s-psf">—</div>
+    <div class="stat-sub">AED/sqft</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Avg Price/sqft</div>
+    <div class="stat-value" id="s-avgpsf">—</div>
+    <div class="stat-sub">AED/sqft</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Ready</div>
+    <div class="stat-value" id="s-ready">—</div>
+    <div class="stat-sub">transactions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Off-plan</div>
+    <div class="stat-value" id="s-offplan">—</div>
+    <div class="stat-sub">transactions</div>
+  </div>
+</div>
+
+<div id="state-area" class="state-msg">
+  <div class="icon">🏙</div>
+  <div>Select an area and click <strong>Fetch Transactions</strong> to view actual DLD recorded sales</div>
+</div>
+
+<div id="table-area" style="display:none">
+  <div class="table-wrap">
+    <table class="tx-table" id="tx-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy('transaction_date')" id="th-date">Date <span class="sort-icon" id="si-date">↕</span></th>
+          <th onclick="sortBy('high_level_location_name')" id="th-area">Area <span class="sort-icon" id="si-area">↕</span></th>
+          <th onclick="sortBy('location_name')" id="th-building">Building / Developer <span class="sort-icon" id="si-building">↕</span></th>
+          <th onclick="sortBy('bedrooms')" id="th-beds">Beds <span class="sort-icon" id="si-beds">↕</span></th>
+          <th onclick="sortBy('property_size')" id="th-size">Size (sqft) <span class="sort-icon" id="si-size">↕</span></th>
+          <th onclick="sortBy('price')" id="th-price">Price (AED) <span class="sort-icon" id="si-price">↕</span></th>
+          <th onclick="sortBy('price_per_sqft')" id="th-psf">Price/sqft <span class="sort-icon" id="si-psf">↕</span></th>
+          <th onclick="sortBy('status')" id="th-status">Status <span class="sort-icon" id="si-status">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="tx-body"></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div id="page-info">Showing — of — transactions</div>
+    <div class="page-btns" id="page-btns"></div>
+  </div>
+</div>
+
+<script>
+const RAPIDAPI_KEY = '';  // Not needed - calls go through backend
+const PER_PAGE = 50;
+
+let allTx = [];
+let filteredTx = [];
+let currentPage = 1;
+let sortField = 'transaction_date';
+let sortDir = 'desc';
+let areaNameMap = {
+  '73':'JVC','71':'JLT','126':'Arjan','13691':'Meydan City',
+  '36':'Business Bay','41':'Downtown Dubai','50':'Dubai Marina',
+  '105':'Dubai Hills','54':'Silicon Oasis','63':'International City',
+  '14':'Al Furjan','8648':'Dubai South','46':'DIP',
+  '62':'Dubai Production City','213':'Tilal City'
+};
+
+function fmt(n) {
+  if (n == null) return '—';
+  return Math.round(n).toLocaleString();
+}
+
+function median(arr) {
+  if (!arr.length) return null;
+  const s = [...arr].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+}
+
+async function fetchData() {
+  const areaId = document.getElementById('f-area').value;
+  const beds = document.getElementById('f-beds').value;
+  const period = document.getElementById('f-period').value;
+
+  const btn = document.getElementById('fetch-btn');
+  btn.disabled = true;
+  document.getElementById('fetch-icon').textContent = '...';
+  document.getElementById('state-area').innerHTML = '<div class="spinner"></div><div>Fetching DLD transactions...</div>';
+  document.getElementById('state-area').style.display = 'block';
+  document.getElementById('table-area').style.display = 'none';
+  document.getElementById('summary-bar').style.display = 'none';
+
+  try {
+    let allResults = [];
+    const areas = areaId ? [areaId] : Object.keys(areaNameMap);
+
+    for (const aid of areas) {
+      let page = 1;
+      let totalPages = 1;
+      while (page <= Math.min(totalPages, 5)) {
+        const url = `/api/property/transactions?location_id=${aid}&bedrooms=${beds}&period=${period}&page=${page}`;
+        const r = await fetch(url);
+        const data = await r.json();
+        if (data.transactions) {
+          allResults = allResults.concat(data.transactions.map(t => ({...t, _areaName: areaNameMap[aid] || aid})));
+          totalPages = data.totalPages || 1;
+        }
+        page++;
+        if (areas.length > 1) break; // Only first page per area in multi-area mode
+      }
+    }
+
+    allTx = allResults;
+    applyFilters();
+    document.getElementById('state-area').style.display = 'none';
+    document.getElementById('table-area').style.display = 'block';
+    document.getElementById('summary-bar').style.display = 'grid';
+  } catch(e) {
+    document.getElementById('state-area').innerHTML = `<div class="icon">⚠️</div><div>Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  document.getElementById('fetch-icon').textContent = '⟳';
+}
+
+function applyFilters() {
+  const status = document.getElementById('f-status').value;
+  const minPrice = parseFloat(document.getElementById('f-minprice').value) || 0;
+  const maxPrice = parseFloat(document.getElementById('f-maxprice').value) || Infinity;
+
+  filteredTx = allTx.filter(t => {
+    if (status && t.status !== status) return false;
+    if (t.price < minPrice || t.price > maxPrice) return false;
+    return true;
+  });
+
+  sortData();
+  updateSummary();
+  currentPage = 1;
+  renderPage();
+}
+
+function sortBy(field) {
+  if (sortField === field) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField = field;
+    sortDir = 'desc';
+  }
+  sortData();
+  renderPage();
+  updateSortIcons();
+}
+
+function sortData() {
+  filteredTx.sort((a,b) => {
+    let av = a[sortField], bv = b[sortField];
+    if (av == null) return 1; if (bv == null) return -1;
+    if (typeof av === 'string') av = av.toLowerCase(), bv = (bv||'').toLowerCase();
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function updateSortIcons() {
+  const fields = ['date','area','building','beds','size','price','psf','status'];
+  const map = {date:'transaction_date',area:'high_level_location_name',building:'location_name',beds:'bedrooms',size:'property_size',price:'price',psf:'price_per_sqft',status:'status'};
+  fields.forEach(f => {
+    const el = document.getElementById('si-'+f);
+    const th = document.getElementById('th-'+f);
+    if (map[f] === sortField) {
+      el.textContent = sortDir === 'asc' ? '↑' : '↓';
+      th.classList.add('sorted');
+    } else {
+      el.textContent = '↕';
+      th.classList.remove('sorted');
+    }
+  });
+}
+
+function updateSummary() {
+  const prices = filteredTx.map(t=>t.price).filter(Boolean);
+  const psfs   = filteredTx.map(t=>t.price_per_sqft).filter(Boolean);
+  const ready  = filteredTx.filter(t=>t.status==='Ready').length;
+  const offplan= filteredTx.filter(t=>t.status==='Off-plan').length;
+
+  document.getElementById('s-total').textContent   = filteredTx.length.toLocaleString();
+  document.getElementById('s-median').textContent  = fmt(median(prices));
+  document.getElementById('s-psf').textContent     = fmt(median(psfs));
+  document.getElementById('s-avgpsf').textContent  = psfs.length ? fmt(psfs.reduce((a,b)=>a+b,0)/psfs.length) : '—';
+  document.getElementById('s-ready').textContent   = ready.toLocaleString();
+  document.getElementById('s-offplan').textContent = offplan.toLocaleString();
+}
+
+function renderPage() {
+  const start = (currentPage-1)*PER_PAGE;
+  const page  = filteredTx.slice(start, start+PER_PAGE);
+  const tbody = document.getElementById('tx-body');
+
+  tbody.innerHTML = page.map(t => {
+    const date = t.transaction_date ? t.transaction_date.slice(0,10) : '—';
+    const status = t.status || '—';
+    const badge = status === 'Ready' ? 'ready' : 'offplan';
+    const areaName = t._areaName || t.high_level_location_name || '—';
+    const building = t.location_name || '—';
+    const size = t.property_size ? Math.round(t.property_size).toLocaleString() : '—';
+    const beds = t.bedrooms === 0 ? 'Studio' : (t.bedrooms ? t.bedrooms+'BR' : '—');
+    return `<tr>
+      <td class="mono dim">${date}</td>
+      <td>${areaName}</td>
+      <td>
+        <span class="building-name">${building}</span>
+      </td>
+      <td class="mono">${beds}</td>
+      <td class="mono">${size}</td>
+      <td class="price-cell">${fmt(t.price)}</td>
+      <td class="psf-cell">${t.price_per_sqft ? Math.round(t.price_per_sqft).toLocaleString() : '—'}</td>
+      <td><span class="badge ${badge}">${status}</span></td>
+    </tr>`;
+  }).join('');
+
+  const total = filteredTx.length;
+  const totalPages = Math.ceil(total/PER_PAGE);
+  document.getElementById('page-info').textContent =
+    `Showing ${start+1}–${Math.min(start+PER_PAGE,total)} of ${total.toLocaleString()} transactions`;
+
+  const btns = document.getElementById('page-btns');
+  btns.innerHTML = '';
+  const addBtn = (label, page, active, disabled) => {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (active?' active':'');
+    b.textContent = label; b.disabled = disabled;
+    b.onclick = () => { currentPage = page; renderPage(); window.scrollTo(0,0); };
+    btns.appendChild(b);
+  };
+  addBtn('← Prev', currentPage-1, false, currentPage===1);
+  const start2 = Math.max(1, currentPage-2);
+  const end2   = Math.min(totalPages, currentPage+2);
+  for (let p=start2; p<=end2; p++) addBtn(p, p, p===currentPage, false);
+  addBtn('Next →', currentPage+1, false, currentPage===totalPages);
+}
+
+function resetFilters() {
+  document.getElementById('f-area').value = '';
+  document.getElementById('f-beds').value = '1';
+  document.getElementById('f-period').value = '1y';
+  document.getElementById('f-status').value = '';
+  document.getElementById('f-minprice').value = '';
+  document.getElementById('f-maxprice').value = '';
+}
+
+// Allow filter changes to re-apply without re-fetching
+document.getElementById('f-status').addEventListener('change', () => { if(allTx.length) applyFilters(); });
+document.getElementById('f-minprice').addEventListener('input', () => { if(allTx.length) applyFilters(); });
+document.getElementById('f-maxprice').addEventListener('input', () => { if(allTx.length) applyFilters(); });
+</script>
+</body>
+</html>
