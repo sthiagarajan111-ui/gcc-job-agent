@@ -344,23 +344,25 @@ async function fetchData() {
   try {
     let allResults = [];
     const areas = areaId ? [areaId] : Object.keys(areaNameMap);
-    if (!areaId) {
-      document.getElementById('state-area').innerHTML = '<div class="spinner"></div><div>Fetching latest transactions across all areas (first 2 pages per area)...<br><small style="color:#7a8099">For complete history, select a specific area</small></div>';
-    }
+    const bedsList = beds === '' ? ['0','1','2','3'] : [beds];
+    const multiArea = areas.length > 1;
+    const multiBeds = bedsList.length > 1;
 
     for (const aid of areas) {
-      let page = 1;
-      let totalPages = 1;
-      while (page <= Math.min(totalPages, 34)) {
-        const url = `/api/property/transactions?location_id=${aid}&bedrooms=${beds}&period=${period}&page=${page}`;
-        const r = await fetch(url);
-        const data = await r.json();
-        if (data.transactions) {
-          allResults = allResults.concat(data.transactions.map(t => ({...t, _areaName: areaNameMap[aid] || aid})));
-          totalPages = data.totalPages || 1;
+      for (const b of bedsList) {
+        let page = 1;
+        let totalPages = 1;
+        const maxPages = multiArea ? 2 : (multiBeds ? 3 : 34);
+        while (page <= Math.min(totalPages, maxPages)) {
+          const url = `/api/property/transactions?location_id=${aid}&bedrooms=${b}&period=${period}&page=${page}`;
+          const r = await fetch(url);
+          const data = await r.json();
+          if (data.transactions && data.transactions.length) {
+            allResults = allResults.concat(data.transactions.map(t => ({...t, _areaName: areaNameMap[aid] || aid})));
+            totalPages = data.totalPages || 1;
+          }
+          page++;
         }
-        page++;
-        if (areas.length > 1 && page >= 2) break; // Max 2 pages per area in multi-area mode
       }
     }
 
