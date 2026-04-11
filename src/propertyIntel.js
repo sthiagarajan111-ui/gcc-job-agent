@@ -172,7 +172,9 @@ async function buildRows() {
   return rows;
 }
 
+let _memCache = null;
 async function getCache() {
+  if (_memCache && new Date(_memCache.expiresAt) > new Date()) { console.log("[PI] memory cache hit"); return _memCache; }
   if (!MONGO_URI) return null;
   try {
     var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000});
@@ -183,6 +185,7 @@ async function getCache() {
 }
 
 async function setCache(data) {
+  _memCache = {data:data, updatedAt:new Date(), expiresAt:new Date(Date.now()+12*3600*1000)};
   if (!MONGO_URI) return;
   try {
     var c = new MongoClient(MONGO_URI, {serverSelectionTimeoutMS:30000});
