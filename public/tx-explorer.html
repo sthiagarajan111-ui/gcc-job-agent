@@ -348,7 +348,7 @@ async function fetchData() {
     for (const aid of areas) {
       let page = 1;
       let totalPages = 1;
-      while (page <= Math.min(totalPages, 5)) {
+      while (page <= Math.min(totalPages, 34)) {
         const url = `/api/property/transactions?location_id=${aid}&bedrooms=${beds}&period=${period}&page=${page}`;
         const r = await fetch(url);
         const data = await r.json();
@@ -357,7 +357,7 @@ async function fetchData() {
           totalPages = data.totalPages || 1;
         }
         page++;
-        if (areas.length > 1) break; // Only first page per area in multi-area mode
+        if (areas.length > 1 && page >= 2) break; // Max 2 pages per area in multi-area mode
       }
     }
 
